@@ -62,6 +62,7 @@ class Product(models.Model):
 									 help_text=_("Choose what type of product this is"),
 									 )
 	categories = models.ManyToManyField(Category, through='ProductCategory', verbose_name=_("categories"))
+	attributes = models.ManyToManyField("ProductAttribute", through="ProductAttributeValue", verbose_name=_("attributes"))
 
 	created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
 	updated = models.DateTimeField(auto_now=True, verbose_name=_("updated"))
@@ -92,3 +93,80 @@ class ProductCategory(models.Model):
 		unique_together = ("product", "category")
 		verbose_name = _("Product category")
 		verbose_name_plural = _("Product categories")
+
+	def __str__(self):
+		return f"{self.category}-{self.product}"
+
+class ProductAttribute(models.Model):
+
+	product_class = models.ForeignKey(
+									ProductClass,
+									on_delete=models.CASCADE,
+									null=True,
+									blank=True,
+									related_name="attributes",
+									verbose_name=_("product type")
+								)
+	name = models.CharField(max_length=200, verbose_name=_("name"))
+
+	# Attribute types
+	Decimal = "Decimal"
+	TEXT = "text"
+	INTEGER = "integer"
+	BOOLEAN = "boolean"
+	FLOAT = "float"
+	RICHTEXT = "richtext"
+	DATE = "date"
+	DATETIME = "datetime"
+	FILE = "file"
+	IMAGE = "image"
+
+	TYPE_CHOICES = (
+		(TEXT, _("Text")),
+		(Decimal, _("Decimal")),
+		(INTEGER, _("Integer")),
+		(BOOLEAN, _("True / False")),
+		(FLOAT, _("Float")),
+		(RICHTEXT, _("Rich Text")),
+		(DATE, _("Date")),
+		(DATETIME, _("Datetime")),
+		(FILE, _("File")),
+		(IMAGE, _("Image")),
+	)
+
+	type = models.CharField(max_length=10, choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0],verbose_name=_("type"))
+
+	class Meta:
+		verbose_name = _("Product attribute")
+		verbose_name_plural = _("Product attributes")
+
+	def __str__(self):
+		return self.name
+
+def attribute_file_path(instance, filename):
+	return "files/attribute/product_{0}/attr_{1}/{2}".format(instance.product.title, instance.attribute.name,filename)
+
+def attribute_image_path(instance, image_name):
+	return "images/attribute/product_{0}/attr_{1}/{2}".format(instance.product.title, instance.attribute.name,image_name)
+
+class ProductAttributeValue(models.Model):
+
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("product"))
+	attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE, related_name="attribute_values", verbose_name=_('attribute'))
+	value_text = models.CharField(max_length=200, blank=True, verbose_name=_("Text"))
+	value_decimal = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2, verbose_name=_("Decimal"))
+	value_integer = models.IntegerField(blank=True, null=True, verbose_name=_("Integer"))
+	value_boolean = models.BooleanField(blank=True, null=True, verbose_name=_("Boolean"))
+	value_float = models.FloatField(blank=True, null=True, verbose_name=_("Float"))
+	value_richtext = models.TextField(blank=True, verbose_name=_("Rich text"))
+	value_datetime = models.DateTimeField(null=True, blank=True, verbose_name=_("Datetime"))
+	value_file = models.FileField(null=True, blank=True, upload_to=attribute_file_path)
+	value_image = models.ImageField(null=True, blank=True, upload_to=attribute_image_path)
+
+	class Meta:
+		verbose_name = _("Product attribute value")
+		verbose_name_plural = _("Product attribute values")
+
+
+	def __str__(self):
+		return self.attribute
