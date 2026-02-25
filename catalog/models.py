@@ -50,7 +50,7 @@ class Category(MP_Node):
 class Product(models.Model):
 
 	title = models.CharField(max_length=200, verbose_name=_("title"))
-	slug = models.SlugField(max_length=200, verbose_name=_("slug"))
+	slug = models.SlugField(max_length=200, blank=True, verbose_name=_("slug"))
 	description = models.TextField(blank=True, verbose_name=_("Description"))
 	upc = models.CharField(verbose_name=_("UPC"), help_text=_("Universal Product Code"))
 	product_class = models.ForeignKey(ProductClass,
@@ -170,3 +170,23 @@ class ProductAttributeValue(models.Model):
 
 	def __str__(self):
 		return self.attribute
+
+def product_image_path(instance, image_name):
+	return "images/product/{0}/{1}".format(instance.product.title,image_name)
+
+
+class ProductImage(models.Model):
+
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images", verbose_name=_("product"))
+	image = models.ImageField(upload_to=product_image_path, verbose_name=_("image"))
+	display_order = models.PositiveIntegerField(default=0, db_index=True, verbose_name=_("display order"))
+	caption = models.CharField(max_length=200, blank=True, verbose_name=_("caption"))
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		ordering = ["display_order"]
+		verbose_name = _("Product image")
+		verbose_name_plural = _("Product images")
+	def __str__(self):
+		return f'{self.product} image'
