@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>E‑SHOP · modern commerce UI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css'%}">
+</head>
+<body>
+
+<!-- top bar with extra info -->
+<div class="top-bar">
+  <i class="fa-regular fa-clock"></i> Flash sale ends in 8 hours • Free shipping $99+ • 30‑day returns
+</div>
+
+<!-- HEADER with refined admin/logout block -->
+<header>
+  <div class="header-container">
+    <a href="#" class="logo">E‑<span>SHOP</span></a>
+
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass icon"></i>
+      <input type="text" placeholder="Search for sneakers, laptops, deals..." />
+    </div>
+
+    <div class="header-right">
+
+      <!-- grouped admin/dashboard/logout with better spacing -->
+      <div style="display:flex; gap:18px; align-items:center;">
+        <a href="#" class="header-icon">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Admin</span>
+        </a>
+        <a href="#" class="header-icon">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="header-icon">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <!-- cart with updated count -->
+      <a href="#" class="header-icon cart-wrapper">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span>Cart</span>
+        <span class="cart-count">7</span>
+      </a>
+
+    </div>
+  </div>
+</header>
+
+<!-- NAVIGATION (categories + mega dropdown enhanced) -->
+<nav class="nav-bar">
+  <div class="categories-container">
+    <ul class="main-categories">
+      <li><a href="#" class="active">Home</a></li>
+      <li>
+        <a href="#">Mobile & Tablet</a>
+        <div class="dropdown">
+          <div class="sub-col">
+            <h4>📱 Smartphones</h4>
+            <ul>
+              <li><a href="#">Samsung Galaxy</a></li>
+              <li><a href="#">iPhone 15/16</a></li>
+              <li><a href="#">Xiaomi · Poco</a></li>
+              <li><a href="#">Google Pixel</a></li>
+              <li><a href="#">Nothing Phone</a></li>
+            </ul>
+          </div>
+          <div class="sub-col">
+            <h4>🎧 Accessories</h4>
+            <ul>
+              <li><a href="#">Cases & Covers</a></li>
+              <li><a href="#">Fast chargers</a></li>
+              <li><a href="#">Tempered glass</a></li>
+              <li><a href="#">AirPods · Earbuds</a></li>
+              <li><a href="#">Power banks</a></li>
+            </ul>
+          </div>
+          <div class="sub-col">
+            <h4>💻 Tablets & wear</h4>
+            <ul>
+              <li><a href="#">iPad Pro/Air</a></li>
+              <li><a href="#">Galaxy Tab S9</a></li>
+              <li><a href="#">Smart watches</a></li>
+              <li><a href="#">Lenovo Tab</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li>
+        <a href="#">Laptop & Computer</a>
+        <div class="dropdown">
+          <div class="sub-col"><h4>MacBooks</h4><ul><li>MacBook Air</li><li>MacBook Pro</li></ul></div>
+          <div class="sub-col"><h4>Windows</h4><ul><li>Gaming</li><li>Ultrabooks</li></ul></div>
+          <div class="sub-col"><h4>Components</h4><ul><li>SSD · RAM</li><li>Monitors</li></ul></div>
+        </div>
+      </li>
+      <li><a href="#">Fashion</a></li>
+      <li><a href="#">Beauty & Care</a></li>
+      <li><a href="#">Home & Kitchen</a></li>
+      <li><a href="#">Sports</a></li>
+      <li><a href="#">Books & Media</a></li>
+      <li><a href="#">Outlet</a></li>   <!-- extra category -->
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO with refined copy -->
+<section class="hero-banner">
+  <div class="hero-content">
+    <h1>Premium picks · smart prices</h1>
+    <p>Why browse anywhere else? Thousands of curated products, ready to ship.</p>
+    <a href="#" class="btn">Explore summer deals <i class="fa-regular fa-arrow-right"></i></a>
+  </div>
+</section>
+
+<!-- featured product grid (new) to extend page -->
+<div class="section-title">
+  <i class="fa-regular fa-fire-flame-curved"></i> 
+  <span>Trending now · just for you</span>
+</div>
+
+<div class="product-grid">
+  <!-- card 1 -->
+  <div class="product-card">
+    <span class="badge">−30%</span>
+    <img src="https://via.placeholder.com/400x400/f5f5f5/666?text=Noise+Can" alt="headphones" class="product-img" style="background:#f9f9f9;">
+    <h3>Noise cancelling headphones</h3>
+    <div class="price"><span class="old-price">$129</span> $89</div>
+    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
+  </div>
+  <!-- card 2 -->
+  <div class="product-card">
+    <img src="https://via.placeholder.com/400x400/fff0f0/666?text=Smartwatch" alt="watch" class="product-img">
+    <h3>Amoled smartwatch series 5</h3>
+    <div class="price">$149</div>
+    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
+  </div>
+  <!-- card 3 -->
+  <div class="product-card">
+    <span class="badge">new</span>
+    <img src="https://via.placeholder.com/400x400/f0f3ff/666?text=Ultrabook" alt="laptop" class="product-img">
+    <h3>Ultra slim i7 · 16GB</h3>
+    <div class="price"><span class="old-price">$1199</span> $1049</div>
+    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
+  </div>
+  <!-- card 4 -->
+  <div class="product-card">
+    <img src="https://via.placeholder.com/400x400/fff9ec/666?text=Sneakers" alt="shoes" class="product-img">
+    <h3>Running sneakers · all black</h3>
+    <div class="price">$79</div>
+    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
+  </div>
+  <!-- card 5 -->
+  <div class="product-card">
+    <span class="badge">−15%</span>
+    <img src="https://via.placeholder.com/400x400/ffeef2/666?text=Coffee+Maker" alt="coffee" class="product-img">
+    <h3>Smart espresso machine</h3>
+    <div class="price"><span class="old-price">$299</span> $254</div>
+    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
+  </div>
+</div>
+
+<!-- brand strip (fresh) -->
+<div class="brands-row">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Nike" alt="nike">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Apple" alt="apple">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Samsung" alt="samsung">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Adidas" alt="adidas">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Sony" alt="sony">
+  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Panasonic" alt="panasonic">
+</div>
+
+<!-- NEWSLETTER + extended footer -->
+<section class="newsletter">
+  <h3>never miss a drop</h3>
+  <p>new arrivals, exclusive sales — directly to your inbox.</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="your.email@example.com">
+    <button>Subscribe</button>
+  </div>
+</section>
+
+<!-- FOOTER (detailed) -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h5>E‑SHOP</h5>
+      <p>Your modern commerce destination.<br>Quality products, fast delivery.</p>
+      <div class="social-icons">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <ul><li><a href="#">Help center</a></li><li><a href="#">Returns & refunds</a></li><li><a href="#">Track order</a></li><li><a href="#">Contact us</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul><li><a href="#">About us</a></li><li><a href="#">Careers</a></li><li><a href="#">Affiliate</a></li><li><a href="#">Press</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <ul><li><a href="#">Privacy policy</a></li><li><a href="#">Terms of use</a></li><li><a href="#">Cookie settings</a></li></ul>
+    </div>
+  </div>
+  <div class="copyright">
+    <span>© 2025 E‑SHOP – prototype extended. All rights reserved.</span>
+  </div>
+</footer>
+
+<!-- tiny dummy placeholder note (images from placeholder service, but layout works) -->
+</body>
+</html>
