@@ -59,54 +59,33 @@
   <div class="categories-container">
     <ul class="main-categories">
       <li><a href="#" class="active">Home</a></li>
+
+      {%for category in categories%}
       <li>
-        <a href="#">Mobile & Tablet</a>
+        <a href="#">{{category.name}}</a>
+          {%with childrens=category.get_children %}
         <div class="dropdown">
+          {%for children in childrens%}
           <div class="sub-col">
-            <h4>📱 Smartphones</h4>
+            <h4>{{children.name}}</h4>
+            {%with subchildrens=children.get_children%}
             <ul>
-              <li><a href="#">Samsung Galaxy</a></li>
-              <li><a href="#">iPhone 15/16</a></li>
-              <li><a href="#">Xiaomi · Poco</a></li>
-              <li><a href="#">Google Pixel</a></li>
-              <li><a href="#">Nothing Phone</a></li>
+              {%for subchildren in subchildrens%}
+              <li>{{subchildren.name}}</li>
+
+              {%endfor%}
+
             </ul>
+            {%endwith%}
           </div>
-          <div class="sub-col">
-            <h4>🎧 Accessories</h4>
-            <ul>
-              <li><a href="#">Cases & Covers</a></li>
-              <li><a href="#">Fast chargers</a></li>
-              <li><a href="#">Tempered glass</a></li>
-              <li><a href="#">AirPods · Earbuds</a></li>
-              <li><a href="#">Power banks</a></li>
-            </ul>
-          </div>
-          <div class="sub-col">
-            <h4>💻 Tablets & wear</h4>
-            <ul>
-              <li><a href="#">iPad Pro/Air</a></li>
-              <li><a href="#">Galaxy Tab S9</a></li>
-              <li><a href="#">Smart watches</a></li>
-              <li><a href="#">Lenovo Tab</a></li>
-            </ul>
-          </div>
+
+          {%endfor%}
         </div>
+        {%endwith%}
       </li>
-      <li>
-        <a href="#">Laptop & Computer</a>
-        <div class="dropdown">
-          <div class="sub-col"><h4>MacBooks</h4><ul><li>MacBook Air</li><li>MacBook Pro</li></ul></div>
-          <div class="sub-col"><h4>Windows</h4><ul><li>Gaming</li><li>Ultrabooks</li></ul></div>
-          <div class="sub-col"><h4>Components</h4><ul><li>SSD · RAM</li><li>Monitors</li></ul></div>
-        </div>
-      </li>
-      <li><a href="#">Fashion</a></li>
-      <li><a href="#">Beauty & Care</a></li>
-      <li><a href="#">Home & Kitchen</a></li>
-      <li><a href="#">Sports</a></li>
-      <li><a href="#">Books & Media</a></li>
-      <li><a href="#">Outlet</a></li>   <!-- extra category -->
+
+      {%endfor%}
+
     </ul>
   </div>
 </nav>
