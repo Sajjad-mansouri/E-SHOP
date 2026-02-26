@@ -42,7 +42,8 @@ INSTALLED_APPS = [
 
     #My App
     'accounts',
-    'catalog'
+    'catalog',
+    'stock'
 
 ]
 
@@ -130,3 +131,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.user'
 
 MEDIA_ROOT='media'
+
+DEFAULT_CURRENCY = 'USD'
