@@ -69,6 +69,7 @@ class Product(models.Model):
 
 	meta_title = models.CharField(max_length=255, blank=True, verbose_name=_('meta title'))
 	meta_description = models.TextField(blank=True, verbose_name=_('meta description'))
+	view_count = models.PositiveIntegerField(default=0)
 	
 
 	def save(self, *args, **kwargs):

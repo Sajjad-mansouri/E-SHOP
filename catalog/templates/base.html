@@ -107,43 +107,18 @@
 
 <div class="product-grid">
   <!-- card 1 -->
+  {% for product in trending_products%}
+
   <div class="product-card">
     <span class="badge">−30%</span>
-    <img src="https://via.placeholder.com/400x400/f5f5f5/666?text=Noise+Can" alt="headphones" class="product-img" style="background:#f9f9f9;">
-    <h3>Noise cancelling headphones</h3>
+    <img src="{{product.images.first.image.url}}" alt="{{product.images.first.caption}}" class="product-img" style="background:#f9f9f9;">
+    <h3>{{product.title}}</h3>
     <div class="price"><span class="old-price">$129</span> $89</div>
     <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
   </div>
-  <!-- card 2 -->
-  <div class="product-card">
-    <img src="https://via.placeholder.com/400x400/fff0f0/666?text=Smartwatch" alt="watch" class="product-img">
-    <h3>Amoled smartwatch series 5</h3>
-    <div class="price">$149</div>
-    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
-  </div>
-  <!-- card 3 -->
-  <div class="product-card">
-    <span class="badge">new</span>
-    <img src="https://via.placeholder.com/400x400/f0f3ff/666?text=Ultrabook" alt="laptop" class="product-img">
-    <h3>Ultra slim i7 · 16GB</h3>
-    <div class="price"><span class="old-price">$1199</span> $1049</div>
-    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
-  </div>
-  <!-- card 4 -->
-  <div class="product-card">
-    <img src="https://via.placeholder.com/400x400/fff9ec/666?text=Sneakers" alt="shoes" class="product-img">
-    <h3>Running sneakers · all black</h3>
-    <div class="price">$79</div>
-    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
-  </div>
-  <!-- card 5 -->
-  <div class="product-card">
-    <span class="badge">−15%</span>
-    <img src="https://via.placeholder.com/400x400/ffeef2/666?text=Coffee+Maker" alt="coffee" class="product-img">
-    <h3>Smart espresso machine</h3>
-    <div class="price"><span class="old-price">$299</span> $254</div>
-    <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
-  </div>
+
+  {%endfor%}
+
 </div>
 
 <!-- brand strip (fresh) -->

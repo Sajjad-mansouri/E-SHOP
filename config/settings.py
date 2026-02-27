@@ -132,5 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.user'
 
 MEDIA_ROOT='media'
+MEDIA_URL = 'media/'
 
 DEFAULT_CURRENCY = 'USD'
