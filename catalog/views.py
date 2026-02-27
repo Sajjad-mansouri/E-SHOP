@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic.base import View, TemplateResponseMixin
+from django.views.generic.detail import DetailView
 from catalog.models import Category, Product
 
 
@@ -21,3 +22,8 @@ class HomePageView(TemplateResponseMixin, View):
 		return Product.objects.order_by("-view_count")[:product_count]
 
 
+
+
+class ProductDetailView(DetailView):
+	model = Product
+	template_name = "catalog/detail/product_detail.html"
