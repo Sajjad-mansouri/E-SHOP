@@ -152,7 +152,7 @@ def attribute_image_path(instance, image_name):
 
 class ProductAttributeValue(models.Model):
 
-	product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("product"))
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_attributes",verbose_name=_("product"))
 	attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE, related_name="attribute_values", verbose_name=_('attribute'))
 	value_text = models.CharField(max_length=200, blank=True, verbose_name=_("Text"))
 	value_decimal = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2, verbose_name=_("Decimal"))
@@ -170,7 +170,8 @@ class ProductAttributeValue(models.Model):
 
 
 	def __str__(self):
-		return self.attribute
+
+		return f"{self.attribute}"
 
 def product_image_path(instance, image_name):
 	return "images/product/{0}/{1}".format(instance.product.title,image_name)

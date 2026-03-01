@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>E‑SHOP · modern commerce UI</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css'%}">
+  {%block style%}{%endblock%}
+ 
 </head>
 <body>
 
@@ -89,47 +90,9 @@
     </ul>
   </div>
 </nav>
+{%block content%}
 
-<!-- HERO with refined copy -->
-<section class="hero-banner">
-  <div class="hero-content">
-    <h1>Premium picks · smart prices</h1>
-    <p>Why browse anywhere else? Thousands of curated products, ready to ship.</p>
-    <a href="#" class="btn">Explore summer deals <i class="fa-regular fa-arrow-right"></i></a>
-  </div>
-</section>
-
-<!-- featured product grid (new) to extend page -->
-<div class="section-title">
-  <i class="fa-regular fa-fire-flame-curved"></i> 
-  <span>Trending now · just for you</span>
-</div>
-
-<div class="product-grid">
-  <!-- card 1 -->
-  {% for product in trending_products%}
-  <a href="{%url 'product_detail' product.slug%}">
-    <div class="product-card">
-      <span class="badge">−30%</span>
-      <img src="{{product.images.first.image.url}}" alt="{{product.images.first.caption}}" class="product-img" style="background:#f9f9f9;">
-      <h3>{{product.title}}</h3>
-      <div class="price"><span class="old-price">$129</span> $89</div>
-      <button class="card-btn"><i class="fa-regular fa-cart-plus"></i> Add</button>
-    </div>
-  </a>
-  {%endfor%}
-
-</div>
-
-<!-- brand strip (fresh) -->
-<div class="brands-row">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Nike" alt="nike">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Apple" alt="apple">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Samsung" alt="samsung">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Adidas" alt="adidas">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Sony" alt="sony">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Panasonic" alt="panasonic">
-</div>
+{%endblock%}
 
 <!-- NEWSLETTER + extended footer -->
 <section class="newsletter">
@@ -173,5 +136,7 @@
 </footer>
 
 <!-- tiny dummy placeholder note (images from placeholder service, but layout works) -->
+{%block script%}
+{%endblock%}
 </body>
 </html>

@@ -46,4 +46,4 @@ class StockRecord(models.Model):
 		verbose_name_plural = _("Stock records")
 
 	def __str__(self):
-		return f"record: seller {seller}, product {product}"
+		return f"record: seller {self.seller}, product {self.product}"
