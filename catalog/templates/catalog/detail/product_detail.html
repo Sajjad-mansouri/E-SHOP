@@ -120,54 +120,18 @@
 
     <!-- right: see comments -->
     <div class="comments-list">
-      <h3><i class="fa-regular fa-comment-dots"></i> Customer reviews (2,384)</h3>
+      <h3><i class="fa-regular fa-comment-dots"></i> Customer reviews ({{stock_record.comments.count}})</h3>
+      {%for comment in stock_record.comments.all%}
+        {%include 'comment/comment_item.html'%}
+      {%endfor%}
 
-      <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
-          <span class="comment-author">Alex M.</span>
-          <span class="comment-date">2 days ago</span>
-        </div>
-        <div class="comment-text">Best ANC I’ve ever tried. The bass is punchy, and they’re super comfortable for long flights.</div>
-        <div class="comment-footer">
-          <span><i class="fa-regular fa-thumbs-up"></i> 47</span>
-          <span><i class="fa-regular fa-thumbs-down"></i> 2</span>
-          <span><i class="fa-regular fa-reply"></i> Reply</span>
-        </div>
-      </div>
 
-      <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></span>
-          <span class="comment-author">Jamie L.</span>
-          <span class="comment-date">1 week ago</span>
-        </div>
-        <div class="comment-text">Great sound, but the touch controls are a bit sensitive. Otherwise excellent.</div>
-        <div class="comment-footer">
-          <span><i class="fa-regular fa-thumbs-up"></i> 21</span>
-          <span><i class="fa-regular fa-thumbs-down"></i> 3</span>
-          <span><i class="fa-regular fa-reply"></i> Reply</span>
-        </div>
-      </div>
 
-      <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
-          <span class="comment-author">Priya K.</span>
-          <span class="comment-date">2 weeks ago</span>
-        </div>
-        <div class="comment-text">Delivered super fast, exactly as described. The seller is legit.</div>
-        <div class="comment-footer">
-          <span><i class="fa-regular fa-thumbs-up"></i> 33</span>
-          <span><i class="fa-regular fa-thumbs-down"></i> 0</span>
-          <span><i class="fa-regular fa-reply"></i> Reply</span>
-        </div>
-      </div>
 
-      <div style="margin-top:20px;"><a href="#" style="color:var(--primary);">See all reviews <i class="fa-regular fa-arrow-right"></i></a></div>
     </div>
   </div>
 </div>
+
 
 {%endblock%}
 

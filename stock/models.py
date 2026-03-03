@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
-# from comment.models import Comment
+from comment.models import Comment
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ class StockRecord(models.Model):
 		verbose_name=_("seller"),
 		related_name="stockrecords",
 	)
-
+	comments = GenericRelation(Comment)
 	sku = models.CharField(max_length=128, verbose_name=_("SKU"))
 	price_currency = models.CharField(
 	   max_length=12, default=settings.DEFAULT_CURRENCY, verbose_name=_("Currency")
