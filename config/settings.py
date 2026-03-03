@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     #My App
     'accounts',
     'catalog',
-    'stock'
+    'stock',
+    'comment',
+
+    #third party
 
 ]
 

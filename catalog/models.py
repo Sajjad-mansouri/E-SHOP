@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
 
+
 class ProductClass(models.Model):
 	"""
 	used to add options for subset of products

@@ -1,5 +1,6 @@
 {%extends 'base.html'%}
 {% load static %}
+
   {%block style%}
   <link rel="stylesheet" type="text/css" href="{% static 'css/product_detail.css'%}">
 
@@ -167,6 +168,7 @@
     </div>
   </div>
 </div>
+
 {%endblock%}
 
 {%block script%}
@@ -214,5 +216,14 @@
       });
     });
   });
+
+
+  let replyCommentbtn =  document.querySelector(".reply-btn-input")
+  replyCommentbtn.addEventListener("click'",()=>{
+    event.preventDefault()
+    let replyInput = document.querySelector(".js-comment-input")
+
+    replyInput.Style.display='block'
+  })
 </script>
 {%endblock%}
