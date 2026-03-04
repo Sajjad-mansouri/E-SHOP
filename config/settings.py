@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'catalog',
     'stock',
     'comment',
+    'dashboard'
 
     #third party
 
