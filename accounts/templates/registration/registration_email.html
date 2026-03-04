@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}
+{% blocktranslate %}You're receiving this email because you requested a Signing Up for your user account at {{ site_name }}.{% endblocktranslate %}
+
+{% translate "Please go to the following page and finalize registration:" %}
+
+{{ protocol }}://{{ domain }}{% url 'register-confirm' uidb64=uid token=token %}
+
+
+
+{% translate "Thanks for using our site!" %}
+
+{% blocktranslate %}The {{ site_name }} team{% endblocktranslate %}
+
+{% endautoescape %}

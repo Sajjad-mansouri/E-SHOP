@@ -1,0 +1,12 @@
+{%extends 'base.html'%}
+{% load static %}
+
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/register.css'%}">
+
+  {%endblock%}
+
+{%block content%}
+<p>email sent to your email please confirm it</p>
+<a href="{%url 'login' %}">login</a>
+{%endblock%}

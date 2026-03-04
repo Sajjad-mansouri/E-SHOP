@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
 
     #My App
     'accounts',
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     #third party
 
 ]
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,3 +141,4 @@ MEDIA_ROOT='media'
 MEDIA_URL = 'media/'
 
 DEFAULT_CURRENCY = 'USD'
+EMAIL_BACKEND = config('EMAIL_BACKEND')

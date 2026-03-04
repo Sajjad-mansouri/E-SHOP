@@ -22,7 +22,9 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),
-    path('comment/',include('comment.urls'))
+    path('comment/',include('comment.urls')),
+    path('account/',include('accounts.urls'))
+
 ]
 
 if settings.DEBUG:
