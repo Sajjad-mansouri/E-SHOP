@@ -22,6 +22,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),
+    path('comment/',include('comment.urls'))
 ]
 
 if settings.DEBUG:

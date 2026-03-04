@@ -98,32 +98,38 @@
   <div class="review-grid">
     <!-- left: write comment & rate -->
     <div class="write-comment">
-      <h3><i class="fa-regular fa-pen-to-square"></i> Write a review</h3>
-      <div class="rating-input">
-        <span style="font-weight:600;">Your rating:</span>
-        <div class="rating-stars" id="ratingStars">
-          <i class="fa-regular fa-star" data-value="1"></i>
-          <i class="fa-regular fa-star" data-value="2"></i>
-          <i class="fa-regular fa-star" data-value="3"></i>
-          <i class="fa-regular fa-star" data-value="4"></i>
-          <i class="fa-regular fa-star" data-value="5"></i>
+      <form class="comment-form">
+        {%csrf_token%}
+        {{comment_form.stock_record}}
+        <h3><i class="fa-regular fa-pen-to-square"></i> Write a review</h3>
+        <div class="rating-input">
+          <span style="font-weight:600;">Your rating:</span>
+          <div class="rating-stars" id="ratingStars">
+            <i class="fa-regular fa-star" data-value="1"></i>
+            <i class="fa-regular fa-star" data-value="2"></i>
+            <i class="fa-regular fa-star" data-value="3"></i>
+            <i class="fa-regular fa-star" data-value="4"></i>
+            <i class="fa-regular fa-star" data-value="5"></i>
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <input type="text" placeholder="Your name (optional)">
-      </div>
-      <div class="form-group">
-        <textarea rows="4" placeholder="Tell others about this product..."></textarea>
-      </div>
-      <button class="submit-review">Submit review</button>
+
+        <div class="form-group">
+          <textarea rows="4" placeholder="Tell others about this product..." name="content"></textarea>
+        </div>
+        <button class="submit-review">Submit review</button>
+        
+      </form>
     </div>
 
     <!-- right: see comments -->
     <div class="comments-list">
       <h3><i class="fa-regular fa-comment-dots"></i> Customer reviews ({{stock_record.comments.count}})</h3>
-      {%for comment in stock_record.comments.all%}
-        {%include 'comment/comment_item.html'%}
-      {%endfor%}
+      <div class="comments">
+        {%for comment in stock_record.comments.all%}
+          {%include 'comment/comment_item.html'%}
+        {%endfor%}
+        
+      </div>
 
 
 
@@ -182,12 +188,26 @@
   });
 
 
-  let replyCommentbtn =  document.querySelector(".reply-btn-input")
-  replyCommentbtn.addEventListener("click'",()=>{
+  let submitReview = document.querySelector('.submit-review');
+  submitReview.addEventListener('click', ()=>{
     event.preventDefault()
-    let replyInput = document.querySelector(".js-comment-input")
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const form = document.querySelector('.comment-form');
+    const formData = new FormData(form)
+    fetch("{%url 'create_review' %}",{
+      method:"POST",
+      headers:{
+        "X-CSRFToken":csrftoken
+      },
+      body:formData
 
-    replyInput.Style.display='block'
+    })
+    .then(response=>response.text())
+    .then(data=>{
+      let commentList = document.querySelector('.comments')
+      commentList.insertAdjacentHTML('afterbegin',data)
+      console.log(data)
+    })
   })
 </script>
 {%endblock%}

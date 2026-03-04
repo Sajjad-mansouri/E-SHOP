@@ -3,6 +3,7 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
 from catalog.models import Category, Product
 from stock.models import StockRecord
+from comment.forms import CommentForm
 
 
 class HomePageView(TemplateResponseMixin, View):
@@ -35,8 +36,10 @@ class ProductDetailView(DetailView):
 		stock_record_id = self.kwargs.get("stock_id")
 		stock_record = get_object_or_404(StockRecord, id=stock_record_id)
 		attributes_values = self.get_attribute_values()
+		comment_form = CommentForm(initial={'stock_record':stock_record})
 		context["stock_record"] = stock_record
 		context["attributes_values"] = attributes_values
+		context['comment_form']=comment_form
 
 		return context
 
