@@ -41,7 +41,7 @@ class StockRecord(models.Model):
 	# Date information
 	date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
 	date_updated = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_("Date updated"))
-
+	is_public = models.BooleanField(default=True)
 
 	class Meta:
 		unique_together = ("seller", "sku")
