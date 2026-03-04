@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+import json
 from .forms import CommentForm
+from .models import Comment
 
 
 
@@ -22,3 +24,17 @@ def create_review(request):
 		print(form.errors)
 
 	return JsonResponse({"status":"failed"})
+
+
+@require_POST
+def remove_review(request):
+	print(request.POST)
+	comment_id = request.POST.get('commentId')
+	print(comment_id)
+	try:
+		get_object_or_404(Comment, id=comment_id).delete()
+		return JsonResponse({'status':'ok'})
+	except:
+		return JsonResponse({'status':'failed'})
+
+

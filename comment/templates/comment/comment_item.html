@@ -1,13 +1,16 @@
-<div class="comment-item">
+<div class="comment-item" data-id="{{comment.id}}" >
   <div class="comment-header">
     <span class="comment-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
     <span class="comment-author">{{comment.user.get_full_name}}</span>
     <span class="comment-date">{{comment.updated|timesince}} ago</span>
+    <span class="remove-comment" style="color: red;" data-id="{{comment.id}}"> X</span>
   </div>
   <div class="comment-text">{{comment.content}}</div>
   <div class="comment-footer">
     <span><i class="fa-regular fa-thumbs-up"></i> 47</span>
     <span><i class="fa-regular fa-thumbs-down"></i> 2</span>
+    
+
     <span><i class="fa-regular fa-reply"></i> Reply</span>
   </div>
 </div>

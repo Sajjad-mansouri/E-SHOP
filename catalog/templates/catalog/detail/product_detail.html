@@ -206,8 +206,35 @@
     .then(data=>{
       let commentList = document.querySelector('.comments')
       commentList.insertAdjacentHTML('afterbegin',data)
-      console.log(data)
     })
+  })
+
+  let removeComments = document.querySelectorAll('.remove-comment')
+
+  function removeComment(event){
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      let commentId = event.target.getAttribute('data-id');
+      let formData = new FormData()
+      formData.append('commentId',commentId)
+      fetch("{%url 'remove_review'%}" ,{
+        method:"post",
+        headers:{
+          "X-CSRFToken":csrftoken,
+        },
+        body:formData
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if (data['status']=='ok'){
+          let commentItem = event.target.parentElement.parentElement
+          commentItem.remove()
+        }
+
+      })
+  }
+  removeComments.forEach(item=>{
+
+    item.addEventListener('click',removeComment)
   })
 </script>
 {%endblock%}
