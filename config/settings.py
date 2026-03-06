@@ -47,9 +47,10 @@ INSTALLED_APPS = [
     'catalog',
     'stock',
     'comment',
-    'dashboard'
+    'dashboard',
 
     #third party
+    'treebeard',
 
 ]
 SITE_ID = 1

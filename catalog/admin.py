@@ -1,5 +1,6 @@
 from django.contrib import admin
 from treebeard.forms import movenodeform_factory
+from treebeard.admin import TreeAdmin
 from .models import ProductClass, Category, Product, ProductCategory, ProductAttribute, ProductAttributeValue, ProductImage
 
 
@@ -7,8 +8,8 @@ from .models import ProductClass, Category, Product, ProductCategory, ProductAtt
 class ProductClassAdmin(admin.ModelAdmin):
 	list_display = ["name", "slug"]
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+
+class CategoryAdmin(TreeAdmin):
 	form = movenodeform_factory(Category)
 	list_display = ["name", "slug"]
 
@@ -22,4 +23,6 @@ admin.site.register(ProductCategory)
 admin.site.register(ProductAttribute)
 admin.site.register(ProductAttributeValue)
 admin.site.register(ProductImage)
+admin.site.register(Category,CategoryAdmin)
+
 

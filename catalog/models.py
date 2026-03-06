@@ -17,7 +17,7 @@ class ProductClass(models.Model):
 		verbose_name = _("Product class")
 		verbose_name_plural = _("Product classes")
 
-	def _str__(self):
+	def __str__(self):
 		return self.name
 
 	def save(self, *args, **kwargs):
@@ -40,8 +40,20 @@ class Category(MP_Node):
 		verbose_name = _("category")
 		verbose_name_plural = _("categories")
 	def __str__(self):
-		return self.name
+		print(self.get_name)
+		return self.get_name
 
+	@property
+	def get_name(self):
+		names = [category.name for category in self.get_ancestor_plus_self()]
+		return " > ".join(names)
+
+	def get_ancestor_plus_self(self):
+		
+		if self.is_root():
+			return [self]
+
+		return list(self.get_ancestors()) + [self]
 	def save(self, *args, **kwargs):
 		if not self.slug:
 			self.slug = slugify(self.name)
