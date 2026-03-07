@@ -25,6 +25,10 @@ class ProductClass(models.Model):
 			self.slug = slugify(self.name)
 		super().save(*args, **kwargs)
 
+	@property
+	def has_attributes(self):
+		return self.attributes.exists()
+		
 def category_image_path(instance, image_name):
 	return "images/categories/{0}/{1}".format(instance.slug,image_name)
 
@@ -173,6 +177,7 @@ class ProductAttributeValue(models.Model):
 	value_boolean = models.BooleanField(blank=True, null=True, verbose_name=_("Boolean"))
 	value_float = models.FloatField(blank=True, null=True, verbose_name=_("Float"))
 	value_richtext = models.TextField(blank=True, verbose_name=_("Rich text"))
+	value_date = models.DateField(null=True, blank=True, verbose_name=_("Datetime"))
 	value_datetime = models.DateTimeField(null=True, blank=True, verbose_name=_("Datetime"))
 	value_file = models.FileField(null=True, blank=True, upload_to=attribute_file_path)
 	value_image = models.ImageField(null=True, blank=True, upload_to=attribute_image_path)

@@ -14,7 +14,10 @@
     <a href="#">Catalog</a> <i class="fa-solid fa-chevron-right"></i>
     <span class="current">Products</span>
   </div>
-  <a class="btn-primary" href="{%url 'create_product'%}"><i class="fa-regular fa-plus"></i> Create new product</a>
+  <form method="GET" action="{%url 'create_product'%}">
+    {{product_class_form}}
+  </form>
+  <button class="btn-primary create-product" href="{%url 'create_product'%}"><i class="fa-regular fa-plus"></i> Create new product</button>
 </div>
 
 <!-- main product list card -->
@@ -83,4 +86,17 @@
   </div>
 </div>
 
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+  const createProductBtn = document.querySelector(".create-product");
+  createProductBtn.addEventListener("click",()=>{
+    event.preventDefault();
+    const productClass  = document.getElementById('id_product_class').value
+
+    window.open("{%url 'create_product'%}?product_class="+productClass)
+  })
+
+</script>
 {%endblock%}

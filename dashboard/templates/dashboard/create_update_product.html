@@ -12,6 +12,7 @@
 
 
 {%block content%}
+
 <div class="breadcrumb-bar">
   <div class="breadcrumb">
     <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
@@ -49,6 +50,13 @@
                   <i class="fa-regular fa-pen-to-square"></i> Product details
                 </a>
               </li>
+              {%if product_class.has_attributes%}
+              <li class="nav-item">
+                <a class="nav-link " href="#product_attrs" data-tab="product_attrs">
+                  <i class="fa-regular fa-pen-to-square"></i> Product Attributes
+                </a>
+              </li>
+              {%endif%}
               <li class="nav-item">
                 <a class="nav-link" href="#product_category" data-tab="product_category">
                   <i class="fa-regular fa-list"></i> Categories
@@ -115,6 +123,25 @@
                 </div>
 
               </div>
+            </div>
+
+
+            <!-- Product attr pane (active by default) -->
+            <div class="tab-pane" id="product_attrs">
+              <div class="table-header mb-3">
+                <h3>Product Attrs</h3>
+              </div>
+              <div class="card card-body">
+
+                {%for field in product_form%}
+                  {% if "attr" in field.id_for_label %}
+                  {{field.label}}
+                  {{field}}
+                  {%endif%}
+                {%endfor%}
+
+              </div>
+
             </div>
 
             <!-- Categories pane -->
