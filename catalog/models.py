@@ -189,7 +189,24 @@ class ProductAttributeValue(models.Model):
 
 	def __str__(self):
 
-		return f"{self.attribute}"
+		return f"{self.attribute}:{self.get_value}"
+
+	@property
+	def get_value(self):
+		ATTRIBUTE_TYPE = {
+		"text":self.value_text,
+		"Decimal":self.value_decimal,
+		"integer":self.value_integer,
+		"boolean":self.value_boolean,
+		"float":self.value_float,
+		"richtext":self.value_richtext,
+		"date":self.value_date,
+		"datetime":self.value_datetime,
+		"file":self.value_file,
+		"image":self.value_image
+
+		}
+		return ATTRIBUTE_TYPE[self.attribute.type]
 
 def product_image_path(instance, image_name):
 	return "images/product/{0}/{1}".format(instance.product.title,image_name)

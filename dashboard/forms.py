@@ -87,12 +87,24 @@ class ProductForm(forms.ModelForm):
 
 	def __init__(self,product_class ,*args , **kwargs):
 		super().__init__(*args, **kwargs)
+		instance = kwargs.get("instance")
+
 		if product_class:
 			self.product_class = product_class
 			attrs = product_class.attributes.all()
 			for attr in attrs:
 
+				initial = None
+				if self.instance.id:
+					try:
+						attr_value = ProductAttributeValue.objects.get(product=self.instance, attribute=attr)
+						initial = attr_value.get_value
+					except ProductAttributeValue.DoesNotExist:
+						pass
+
 				self.fields[f"attr_{attr.name}"] = self.ATRIBUTES_FORMS[attr.type](attr)
+				self.fields[f"attr_{attr.name}"].initial = initial
+
 
 	def save(self, commit=True):
 
@@ -107,11 +119,14 @@ class ProductForm(forms.ModelForm):
 						attr = self.product_class.attributes.get(name=attr_name)
 
 						attr_dict = {"product":product, "attribute":attr, f"value_{attr.type}":field_value}
+						if self.instance:
+							ProductAttributeValue.objects.update_or_create(product=product, attribute=attr, defaults={f"value_{attr.type}":field_value})
 						attrs.append(attr_dict)
 
+				if not self.instance:
+					product_attrs = [ProductAttributeValue(**attr) for attr in attrs]
+					ProductAttributeValue.objects.bulk_update(product_attrs)
 
-				product_attrs = [ProductAttributeValue(**attr) for attr in attrs]
-				ProductAttributeValue.objects.bulk_create(product_attrs)
 		return product
 
 class ProductImageForm(forms.ModelForm):

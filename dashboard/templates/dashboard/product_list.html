@@ -55,7 +55,7 @@
           {%for stock_record in object_list%}
           <!-- row 1: with discount (price after discount shown) -->
           <tr>
-            <td><strong>{{stock_record.product.title}}</strong></td>
+            <td><strong><a href="{%url 'update_product' stock_record.product.id %}">{{stock_record.product.title}}</a></strong></td>
             <td><span class="badge">{{stock_record.product.upc}}</span></td>
             <td class="price-cell">
               $329.99 

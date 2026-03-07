@@ -23,24 +23,30 @@ class ProductListView(ListView):
 		context['product_class_form'] = product_class_form
 		return context
 
-class CreateProductView(TemplateResponseMixin, View):
+class CreateUpdateProductView(TemplateResponseMixin, View):
 	template_name = "dashboard/create_update_product.html"
 
 	def dispatch(self, request, *args, **kwargs):
 		product_class_id = request.GET.get('product_class')
+		product_id = kwargs.get('id')
+		if product_id:
+			self.product = get_object_or_404(Product, id=product_id)
+			self.product_class = self.product.product_class
+			print('product class',self.product_class)
 		if product_class_id:
 			self.product_class = get_object_or_404(ProductClass, id=product_class_id)
-		else:
+		elif not product_id:
 			self.product_class = None
 		return super().dispatch(request, *args, **kwargs)
 
 	def get(self, request, *args, **kwargs):
-		img_formset = image_formset(prefix="img")
-		product_form = ProductForm(self.product_class ,prefix="product")
 
-		product_category_form = ProductCategoryInline(prefix="category")
-		stock_record_inline = StockRecordInlineForm(prefix="stock")
+		img_formset = image_formset(instance=self.product, prefix="img")
+		product_form = ProductForm(self.product_class , instance=self.product,prefix="product")
 
+		product_category_form = ProductCategoryInline(instance=self.product, prefix="category")
+		stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
+		print('self.product_class', self.product_class)
 		return self.render_to_response({
 			"img_formset":img_formset, 
 			"product_form":product_form, 
@@ -53,7 +59,7 @@ class CreateProductView(TemplateResponseMixin, View):
 
 	def post(self, request, *args, **kwargs):
 
-		product_form = ProductForm(self.product_class, data=request.POST, prefix="product")
+		product_form = ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
 		if product_form.is_valid():
 			self.object = product_form.save()
 
