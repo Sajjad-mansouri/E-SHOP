@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.base import View, TemplateResponseMixin
+from django.views.generic.edit import DeleteView
 from django.forms.models import inlineformset_factory
 from .forms import image_formset, ProductForm, ProductCategoryInline, StockRecordInlineForm, ProductClassForm
 from stock.models import StockRecord
@@ -28,15 +30,20 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 	def dispatch(self, request, *args, **kwargs):
 		product_class_id = request.GET.get('product_class')
-		product_id = kwargs.get('id')
+		product_id = kwargs.get('pk')
 		if product_id:
 			self.product = get_object_or_404(Product, id=product_id)
 			self.product_class = self.product.product_class
-			print('product class',self.product_class)
-		if product_class_id:
+
+		elif product_class_id:
 			self.product_class = get_object_or_404(ProductClass, id=product_class_id)
-		elif not product_id:
+			self.product=None
+
+		else:
 			self.product_class = None
+			self.product=None
+
+
 		return super().dispatch(request, *args, **kwargs)
 
 	def get(self, request, *args, **kwargs):
@@ -89,3 +96,9 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		return redirect("products")
 
 
+
+
+class DeleteProductView(DeleteView):
+	template_name = "dashboard/delete_product.html"
+	model = Product
+	success_url = reverse_lazy("products")

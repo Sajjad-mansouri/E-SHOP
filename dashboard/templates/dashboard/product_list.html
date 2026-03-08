@@ -23,6 +23,7 @@
 <!-- main product list card -->
 <div class="products-card">
   <div class="card">
+    {%if object_list%}
     <!-- search panel: upc + title -->
     <div class="search-panel">
       <div class="search-field">
@@ -49,6 +50,8 @@
             <th>Stock records</th>
             <th>Is public</th>
             <th>Date updated</th>
+            <th>Action</th>
+
           </tr>
         </thead>
         <tbody>
@@ -68,6 +71,7 @@
             <td><span class="stock-badge">{{stock_record.num_in_stock}} in stock</span></td>
             <td class="is-public">{{stock_record.is_public}}<i class="fa-regular fa-circle-check" style="color:#2e7d32;"></i></td>
             <td>{{stock_record.date_updated|date}}</td>
+            <td><a href="{%url 'delete_product' stock_record.product.id  %}">Del</a> <a href="{%url 'update_product' stock_record.product.id %}">update</a></td>
           </tr>
           {%endfor%}
 
@@ -83,6 +87,9 @@
         <button class="btn-primary" style="background:white; color:#333; border:1px solid #ddd; padding:8px 16px; margin-left:8px;"><i class="fa-regular fa-chevron-right"></i></button>
       </div>
     </div>
+    {%else%}
+    No Product Exists, create first product!
+    {%endif%}
   </div>
 </div>
 

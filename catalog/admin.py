@@ -17,7 +17,7 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-	list_display = ['title', 'slug', 'created', 'updated']
+	list_display = ['pk','title', 'slug', 'created', 'updated']
 
 admin.site.register(ProductCategory)
 admin.site.register(ProductAttribute)

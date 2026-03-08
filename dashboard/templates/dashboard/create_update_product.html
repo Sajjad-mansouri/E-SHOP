@@ -40,13 +40,9 @@
               <h3>Sections</h3>
             </div>
             <ul class="nav flex-column" id="product_update_tabs">
+
               <li class="nav-item">
-                <a class="nav-link active" href="#product_type" data-tab="product_type">
-                  <i class="fa-regular fa-pen-to-square"></i> Product Type
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link " href="#product_details" data-tab="product_details">
+                <a class="nav-link active" href="#product_details" data-tab="product_details">
                   <i class="fa-regular fa-pen-to-square"></i> Product details
                 </a>
               </li>
@@ -86,23 +82,10 @@
         <div class="col-md-9">
           <div class="tab-content">
 
-            <!-- Product Type pane (active by default) -->
-            <div class="tab-pane active" id="product_type">
-              <div class="table-header mb-3">
-                <h3>Product Type</h3>
-              </div>
-              <div class="card card-body">
-                <div class="form-group">
-                  <label for="id_product_class"><i class="fa-regular fa-heading"></i> product class</label>
-                  {{product_form.product_class}}
-                </div>
 
-
-              </div>
-            </div>
 
             <!-- Product details pane (active by default) -->
-            <div class="tab-pane" id="product_details">
+            <div class="tab-pane active" id="product_details">
               <div class="table-header mb-3">
                 <h3>Product details</h3>
               </div>
