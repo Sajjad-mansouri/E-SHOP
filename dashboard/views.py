@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.http import JsonResponse, HttpResponse
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.base import View, TemplateResponseMixin
@@ -102,3 +104,17 @@ class DeleteProductView(DeleteView):
 	template_name = "dashboard/delete_product.html"
 	model = Product
 	success_url = reverse_lazy("products")
+
+
+class SearchProduct(View):
+
+	def get(self, request, *args, **kwargs):
+		search = request.GET.get("search")
+		object_list = StockRecord.objects.filter(
+			Q(product__title__icontains=search)|
+			Q(product__upc__icontains=search)
+			)
+		if object_list:
+			return render(request, "dashboard/_records.html", {"object_list":object_list, "search":True})
+		else:
+			return HttpResponse("")

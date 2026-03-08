@@ -25,18 +25,40 @@
   <div class="card">
     {%if object_list%}
     <!-- search panel: upc + title -->
+
     <div class="search-panel">
-      <div class="search-field">
-        <i class="fa-regular fa-barcode"></i>
-        <input type="text" placeholder="Search by UPC...">
-      </div>
+
       <div class="search-field">
         <i class="fa-regular fa-heading"></i>
-        <input type="text" placeholder="Search by title...">
+        <input type="text" placeholder="Search by title, UPC..." name="title" class="search">
       </div>
       <button class="btn-primary" style="padding:12px 28px; background:#eaeef2; color:#333; box-shadow:none;"><i class="fa-regular fa-magnifying-glass"></i> Apply</button>
+
+      <!-- <input type="submit" name=""> -->
     </div>
 
+    <div class="table-responsive search-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>UPC</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Product type</th>
+            <th>Stock records</th>
+            <th>Is public</th>
+            <th>Date updated</th>
+
+
+          </tr>
+        </thead>
+        <tbody>
+
+
+        </tbody>
+      </table>
+    </div>
     <!-- products table -->
     <div class="table-responsive">
       <table>
@@ -55,25 +77,7 @@
           </tr>
         </thead>
         <tbody>
-          {%for stock_record in object_list%}
-          <!-- row 1: with discount (price after discount shown) -->
-          <tr>
-            <td><strong><a href="{%url 'update_product' stock_record.product.id %}">{{stock_record.product.title}}</a></strong></td>
-            <td><span class="badge">{{stock_record.product.upc}}</span></td>
-            <td class="price-cell">
-              $329.99 
-              <span class="old-price">${{stock_record.price}}</span>
-              <span class="discount-badge">-18%</span>
-            </td>
-
-            <td><img src="{{stock_record.product.images.first.image.url}}" class="product-thumb" alt="thumb"></td>
-            <td>{{stock_record.product.product_class.name}}</td>
-            <td><span class="stock-badge">{{stock_record.num_in_stock}} in stock</span></td>
-            <td class="is-public">{{stock_record.is_public}}<i class="fa-regular fa-circle-check" style="color:#2e7d32;"></i></td>
-            <td>{{stock_record.date_updated|date}}</td>
-            <td><a href="{%url 'delete_product' stock_record.product.id  %}">Del</a> <a href="{%url 'update_product' stock_record.product.id %}">update</a></td>
-          </tr>
-          {%endfor%}
+          {%include "dashboard/_records.html"%}
 
         </tbody>
       </table>
@@ -105,5 +109,29 @@
     window.open("{%url 'create_product'%}?product_class="+productClass)
   })
 
+
+    const searchTitle = document.querySelector(".search");
+    const searchTable = document.querySelector(".search-table")
+    const searchTableBody = searchTable.querySelector("tbody")
+
+    searchTitle.addEventListener("keyup", ()=>{
+      let searchTitleValue = searchTitle.value
+      fetch("{% url 'search_product'%}"+"?search="+searchTitle.value)
+      .then(response=>response.text())
+      .then(data=>{
+        if(searchTitle.value==""){
+
+        searchTable.style.display="none"
+
+        }else if(data !=""){
+        searchTableBody.innerText=""
+        searchTableBody.insertAdjacentHTML('afterbegin',data)
+        searchTable.style.display="block"
+
+        }
+      })
+
+    })
 </script>
 {%endblock%}
+
