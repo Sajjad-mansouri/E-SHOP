@@ -1,5 +1,12 @@
 from django.urls import path
-from .views import dashboard, ProductListView, CreateUpdateProductView, DeleteProductView, SearchProduct
+from .views import (
+					dashboard, 
+					ProductListView, 
+					CreateUpdateProductView, 
+					DeleteProductView, 
+					SearchProduct,
+					ProductTypeView
+					)
 
 urlpatterns = [
 	path("", dashboard, name="dashboard"),
@@ -8,6 +15,9 @@ urlpatterns = [
 	path("product/update/<int:pk>/", CreateUpdateProductView.as_view(), name="update_product"),
 	path("product/delete/<int:pk>/", DeleteProductView.as_view(), name="delete_product"),
 	path("product/search", SearchProduct.as_view(), name="search_product"),
+
+	path("product-type/", ProductTypeView.as_view(), name="product_type"),
+
 
 
 

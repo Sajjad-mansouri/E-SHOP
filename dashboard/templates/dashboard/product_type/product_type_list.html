@@ -1,0 +1,53 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard_main.css'%}">
+{%endblock%}
+
+{%block content%}
+
+
+<!-- breadcrumb + create btn row -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Catalog</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">Product Type</span>
+  </div>
+
+  <button class="btn-primary create-product" href=""><i class="fa-regular fa-plus"></i> Create new product Type</button>
+</div>
+
+<div class="products-card">
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Action</th>
+
+          </tr>
+        </thead>
+        <tbody>
+			{%for product_type in object_list%}
+			<!-- row 1: with discount (price after discount shown) -->
+
+			<tr>
+			  <td><strong><a href="">{{product_type.name}}</a></strong></td>
+			  <td><span class="badge">{{product_type.slug}}</span></td>
+
+			  <td><a href="">Del</a> <a href="">update</a></td>
+
+			</tr>
+
+			{%endfor%}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{%endblock%}

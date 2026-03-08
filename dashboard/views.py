@@ -118,3 +118,8 @@ class SearchProduct(View):
 			return render(request, "dashboard/_records.html", {"object_list":object_list, "search":True})
 		else:
 			return HttpResponse("")
+
+
+class ProductTypeView(ListView):
+	model = ProductClass
+	template_name = "dashboard/product_type/product_type_list.html"
