@@ -187,3 +187,9 @@ class ProductTypeCreateUpdateView(UpdateView):
 
 	def form_invalid(self, form, formset):
 		return self.render_to_response(self.get_context_data(form=form, formset=formset))
+
+
+class ProductTypeDeleteView(DeleteView):
+	template_name = "dashboard/product_type/delete_product_type.html"
+	model = ProductClass
+	success_url = reverse_lazy("product_type_list")
