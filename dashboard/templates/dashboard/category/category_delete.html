@@ -1,0 +1,15 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard_main.css'%}">
+{%endblock%}
+
+{%block content%}
+<form method="POST">
+	are you sure want to delete this category?
+	{%csrf_token%}
+
+<input type="submit" value="delete">
+</form>
+{%endblock%}

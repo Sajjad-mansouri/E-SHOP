@@ -1,7 +1,8 @@
 from django.forms.models import inlineformset_factory
 from django import forms
-from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute
+from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
+from treebeard.forms import movenodeform_factory
 
 
 class ProductClassForm(forms.ModelForm):
@@ -173,3 +174,12 @@ class ProductAttributeeForm(forms.ModelForm):
 
 		}
 product_type_attr_formset = inlineformset_factory(ProductClass, ProductAttribute,fields = ["name", "type"], form=ProductAttributeeForm,extra=1)
+
+
+CategoryFormFactory = movenodeform_factory(Category)
+class CategoryForm(CategoryFormFactory):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		for field_name, field in self.fields.items():
+			field.widget.attrs.update({"class":"form-control"})

@@ -14,7 +14,8 @@ from .forms import (
 					StockRecordInlineForm, 
 					ProductClassForm,
 					ProductTypeForm,
-					product_type_attr_formset
+					product_type_attr_formset,
+					CategoryForm
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
@@ -204,8 +205,20 @@ class SubCategoryView(DetailView):
 	template_name = "dashboard/category/category_list.html"
 	model = Category
 
-	def get_context_data(self,**kwargs):
-		print(dir(self.object))
-		print(self.object.get_children)
-		print(kwargs)
-		return kwargs
+
+class CategoryCreateView(CreateView):
+	template_name = "dashboard/category/category_create_update.html"
+	model = Category
+	form_class = CategoryForm
+	success_url = reverse_lazy("category")
+
+class CategoryUpdateView(UpdateView):
+	template_name = "dashboard/category/category_create_update.html"
+	model = Category
+	form_class = CategoryForm
+	success_url = reverse_lazy("category")
+
+class CategoryDeleteView(DeleteView):
+	template_name = "dashboard/category/category_delete.html"
+	model = Category
+	success_url = reverse_lazy("category")

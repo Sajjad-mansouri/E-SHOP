@@ -1,9 +1,9 @@
 <tr>
-  <td><strong><a href="">{{object.name}}</a></strong></td>
+  <td><strong><a href="{%url 'category_update' object.pk %}">{{object.name}}</a></strong></td>
   <td>{{object.description}}</span></td>
   <td >{%if object.get_descendant_count > 0 %}<a href="{%url 'sub_category' object.pk %}">{{object.get_descendant_count}}</a>{%else%}0{%endif%}</td>
 
   <td>{%if object.image%}<img src="{{object.image.url}}" class="product-thumb" alt="thumb">{%else%}-{%endif%}</td>
-  <td><a href="">update</a></td>
+  <td><a href="{%url 'category_update' object.pk %}">update</a> <a href="{%url 'category_delete' object.pk %}">del</a></td>
 
 </tr>

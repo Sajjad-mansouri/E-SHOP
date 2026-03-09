@@ -33,7 +33,7 @@ def category_image_path(instance, image_name):
 	return "images/categories/{0}/{1}".format(instance.slug,image_name)
 
 class Category(MP_Node):
-	COMPARISON_FIELDS = ("pk", "path", "depth")
+
 	name = models.CharField(max_length=200, db_index=True, verbose_name=_("name"))
 	slug = models.SlugField(max_length=200, blank=True, db_index=True, verbose_name=_("slug"))
 	image = models.ImageField(upload_to=category_image_path, null=True, blank=True, verbose_name=_("image"))
