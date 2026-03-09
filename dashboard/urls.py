@@ -5,7 +5,8 @@ from .views import (
 					CreateUpdateProductView, 
 					DeleteProductView, 
 					SearchProduct,
-					ProductTypeView
+					ProductTypeView,
+					ProductTypeCreateUpdateView
 					)
 
 urlpatterns = [
@@ -16,7 +17,11 @@ urlpatterns = [
 	path("product/delete/<int:pk>/", DeleteProductView.as_view(), name="delete_product"),
 	path("product/search", SearchProduct.as_view(), name="search_product"),
 
-	path("product-type/", ProductTypeView.as_view(), name="product_type"),
+	path("product-type/", ProductTypeView.as_view(), name="product_type_list"),
+	path("product-type/create/", ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
+	path("product-type/update/<int:pk>/", ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
+	
+
 
 
 

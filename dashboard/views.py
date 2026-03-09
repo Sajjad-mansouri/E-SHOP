@@ -1,12 +1,20 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.base import View, TemplateResponseMixin
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.forms.models import inlineformset_factory
-from .forms import image_formset, ProductForm, ProductCategoryInline, StockRecordInlineForm, ProductClassForm
+from .forms import (
+					image_formset, 
+					ProductForm, 
+					ProductCategoryInline, 
+					StockRecordInlineForm, 
+					ProductClassForm,
+					ProductTypeForm,
+					product_type_attr_formset
+					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue
 
@@ -123,3 +131,59 @@ class SearchProduct(View):
 class ProductTypeView(ListView):
 	model = ProductClass
 	template_name = "dashboard/product_type/product_type_list.html"
+
+
+class ProductTypeCreateUpdateView(UpdateView):
+	model = ProductClass
+	form_class = ProductTypeForm
+	template_name = "dashboard/product_type/product_type_create_update.html"
+	success_url = reverse_lazy("product_type_list")
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["attrs_formset"] = self.get_formset()
+		return context
+
+
+	def post(self, request, *args, **kwargs):
+		"""
+		Handle POST requests: instantiate a form instance with the passed
+		POST variables and then check if it's valid.
+		"""
+		self.object = self.get_object()
+		form = self.get_form()
+		if form.is_valid():
+			self.object = form.save(commit=False)
+		formset = self.get_formset()
+
+		if form.is_valid() and formset.is_valid():
+			return self.form_valid(form, formset)
+		else:
+			print(formset.non_form_errors())
+			print(form.errors)
+			print(formset.errors)
+			return self.form_invalid(form, formset)
+
+	def get_object(self):
+
+		product_type_pk = self.kwargs.get("pk")
+		if product_type_pk:
+			print(get_object_or_404(ProductClass, pk=product_type_pk))
+			return  get_object_or_404(ProductClass, pk=product_type_pk)
+		else:
+			return  None
+
+
+	def get_formset(self):
+
+		return product_type_attr_formset(**self.get_form_kwargs())
+
+	def form_valid(self, form, formset):
+		success_url = self.get_success_url()
+		self.object = form.save()
+		formset.save()
+		return HttpResponseRedirect(success_url)
+
+	def form_invalid(self, form, formset):
+		return self.render_to_response(self.get_context_data(form=form, formset=formset))

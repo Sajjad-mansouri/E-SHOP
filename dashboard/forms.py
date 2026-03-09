@@ -1,6 +1,6 @@
 from django.forms.models import inlineformset_factory
 from django import forms
-from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue
+from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute
 from stock.models import StockRecord
 
 
@@ -156,3 +156,20 @@ StockRecordInlineForm = inlineformset_factory(Product, StockRecord,fields = ["sk
 
 
 
+class ProductTypeForm(forms.ModelForm):
+	class Meta:
+		model = ProductClass
+		fields = ["name",]
+		widgets = {
+			"name":forms.TextInput(attrs={"class":"form-control"})
+		}
+class ProductAttributeeForm(forms.ModelForm):
+	class Meta:
+		model = ProductAttribute
+		fields = ["name", "type"]
+		widgets = {
+			"name":forms.TextInput(attrs={"class":"form-control"}),
+			"type":forms.Select(attrs={"class":"form-control"}),
+
+		}
+product_type_attr_formset = inlineformset_factory(ProductClass, ProductAttribute,fields = ["name", "type"], form=ProductAttributeeForm,extra=1)
