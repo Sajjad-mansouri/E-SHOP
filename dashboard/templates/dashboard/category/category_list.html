@@ -1,0 +1,113 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block style%}
+
+<link rel="stylesheet" type="text/css" href="{%static 'css/product_list.css'%}">
+{%endblock%}
+
+{%block content%}
+
+<!-- breadcrumb + create btn row -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Catalog</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">Products</span>
+  </div>
+  <form method="GET" action="{%url 'create_product'%}">
+    {{product_class_form}}
+  </form>
+  <button class="btn-primary create-product" href="{%url 'create_product'%}"><i class="fa-regular fa-plus"></i> Create new category</button>
+</div>
+
+<!-- main product list card -->
+<div class="products-card">
+  <div class="card">
+
+    <!-- search panel: upc + title -->
+
+    <div class="search-panel">
+
+      <div class="search-field">
+        <i class="fa-regular fa-heading"></i>
+        <input type="text" placeholder="Search by title, UPC..." name="title" class="search">
+      </div>
+      <button class="btn-primary" style="padding:12px 28px; background:#eaeef2; color:#333; box-shadow:none;"><i class="fa-regular fa-magnifying-glass"></i> Apply</button>
+
+      <!-- <input type="submit" name=""> -->
+    </div>
+
+    <!-- products table -->
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Number of child categories</th>
+            <th>Image</th>
+            <th>Action</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {%if object%}
+          {%include "dashboard/category/_sub_categories.html"%}
+          {%else%}
+          {%include "dashboard/category/_categories.html"%}
+          {%endif%}
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- simple pagination / footer inside card -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 24px; align-items: center; gap: 20px;">
+      <span style="color:#777;">Showing 1–6 of 42 products</span>
+      <div>
+        <button class="btn-primary" style="background:white; color:#333; border:1px solid #ddd; padding:8px 16px;"><i class="fa-regular fa-chevron-left"></i></button>
+        <button class="btn-primary" style="background:white; color:#333; border:1px solid #ddd; padding:8px 16px; margin-left:8px;"><i class="fa-regular fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+  const createProductBtn = document.querySelector(".create-product");
+  createProductBtn.addEventListener("click",()=>{
+    event.preventDefault();
+    const productClass  = document.getElementById('id_product_class').value
+
+    window.open("{%url 'create_product'%}?product_class="+productClass)
+  })
+
+
+    const searchTitle = document.querySelector(".search");
+    const searchTable = document.querySelector(".search-table")
+    const searchTableBody = searchTable.querySelector("tbody")
+
+    searchTitle.addEventListener("keyup", ()=>{
+      let searchTitleValue = searchTitle.value
+      fetch("{% url 'search_product'%}"+"?search="+searchTitle.value)
+      .then(response=>response.text())
+      .then(data=>{
+        if(searchTitle.value==""){
+
+        searchTable.style.display="none"
+
+        }else if(data !=""){
+        searchTableBody.innerText=""
+        searchTableBody.insertAdjacentHTML('afterbegin',data)
+        searchTable.style.display="block"
+
+        }
+      })
+
+    })
+</script>
+{%endblock%}
+

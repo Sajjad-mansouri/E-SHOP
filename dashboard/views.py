@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
+from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
 from .forms import (
 					image_formset, 
@@ -16,7 +17,7 @@ from .forms import (
 					product_type_attr_formset
 					)
 from stock.models import StockRecord
-from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue
+from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
 
 
 # Create your views here.
@@ -193,3 +194,18 @@ class ProductTypeDeleteView(DeleteView):
 	template_name = "dashboard/product_type/delete_product_type.html"
 	model = ProductClass
 	success_url = reverse_lazy("product_type_list")
+
+
+class CategoryListView(ListView):
+	template_name = "dashboard/category/category_list.html"
+	model = Category
+
+class SubCategoryView(DetailView):
+	template_name = "dashboard/category/category_list.html"
+	model = Category
+
+	def get_context_data(self,**kwargs):
+		print(dir(self.object))
+		print(self.object.get_children)
+		print(kwargs)
+		return kwargs
