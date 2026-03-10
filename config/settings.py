@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'stock',
     'comment',
     'dashboard',
+    'offer',
 
     #third party
     'treebeard',
