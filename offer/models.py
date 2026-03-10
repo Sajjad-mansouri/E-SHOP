@@ -87,3 +87,88 @@ class OfferType(models.Model):
 
 	def __str__(self):
 		return f"{self.offer_range}-{self.type}:{self.value}"
+
+class Offer(models.Model):
+
+	name = models.CharField(
+		_("Name"),
+		max_length=100,
+		unique=True,
+	)
+	slug = models.SlugField(
+		_("Slug"), max_length=100, unique=True, blank=True 
+	)
+	description = models.TextField(
+		_("Description"),
+		blank=True,
+	)
+
+	OFFER_STATUS = [
+		("open", "open"),
+		("Suspended", "Suspended"),
+
+	]
+	status = models.CharField(_("Status"), max_length=50, choices=OFFER_STATUS, default="open")
+
+	offer_type = models.ForeignKey(
+		OfferType,
+		on_delete=models.CASCADE,
+		related_name="offers",
+		verbose_name=_("Offer Type"),
+	)
+
+	priority = models.IntegerField(
+		_("Priority"),
+		default=0,
+		db_index=True,
+		help_text=_("The highest priority offers are applied first"),
+	)
+
+	max_discount = models.DecimalField(
+		_("Max discount"),
+		decimal_places=2,
+		max_digits=10,
+		null=True,
+		blank=True,
+		help_text=_(
+			"When an offer has given more discount to orders "
+			"than this threshold, then the offer becomes "
+			"unavailable"
+		),
+	)
+
+	start_datetime = models.DateTimeField(
+		_("Start date"),
+		blank=True,
+		null=True,
+		help_text=_(
+			"Offers are active from the start date. "
+			"Leave this empty if the offer has no start date."
+		),
+	)
+	end_datetime = models.DateTimeField(
+		_("End date"),
+		blank=True,
+		null=True,
+		help_text=_(
+			"Offers are active until the end date. "
+			"Leave this empty if the offer has no expiry date."
+		),
+	)
+
+	created = models.DateTimeField(_("Date Created"), auto_now_add=True)
+	updated = models.DateTimeField(_("Date Updated"), auto_now=True)
+
+	class Meta:
+		ordering = ["-priority", "pk"]
+		verbose_name = _("offer")
+		verbose_name_plural = _("offers")
+
+	def __str__(self):
+		return self.name
+
+
+	def save(self, *args, **kwargs):
+		if not self.slug:
+			self.slug = slugify(self.name)
+		super().save(*args, **kwargs)
