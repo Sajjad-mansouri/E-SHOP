@@ -1,0 +1,62 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/product_list.css'%}">
+{%endblock%}
+
+{%block content%}
+
+
+<!-- breadcrumb + create btn row -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Offer</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">Offer Range</span>
+  </div>
+
+  <a class="btn-primary create-product" href="{%url 'product_type_create'%}"><i class="fa-regular fa-plus"></i> Create new Offer Range</a>
+</div>
+
+<div class="products-card">
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Num products</th>
+            <th>Description</th>
+            <th>created</th>
+            <th>action</th>
+
+
+
+          </tr>
+        </thead>
+        <tbody>
+			{%for object in object_list%}
+			<!-- row 1: with discount (price after discount shown) -->
+
+			<tr>
+			  <td><strong><a href="">{{object.name}}</a></strong></td>
+			  <td>{{object.slug}}</td>
+        <td>{{object.product_count}}</td>
+        <td>{{object.description}}</td>
+        <td>{{object.created}}</td>
+
+
+			  <td><a href="">Del</a> <a href="">update</a></td>
+
+			</tr>
+
+			{%endfor%}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{%endblock%}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from catalog.models import Product, ProductClass, Category
@@ -60,6 +61,32 @@ class OfferRange(models.Model):
 		if not self.slug:
 			self.slug = slugify(self.name)
 		super().save(*args, **kwargs)
+
+	@property
+	def get_products(self):
+		# included_products
+		# excluded_products
+		# classes
+		# included_categories
+		# excluded_categories
+		included_products_filter = Q(id__in=self.included_products.values("id"))
+		excluded_products_filter = ~Q(id__in=self.excluded_products.values("id"))
+		included_categories_filter = Q(categories__in=self.included_categories.values("id"))
+		excluded_categories_filter = ~Q(categories__in=self.excluded_categories.values("id"))
+		classes_filter = Q(product_class__in=self.classes.values("id"))
+		public_filter = Q(is_public=True) 
+
+		_filter = (
+			(included_products_filter | included_categories_filter | classes_filter)
+			& excluded_products_filter & excluded_categories_filter & public_filter
+			)
+		offer_products = Product.objects.filter(_filter)
+		return offer_products
+
+	@property
+	def product_count(self):
+		return self.get_products.count()
+
 
 class OfferType(models.Model):
 	offer_range = models.ForeignKey(

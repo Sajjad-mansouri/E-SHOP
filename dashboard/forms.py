@@ -144,7 +144,7 @@ image_formset = inlineformset_factory(Product, ProductImage,fields = ["image", "
 class StockRecordForm(forms.ModelForm):
 	class Meta:
 		model = StockRecord
-		fields = ["sku", "num_in_stock", "price", "is_public"]
+		fields = ["sku", "num_in_stock", "price",]
 		widgets = {
 			"sku":forms.TextInput(attrs={"class":"form-control"}),
 			"num_in_stock":forms.NumberInput(attrs={"class":"form-control"}),
@@ -153,7 +153,7 @@ class StockRecordForm(forms.ModelForm):
 		}
 
 
-StockRecordInlineForm = inlineformset_factory(Product, StockRecord,fields = ["sku", "num_in_stock", "price", "is_public"],form=StockRecordForm,extra=1)
+StockRecordInlineForm = inlineformset_factory(Product, StockRecord,fields = ["sku", "num_in_stock", "price", ],form=StockRecordForm,extra=1)
 
 
 
