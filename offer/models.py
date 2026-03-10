@@ -60,3 +60,30 @@ class OfferRange(models.Model):
 		if not self.slug:
 			self.slug = slugify(self.name)
 		super().save(*args, **kwargs)
+
+class OfferType(models.Model):
+	offer_range = models.ForeignKey(
+		OfferRange,
+		blank=True,
+		null=True,
+		on_delete=models.CASCADE,
+		verbose_name=_("Offer Range"),
+	)
+
+	TYPE_CHOICES = [
+		("Percentage", _("Discount is a percentage off of the product's value")),
+
+		("Shipping percentage", _("Discount is a percentage off of the shipping cost")),
+		("Shipping fixed price", _("Get shipping for a fixed price"))
+	]
+	type = models.CharField(_("Offer Type"), max_length=100, choices=TYPE_CHOICES, blank=True)
+	value = models.DecimalField(
+		_("Value"), decimal_places=2, max_digits=10, null=True, blank=True
+	)
+
+	class Meta:
+		verbose_name = _("Offer Type")
+		verbose_name_plural = _("Offer Types")
+
+	def __str__(self):
+		return f"{self.offer_range}-{self.type}:{self.value}"
