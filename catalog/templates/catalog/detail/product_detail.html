@@ -194,7 +194,7 @@
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     const form = document.querySelector('.comment-form');
     const formData = new FormData(form)
-    fetch("{%url 'create_review' %}",{
+    fetch("{%url 'comment:create_review' %}",{
       method:"POST",
       headers:{
         "X-CSRFToken":csrftoken
@@ -216,7 +216,7 @@
       let commentId = event.target.getAttribute('data-id');
       let formData = new FormData()
       formData.append('commentId',commentId)
-      fetch("{%url 'remove_review'%}" ,{
+      fetch("{%url 'comment:remove_review'%}" ,{
         method:"post",
         headers:{
           "X-CSRFToken":csrftoken,

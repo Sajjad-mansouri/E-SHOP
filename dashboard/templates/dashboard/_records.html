@@ -2,7 +2,7 @@
 <!-- row 1: with discount (price after discount shown) -->
 
 <tr>
-  <td><strong><a href="{%url 'update_product' stock_record.product.id %}">{{stock_record.product.title}}</a></strong></td>
+  <td><strong><a href="{%url 'dashboard:update_product' stock_record.product.id %}">{{stock_record.product.title}}</a></strong></td>
   <td><span class="badge">{{stock_record.product.upc}}</span></td>
   <td class="price-cell">
     $329.99 
@@ -16,7 +16,7 @@
   <td class="is-public">{{stock_record.is_public}}<i class="fa-regular fa-circle-check" style="color:#2e7d32;"></i></td>
   <td>{{stock_record.date_updated|date}}</td>
   {%if not search%}
-  <td><a href="{%url 'delete_product' stock_record.product.id  %}">Del</a> <a href="{%url 'update_product' stock_record.product.id %}">update</a></td>
+  <td><a href="{%url 'dashboard:delete_product' stock_record.product.id  %}">Del</a> <a href="{%url 'dashboard:update_product' stock_record.product.id %}">update</a></td>
   {%endif%}
 </tr>
 

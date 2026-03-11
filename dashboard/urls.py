@@ -21,8 +21,10 @@ from .views import (
 					OfferRangeDeleteView
 					)
 
+
+app_name = "dashboard"
 urlpatterns = [
-	path("", dashboard, name="dashboard"),
+	path("", dashboard, name="main"),
 	path("products/", ProductListView.as_view(), name="products"),
 	path("product/create/", CreateUpdateProductView.as_view(), name="create_product"),
 	path("product/update/<int:pk>/", CreateUpdateProductView.as_view(), name="update_product"),

@@ -14,10 +14,10 @@
     <a href="#">Catalog</a> <i class="fa-solid fa-chevron-right"></i>
     <span class="current">Products</span>
   </div>
-  <form method="GET" action="{%url 'create_product'%}">
+  <form method="GET" action="{%url 'dashboard:create_product'%}">
     {{product_class_form}}
   </form>
-  <button class="btn-primary create-product" href="{%url 'create_product'%}"><i class="fa-regular fa-plus"></i> Create new product</button>
+  <button class="btn-primary create-product" href="{%url 'dashboard:create_product'%}"><i class="fa-regular fa-plus"></i> Create new product</button>
 </div>
 
 <!-- main product list card -->
@@ -106,7 +106,7 @@
     event.preventDefault();
     const productClass  = document.getElementById('id_product_class').value
 
-    window.open("{%url 'create_product'%}?product_class="+productClass)
+    window.open("{%url 'dashboard:create_product'%}?product_class="+productClass)
   })
 
 
@@ -116,7 +116,7 @@
 
     searchTitle.addEventListener("keyup", ()=>{
       let searchTitleValue = searchTitle.value
-      fetch("{% url 'search_product'%}"+"?search="+searchTitle.value)
+      fetch("{% url 'dashboard:search_product'%}"+"?search="+searchTitle.value)
       .then(response=>response.text())
       .then(data=>{
         if(searchTitle.value==""){

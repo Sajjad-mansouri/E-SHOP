@@ -25,7 +25,7 @@
 <div class="product-grid">
   <!-- card 1 -->
   {% for record in stock_records%}
-  <a href="{%url 'product_detail' record.product.slug record.id%}">
+  <a href="{%url 'catalog:product_detail' record.product.slug record.id%}">
     <div class="product-card">
       <span class="badge">−30%</span>
       <img src="{{record.product.images.first.image.url}}" alt="{{record.product.images.first.caption}}" class="product-img" style="background:#f9f9f9;">
