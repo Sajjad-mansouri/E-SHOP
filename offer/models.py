@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from catalog.models import Product, ProductClass, Category
 
+
 class OfferRange(models.Model):
 	name = models.CharField(_("Name"), max_length=100, unique=True)
 	slug = models.SlugField( _("Slug"), max_length=100, unique=True, blank=True)
@@ -75,11 +76,16 @@ class OfferRange(models.Model):
 		excluded_categories_filter = ~Q(categories__in=self.excluded_categories.values("id"))
 		classes_filter = Q(product_class__in=self.classes.values("id"))
 		public_filter = Q(is_public=True) 
+		if self.includes_all_products:
+			_filter = (
+				excluded_products_filter & excluded_categories_filter & public_filter
+				)
+		else:
 
-		_filter = (
-			(included_products_filter | included_categories_filter | classes_filter)
-			& excluded_products_filter & excluded_categories_filter & public_filter
-			)
+			_filter = (
+				(included_products_filter | included_categories_filter | classes_filter)
+				& excluded_products_filter & excluded_categories_filter & public_filter
+				)
 		offer_products = Product.objects.filter(_filter)
 		return offer_products
 

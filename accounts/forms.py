@@ -86,7 +86,7 @@ class UserRegistrationForm(UserCreationForm):
 		Generate a one-use only link for resetting password and send it to the
 		user.
 		"""
-		print('form _save method')
+
 
 		email = self.cleaned_data["email"]
 		if not domain_override:
@@ -96,12 +96,11 @@ class UserRegistrationForm(UserCreationForm):
 		else:
 			site_name = domain = domain_override
 		email_field_name = UserModel.get_email_field_name()
-		print(email_field_name)
-		print(self.get_users(email))
+
 		for user in self.get_users(email):
 			user_email = getattr(user, email_field_name)
 			user_pk_bytes = force_bytes(UserModel._meta.pk.value_to_string(user))
-			print(user_pk_bytes)
+			
 			context = {
 				"email": user_email,
 				"domain": domain,
@@ -112,7 +111,7 @@ class UserRegistrationForm(UserCreationForm):
 				"protocol": "https" if use_https else "http",
 				**(extra_email_context or {}),
 			}
-			print('context',context)
+			
 			self.send_mail(
 				subject_template_name,
 				email_template_name,
@@ -122,7 +121,7 @@ class UserRegistrationForm(UserCreationForm):
 				html_email_template_name=html_email_template_name,
 			)
 	def save(self, commit=True, **opts):
-		print('form save method')
+		
 		user = super().save(commit=False)
 		user.is_active = False
 		user.username = user.email

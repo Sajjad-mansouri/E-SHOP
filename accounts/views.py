@@ -78,7 +78,7 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
 
         self.validlink = False
         self.user = self.get_user(kwargs["uidb64"])
-        print('self.user', self.user)
+       
         if self.user is not None:
             token = kwargs["token"]
             if token == self.confirm_registration_url_token:

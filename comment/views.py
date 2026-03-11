@@ -21,16 +21,16 @@ def create_review(request):
 		return render(request, "comment/comment_item.html", {'comment':form})
 
 	else:
-		print(form.errors)
+		pass
 
 	return JsonResponse({"status":"failed"})
 
 
 @require_POST
 def remove_review(request):
-	print(request.POST)
+
 	comment_id = request.POST.get('commentId')
-	print(comment_id)
+
 	try:
 		get_object_or_404(Comment, id=comment_id).delete()
 		return JsonResponse({'status':'ok'})

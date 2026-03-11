@@ -3,6 +3,8 @@ from django import forms
 from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
+from offer.models import OfferRange
+from .widgets import CustomCheckboxSelectMultiple
 
 
 class ProductClassForm(forms.ModelForm):
@@ -183,3 +185,29 @@ class CategoryForm(CategoryFormFactory):
 
 		for field_name, field in self.fields.items():
 			field.widget.attrs.update({"class":"form-control"})
+
+
+
+
+class OfferRangeForm(forms.ModelForm):
+
+	class Meta:
+		model = OfferRange
+		fields = [
+				"name", "description", "is_public", 
+				"includes_all_products", "included_products",
+				"excluded_products", "classes",
+				"included_categories", "excluded_categories"
+
+				]
+
+		widgets = {
+				"included_products":CustomCheckboxSelectMultiple(),
+				"excluded_products":CustomCheckboxSelectMultiple(),
+				"classes":forms.CheckboxSelectMultiple(),
+				"included_categories":forms.CheckboxSelectMultiple(),
+				"excluded_categories":forms.CheckboxSelectMultiple(),
+
+
+		}
+		

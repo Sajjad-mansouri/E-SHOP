@@ -44,7 +44,7 @@ class Category(MP_Node):
 		verbose_name = _("category")
 		verbose_name_plural = _("categories")
 	def __str__(self):
-		print(self.get_name)
+
 		return self.get_name
 
 	@property
@@ -62,6 +62,7 @@ class Category(MP_Node):
 		if not self.slug:
 			self.slug = slugify(self.name)
 		super().save(*args, **kwargs)
+
 
 
 class Product(models.Model):
@@ -89,6 +90,7 @@ class Product(models.Model):
 	view_count = models.PositiveIntegerField(default=0)
 	
 	is_public = models.BooleanField(default=True)
+
 	
 	def save(self, *args, **kwargs):
 		if not self.slug:
@@ -99,6 +101,7 @@ class Product(models.Model):
 		ordering = ["-created"]
 		verbose_name = _("Product")
 		verbose_name_plural = _("Products")
+
 
 	def __str__(self):
 		return self.title

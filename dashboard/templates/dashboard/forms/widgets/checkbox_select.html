@@ -1,0 +1,72 @@
+
+ <div class="main-content">
+    <!-- Multi-select dropdown -->
+    <div class="multi-select-container">
+        <div class="select-header" >
+            <div class="selected-count">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="selectedCount">0</span> products selected
+            </div>
+            <div class="select-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+        
+        <div class="dropdown-content" >
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" class="productSearch" placeholder="Search products by name, category, or UPC...">
+            </div>
+            
+            <div class="dropdown-header">
+                <div class="header-row">
+                    <div class="header-col select-col">
+                        <input type="checkbox" >
+                    </div>
+                    <div class="header-col image-col">Image</div>
+                    <div class="header-col name-col">Product Name</div>
+                    <div class="header-col price-col">Price</div>
+                    <div class="header-col category-col">Category</div>
+                    <div class="header-col stock-col">Stock</div>
+                    <div class="header-col upc-col">UPC</div>
+                </div>
+            </div>
+            
+            <div class="products-list" >
+                <!-- Product rows will be dynamically inserted here -->
+
+    {% for group, options, index in widget.optgroups %}
+    {% for widget in options %}
+    <div class="product-row">
+      
+      {%with instance=widget.value.instance%}
+      <div class="product-col product-checkbox">
+        <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+
+      </div>
+      <div class="product-col product-image">
+          <img src="{{instance.images.all.0.image.url}}" alt="">
+      </div>
+      <div class="product-col product-name">{{instance.title}}</div>
+      <div class="product-col product-price"></div>
+      <div class="product-col product-category">
+          <span></span>
+      </div>
+      <div class="product-col product-stock">
+          <span class="${stockClass}"> units</span>
+      </div>
+      <div class="product-col product-upc"></div>
+    </div>
+      
+    {%endwith%}
+    {%endfor%}
+    {%endfor%}
+
+
+            </div>
+            
+
+        </div>
+    </div>
+    
+</div>

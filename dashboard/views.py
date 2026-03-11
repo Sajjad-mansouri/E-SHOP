@@ -15,7 +15,9 @@ from .forms import (
 					ProductClassForm,
 					ProductTypeForm,
 					product_type_attr_formset,
-					CategoryForm
+					CategoryForm,
+
+					OfferRangeForm,
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
@@ -65,7 +67,6 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 		product_category_form = ProductCategoryInline(instance=self.product, prefix="category")
 		stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
-		print('self.product_class', self.product_class)
 		return self.render_to_response({
 			"img_formset":img_formset, 
 			"product_form":product_form, 
@@ -162,16 +163,14 @@ class ProductTypeCreateUpdateView(UpdateView):
 		if form.is_valid() and formset.is_valid():
 			return self.form_valid(form, formset)
 		else:
-			print(formset.non_form_errors())
-			print(form.errors)
-			print(formset.errors)
+
 			return self.form_invalid(form, formset)
 
 	def get_object(self):
 
 		product_type_pk = self.kwargs.get("pk")
 		if product_type_pk:
-			print(get_object_or_404(ProductClass, pk=product_type_pk))
+
 			return  get_object_or_404(ProductClass, pk=product_type_pk)
 		else:
 			return  None
@@ -228,3 +227,10 @@ class CategoryDeleteView(DeleteView):
 class OfferRangeListView(ListView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/list.html"
+
+
+class OfferRangeCreateView(CreateView):
+	model = OfferRange
+	template_name = "dashboard/offer/range/create_update.html"
+	form_class = OfferRangeForm
+	success_url = reverse_lazy("offer_range")

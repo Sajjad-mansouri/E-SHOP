@@ -15,7 +15,8 @@ from .views import (
 					CategoryUpdateView,
 					CategoryDeleteView,
 
-					OfferRangeListView
+					OfferRangeListView,
+					OfferRangeCreateView,
 					)
 
 urlpatterns = [
@@ -39,6 +40,8 @@ urlpatterns = [
 	path("category/delete/<int:pk>/", CategoryDeleteView.as_view(), name="category_delete"),
 
 	path("offer/range/", OfferRangeListView.as_view(), name="offer_range"),
+	path("offer/range/create/", OfferRangeCreateView.as_view(), name="offer_range_create"),
+
 
 
 
