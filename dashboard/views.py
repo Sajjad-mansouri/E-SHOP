@@ -234,3 +234,9 @@ class OfferRangeCreateView(CreateView):
 	template_name = "dashboard/offer/range/create_update.html"
 	form_class = OfferRangeForm
 	success_url = reverse_lazy("offer_range")
+
+class OfferRangeUpdateView(UpdateView):
+	model = OfferRange
+	template_name = "dashboard/offer/range/create_update.html"
+	form_class = OfferRangeForm
+	success_url = reverse_lazy("offer_range")

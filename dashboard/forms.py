@@ -190,7 +190,11 @@ class CategoryForm(CategoryFormFactory):
 
 
 class OfferRangeForm(forms.ModelForm):
-
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields["included_products"].queryset = Product.objects.filter(is_public=True)
+		self.fields["excluded_products"].queryset = Product.objects.filter(is_public=True)
+		
 	class Meta:
 		model = OfferRange
 		fields = [
