@@ -21,7 +21,7 @@ from .forms import (
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
-from offer.models import OfferRange
+from offer.models import OfferRange, Offer
 
 # Create your views here.
 def dashboard(request):
@@ -245,3 +245,8 @@ class OfferRangeDeleteView(DeleteView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/delete.html"
 	success_url = reverse_lazy("offer_range")
+
+
+class OfferListView(ListView):
+	model = Offer
+	template_name = "dashboard/offer/offer/list.html"
