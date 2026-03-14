@@ -314,3 +314,8 @@ class CouponUpdateView(UpdateView):
 	form_class = CouponForm
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
+
+class CouponDeleteView(DeleteView):
+	model = Coupon
+	success_url = reverse_lazy("dashboard:coupon_list")
+	template_name = "dashboard/offer/coupon/delete.html"

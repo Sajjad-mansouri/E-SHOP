@@ -18,7 +18,7 @@
   <div class="offers-card">
     <div class="header-actions">
       <h1><i class="fa-regular fa-tag"></i> coupons</h1>
-      <a href="" class="btn-primary"><i class="fa-regular fa-plus"></i> New coupon</a>
+      <a href="{%url 'dashboard:coupon_create'%}" class="btn-primary"><i class="fa-regular fa-plus"></i> New coupon</a>
     </div>
 
     <!-- search filters: offer name + is_active (is_available) -->
@@ -62,7 +62,7 @@
 
             <td class="actions">
               <a href="{%url 'dashboard:coupon_update' coupon.pk %}"><i class="fa-regular fa-pen-to-square"></i>edit</a>
-              <a href=""><i class="fa-regular fa-trash-can"></i>del</a>
+              <a href="{%url 'dashboard:coupon_delete' coupon.pk %}"><i class="fa-regular fa-trash-can"></i>del</a>
             </td>
           </tr>
           {%endfor%}
