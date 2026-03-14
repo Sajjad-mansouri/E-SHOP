@@ -1,0 +1,30 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/create_update_offer.css'%}">
+{%endblock%}
+
+{%block content%}
+
+<div class="breadcrumb-bar">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Offers</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">Create offer</span>
+  </div>
+</div>
+
+<main class="offer-container">
+  <div class="offer-card">
+    <h1><i class="fa-regular fa-tag"></i> Create new offer</h1>
+
+    <form method="POST">
+      {%csrf_token%}
+      {{form}}
+      <input type="submit" value="create">
+    </form>
+        
+  </div>
+</main>
+
+{%endblock%}

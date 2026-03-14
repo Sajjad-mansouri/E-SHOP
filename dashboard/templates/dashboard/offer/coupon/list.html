@@ -1,0 +1,84 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/offer_list.css'%}">
+{%endblock%}
+
+{%block content%}
+<div class="breadcrumb-bar">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Coupon</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">All coupons</span>
+  </div>
+</div>
+
+<main class="offers-container">
+  <div class="offers-card">
+    <div class="header-actions">
+      <h1><i class="fa-regular fa-tag"></i> coupons</h1>
+      <a href="" class="btn-primary"><i class="fa-regular fa-plus"></i> New coupon</a>
+    </div>
+
+    <!-- search filters: offer name + is_active (is_available) -->
+    <div class="filters-panel">
+      <div class="filter-group">
+        <i class="fa-regular fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search by coupon code...">
+      </div>
+      <div class="filter-group">
+        <i class="fa-regular fa-toggle-on"></i>
+        <select>
+          <option value="">All (active / inactive)</option>
+          <option value="1">Active only</option>
+          <option value="0">Inactive only</option>
+        </select>
+      </div>
+      <button class="filter-apply"><i class="fa-regular fa-sliders"></i> Apply</button>
+    </div>
+
+    <!-- offers table -->
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>code</th>
+            <th>discount</th>
+            <th>valid from</th>
+            <th>valid to</th>
+            <th>status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for coupon in object_list%}
+          <tr>
+            <td><strong>{{coupon.code}}</strong></td>
+            <td><span class="offer-type">{{coupon.discount}}</span></td>
+            <td>{{coupon.valid_from}}</td>
+            <td>{{coupon.valid_to}}</td>
+            <td><span class="badge success">{{coupon.active}}</span></td>
+
+            <td class="actions">
+              <a href=""><i class="fa-regular fa-pen-to-square"></i>edit</a>
+              <a href=""><i class="fa-regular fa-trash-can"></i>del</a>
+            </td>
+          </tr>
+          {%endfor%}
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- simple pagination / extra info -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 24px; align-items: center; gap: 20px;">
+      <span style="color:#777;">Showing 1–6 of 18 offers</span>
+      <div>
+        <button class="btn-primary" style="background:white; color:#333; border:1px solid #ddd; padding:8px 16px;"><i class="fa-regular fa-chevron-left"></i></button>
+        <button class="btn-primary" style="background:white; color:#333; border:1px solid #ddd; padding:8px 16px; margin-left:8px;"><i class="fa-regular fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</main>
+{%endblock%}

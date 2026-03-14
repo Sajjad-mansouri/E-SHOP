@@ -6,7 +6,7 @@ from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
 from offer.models import OfferRange, Offer, OfferType
 from .widgets import CustomCheckboxSelectMultiple
-
+from coupon.models import Coupon
 
 class ProductClassForm(forms.ModelForm):
 	class Meta:
@@ -252,5 +252,20 @@ class OfferRestrictionForm(forms.ModelForm):
 			"max_discount":forms.NumberInput(attrs={"class":"form-control", "placeholder":"10.00"}),
 			"start_datetime":forms.DateTimeInput(attrs={"class":"form-control", "type":"datetime-local"}),
 			"end_datetime":forms.DateTimeInput(attrs={"class":"form-control", "type":"datetime-local"}),
+
+		}
+
+class CouponForm(forms.ModelForm):
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		for field_name, field in self.fields.items():
+			field.widget.attrs.update({"class":"form-control"})
+	class Meta:
+		model = Coupon
+		fields = ["code", "description", "valid_from", "valid_to", "discount", "active", "usage"]
+		widgets = {
+				"valid_from":forms.DateTimeInput(attrs={"type":"datetime-local"}),
+				"valid_to":forms.DateTimeInput(attrs={"type":"datetime-local"}),
 
 		}

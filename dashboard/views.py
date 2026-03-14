@@ -22,10 +22,13 @@ from .forms import (
 					OfferDetailForm,
 					OfferTypeForm,
 					OfferRestrictionForm,
+
+					CouponForm,
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
 from offer.models import OfferRange, Offer
+from coupon.models import Coupon
 
 # Create your views here.
 def dashboard(request):
@@ -294,3 +297,14 @@ class DeleteOfferView(DeleteView):
 		success_url = self.get_success_url()
 		self.object.offer_type.delete()
 		return HttpResponseRedirect(success_url)
+
+
+class CouponListView(ListView):
+	model = Coupon
+	template_name = "dashboard/offer/coupon/list.html"
+
+class CouponCreateView(CreateView):
+	model = Coupon
+	form_class = CouponForm
+	success_url = reverse_lazy("dashboard:coupon_list")
+	template_name = "dashboard/offer/coupon/create_update.html"
