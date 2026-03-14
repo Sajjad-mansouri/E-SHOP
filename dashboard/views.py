@@ -256,7 +256,7 @@ class OfferListView(ListView):
 	template_name = "dashboard/offer/offer/list.html"
 
 
-class CreateOfferDetailView(OfferWizardStepView):
+class CreateOfferView(OfferWizardStepView):
 
 	template_name = "dashboard/offer/offer/create_update.html"
 
@@ -264,10 +264,24 @@ class CreateOfferDetailView(OfferWizardStepView):
 class OfferStepView(View):
 	def get(self, request, *args, **kwargs):
 		offer_step = kwargs.get("offer_step")
+		offer_pk = kwargs.get('offer_pk')
+		if offer_pk:
+			offer = get_object_or_404(Offer, pk=offer_pk)
+			offer_type = offer.offer_type
+		else:
+			offer=None
+			offer_type=None
+
 		if offer_step==1:
-			form = OfferDetailForm()
+			form = OfferDetailForm(instance=offer)
 		elif offer_step == 2:
-			form = OfferTypeForm()
+			form = OfferTypeForm(instance=offer_type)
 		elif offer_step == 3:
-			form = OfferRestrictionForm()
+			form = OfferRestrictionForm(instance=offer)
 		return render(request, f"dashboard/offer/offer/_step_{offer_step}.html", {"form":form})
+
+
+
+class UpdateOfferView(CreateOfferView):
+
+	update = True

@@ -43,14 +43,16 @@
         <!-- steps here -->
         <form method="POST">
         {% csrf_token %}
+
           
         </form>
 
         <!-- navigation buttons (prev/next) plus final create -->
         <div class="step-actions">
-          <button class="btn btn-outline" id="prevBtn" disabled><i class="fa-regular fa-chevron-left"></i> Previous</button>
+
           <button class="btn btn-primary" id="nextBtn">Next <i class="fa-regular fa-chevron-right"></i></button>
-          <button class="btn btn-secondary" id="saveOfferBtn" style="display: none;">Create offer</button>
+          <button class="btn btn-secondary" id="saveOfferBtn" style="display: none;" data-update="{{update}}">Create offer</button>
+
         </div>
       </div>
 
@@ -70,19 +72,14 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const saveBtn = document.getElementById('saveOfferBtn');
+    const isUpdate = saveBtn.getAttribute("data-update");
+    let create_form_url = "{{create_form_url}}";
 
     let currentStep = 1; // 1,2,3
 
-    function updateUI() {
+    function updateUI(form_url) {
       const form = stepContent.querySelector('form');
-      let path;
-      if (currentStep == 1){
-        path = "{%url 'dashboard:offer_step' 1 %}"
-      }else if(currentStep == 2){
-        path = "{%url 'dashboard:offer_step' 2 %}"
-      }else if(currentStep == 3){
-        path = "{%url 'dashboard:offer_step' 3 %}"
-      }
+      let path = form_url;
       fetch(path)
       .then(response=>response.text())
       .then(data=>{
@@ -112,30 +109,29 @@
         }
       });
 
-      // prev button logic
-      if (currentStep === 1) {
-        prevBtn.disabled = true;
-      } else {
-        prevBtn.disabled = false;
-      }
+
 
       // next / save button
-      if (currentStep === 3) {
+      if (currentStep === 3 ) {
         nextBtn.style.display = 'none';
         saveBtn.style.display = 'inline-flex';
+      }else if(isUpdate === "True"){
+        saveBtn.style.display = 'inline-flex';
+
       } else {
         nextBtn.style.display = 'inline-flex';
         saveBtn.style.display = 'none';
       }
     }
 
-    async function postForm(){
+    async function postForm(save){
       const form = stepContent.querySelector('form');
       const offerForm = new FormData(form);
+      offerForm.append("save", save)
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
       try {
 
-      const response = await fetch("{%url 'dashboard:offer_create'%}"+"?step="+currentStep , {
+      const response = await fetch(create_form_url, {
         method:"POST",
         headers:{
         "X-CSRFToken":csrfToken,    
@@ -143,28 +139,23 @@
         body:offerForm
         })
       const data = await response.json();
-      return data.is_valid
+
+      return data
       }catch(error){
         throw error
       }
     }
 
-    prevBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (currentStep > 1) {
-        currentStep--;
-        updateUI();
-      }
-    });
 
     nextBtn.addEventListener('click', function(e) {
       e.preventDefault();
       if (currentStep < 3) {
 
-      postForm(currentStep).then(is_valid=>{
-        if(is_valid){
+      postForm().then(data=>{
+        if(data.is_valid){
         currentStep++;
-        updateUI();
+        create_form_url = data.create_form_url
+        updateUI(data.form_url);
 
         }
       })
@@ -176,7 +167,8 @@
 
     saveBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      postForm(currentStep).then(is_valid=>{
+      let save=true;
+      postForm(save).then(is_valid=>{
         if(is_valid){
           window.location.href = "{%url 'dashboard:offer_list'%}"
         }
@@ -187,7 +179,7 @@
     });
 
     // initial state
-    updateUI();
+    updateUI("{{form_url}}");
   })();
 </script>
 {%endblock%}

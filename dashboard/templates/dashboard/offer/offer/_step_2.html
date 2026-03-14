@@ -3,6 +3,9 @@
           <div class="pane-header">
             <h2><i class="fa-regular fa-percent"></i> Offer type</h2>
           </div>
+            {%for hidden in form.hidden_fields%}
+            {{hidden}}
+            {%endfor%}
           <div class="form-group">
             <label for="{{form.offer_range.id_for_label}}"><i class="fa-regular fa-layer-group"></i> {{form.offer_range.label}}</label>
             {{form.offer_range}}

@@ -1,8 +1,11 @@
-      
+
         <div class="step-pane active" id="step1">
           <div class="pane-header">
             <h2><i class="fa-regular fa-pen-to-square"></i> Offer details</h2>
           </div>
+            {%for hidden in form.hidden_fields%}
+            {{hidden}}
+            {%endfor%}
           <div class="form-group">
             
             <label for="{{form.name.id_for_label}}"><i class="fa-regular fa-heading"></i>{{form.name.label}}</label>

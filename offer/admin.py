@@ -8,6 +8,6 @@ class OfferRangeAdmin(admin.ModelAdmin):
 
 @admin.register(Offer)
 class OfferRangeAdmin(admin.ModelAdmin):
-	list_display = ["name", "description", "status", "priority", "max_discount", "created"]
+	list_display = ["id", "name", "description", "status", "priority", "max_discount", "created"]
 
 admin.site.register(OfferType)
