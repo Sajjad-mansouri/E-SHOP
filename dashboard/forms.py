@@ -1,9 +1,10 @@
 from django.forms.models import inlineformset_factory
 from django import forms
+from django.utils import timezone
 from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
-from offer.models import OfferRange
+from offer.models import OfferRange, Offer, OfferType
 from .widgets import CustomCheckboxSelectMultiple
 
 
@@ -216,4 +217,40 @@ class OfferRangeForm(forms.ModelForm):
 		}
 		
 
+class OfferDetailForm(forms.ModelForm):
+	class Meta:
+		model = Offer
+		fields = ["name", "description", "status", "priority"]
+		widgets = {
+			"name":forms.TextInput(attrs={"class":"form-control", "placeholder":"e.g. Summer sale 20%"}),
+			"description":forms.Textarea(attrs={"class":"form-control", "rows":4, "placeholder":"Offer description..."}),
+			"status":forms.Select(attrs={"class":"form-select"}),
+			"priority":forms.NumberInput(attrs={"class":"form-control"})
+		}
 
+class OfferTypeForm(forms.ModelForm):
+	class Meta:
+		model = OfferType
+		fields = ["offer_range", "type", "value"]
+		widgets = {
+			"offer_range":forms.Select(attrs={"class":"form-select"}),
+			"type":forms.Select(attrs={"class":"form-select"}),
+
+			"value":forms.NumberInput(attrs={"class":"form-control"})
+		}
+
+class OfferRestrictionForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields["start_datetime"].initial = timezone.now
+		self.fields["end_datetime"].initial = timezone.now
+		
+	class Meta:
+		model = Offer
+		fields = ["max_discount", "start_datetime", "end_datetime"]
+		widgets = {
+			"max_discount":forms.NumberInput(attrs={"class":"form-control", "placeholder":"10.00"}),
+			"start_datetime":forms.DateTimeInput(attrs={"class":"form-control", "type":"datetime-local"}),
+			"end_datetime":forms.DateTimeInput(attrs={"class":"form-control", "type":"datetime-local"}),
+
+		}

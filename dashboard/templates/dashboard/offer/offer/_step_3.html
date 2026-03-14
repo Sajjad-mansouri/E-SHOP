@@ -1,0 +1,23 @@
+        <!-- STEP 3: Offer restriction (max discount + datetime) -->
+        <div class="step-pane active" id="step3">
+          <div class="pane-header">
+            <h2><i class="fa-regular fa-lock"></i> Offer restriction</h2>
+          </div>
+          <div class="form-group">
+            <label for="{{form.max_discount.id_for_label}}"><i class="fa-regular fa-money-bill"></i> {{form.max_discount.label}}</label>
+            {{form.max_discount}}
+    
+          </div>
+          <div class="row-duo">
+            <div class="form-group">
+              <label for="{{form.start_datetime.id_for_label}}"><i class="fa-regular fa-calendar"></i> {{form.start_datetime.label}}</label>
+              {{form.start_datetime}}
+
+            </div>
+            <div class="form-group">
+              <label for="{{form.end_datetime.id_for_label}}"><i class="fa-regular fa-calendar-check"></i> {{form.end_datetime.label}}</label>
+              {{form.end_datetime}}
+
+            </div>
+          </div>
+        </div>

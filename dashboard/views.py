@@ -7,6 +7,7 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
+from .wizard_views import OfferWizardStepView
 from .forms import (
 					image_formset, 
 					ProductForm, 
@@ -18,6 +19,9 @@ from .forms import (
 					CategoryForm,
 
 					OfferRangeForm,
+					OfferDetailForm,
+					OfferTypeForm,
+					OfferRestrictionForm,
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
@@ -250,3 +254,20 @@ class OfferRangeDeleteView(DeleteView):
 class OfferListView(ListView):
 	model = Offer
 	template_name = "dashboard/offer/offer/list.html"
+
+
+class CreateOfferDetailView(OfferWizardStepView):
+
+	template_name = "dashboard/offer/offer/create_update.html"
+
+
+class OfferStepView(View):
+	def get(self, request, *args, **kwargs):
+		offer_step = kwargs.get("offer_step")
+		if offer_step==1:
+			form = OfferDetailForm()
+		elif offer_step == 2:
+			form = OfferTypeForm()
+		elif offer_step == 3:
+			form = OfferRestrictionForm()
+		return render(request, f"dashboard/offer/offer/_step_{offer_step}.html", {"form":form})

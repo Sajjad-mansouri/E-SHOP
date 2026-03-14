@@ -1,0 +1,193 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/create_update_offer.css'%}">
+{%endblock%}
+
+{%block content%}
+
+<div class="breadcrumb-bar">
+  <div class="breadcrumb">
+    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
+    <a href="#">Offers</a> <i class="fa-solid fa-chevron-right"></i>
+    <span class="current">Create offer</span>
+  </div>
+</div>
+
+<main class="offer-container">
+  <div class="offer-card">
+    <h1><i class="fa-regular fa-tag"></i> Create new offer</h1>
+
+    <div class="multi-step-row">
+      <!-- LEFT: steps (offer, offer type, offer restriction) -->
+      <div class="steps-sidebar">
+        <div class="steps-list">
+          <div class="step-item active" data-step="step1">
+            <span class="step-number">1</span>
+            <span class="step-title">Offer</span>
+          </div>
+          <div class="step-item" data-step="step2">
+            <span class="step-number">2</span>
+            <span class="step-title">Offer type</span>
+          </div>
+          <div class="step-item" data-step="step3">
+            <span class="step-number">3</span>
+            <span class="step-title">Offer restriction</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: dynamic step panes -->
+
+      <div class="step-content">
+        <!-- steps here -->
+        <form method="POST">
+        {% csrf_token %}
+          
+        </form>
+
+        <!-- navigation buttons (prev/next) plus final create -->
+        <div class="step-actions">
+          <button class="btn btn-outline" id="prevBtn" disabled><i class="fa-regular fa-chevron-left"></i> Previous</button>
+          <button class="btn btn-primary" id="nextBtn">Next <i class="fa-regular fa-chevron-right"></i></button>
+          <button class="btn btn-secondary" id="saveOfferBtn" style="display: none;">Create offer</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+{%endblock%}
+{%block script%}
+
+<!-- simple multi‑step javascript (client‑side simulation) -->
+<script>
+  (function() {
+    const stepContent = document.querySelector('.step-content');
+    const steps = document.querySelectorAll('.step-item');
+    const panes = document.querySelectorAll('.step-pane');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const saveBtn = document.getElementById('saveOfferBtn');
+
+    let currentStep = 1; // 1,2,3
+
+    function updateUI() {
+      const form = stepContent.querySelector('form');
+      let path;
+      if (currentStep == 1){
+        path = "{%url 'dashboard:offer_step' 1 %}"
+      }else if(currentStep == 2){
+        path = "{%url 'dashboard:offer_step' 2 %}"
+      }else if(currentStep == 3){
+        path = "{%url 'dashboard:offer_step' 3 %}"
+      }
+      fetch(path)
+      .then(response=>response.text())
+      .then(data=>{
+        let stepPane = form.querySelector('.step-pane')
+        if(stepPane){
+        stepPane.remove()
+        }
+        form.insertAdjacentHTML('afterbegin',data)
+      })
+
+      // activate step item
+      steps.forEach((step, idx) => {
+        const stepNum = idx + 1;
+        if (stepNum === currentStep) {
+          step.classList.add('active');
+        } else {
+          step.classList.remove('active');
+        }
+      });
+
+      // show corresponding pane
+      panes.forEach((pane, idx) => {
+        if (idx + 1 === currentStep) {
+          pane.classList.add('active');
+        } else {
+          pane.classList.remove('active');
+        }
+      });
+
+      // prev button logic
+      if (currentStep === 1) {
+        prevBtn.disabled = true;
+      } else {
+        prevBtn.disabled = false;
+      }
+
+      // next / save button
+      if (currentStep === 3) {
+        nextBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-flex';
+      } else {
+        nextBtn.style.display = 'inline-flex';
+        saveBtn.style.display = 'none';
+      }
+    }
+
+    async function postForm(){
+      const form = stepContent.querySelector('form');
+      const offerForm = new FormData(form);
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+      try {
+
+      const response = await fetch("{%url 'dashboard:offer_create'%}"+"?step="+currentStep , {
+        method:"POST",
+        headers:{
+        "X-CSRFToken":csrfToken,    
+        },
+        body:offerForm
+        })
+      const data = await response.json();
+      return data.is_valid
+      }catch(error){
+        throw error
+      }
+    }
+
+    prevBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (currentStep > 1) {
+        currentStep--;
+        updateUI();
+      }
+    });
+
+    nextBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (currentStep < 3) {
+
+      postForm(currentStep).then(is_valid=>{
+        if(is_valid){
+        currentStep++;
+        updateUI();
+
+        }
+      })
+
+        
+
+      }
+    });
+
+    saveBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      postForm(currentStep).then(is_valid=>{
+        if(is_valid){
+          window.location.href = "{%url 'dashboard:offer_list'%}"
+        }
+      })
+
+      
+      
+    });
+
+    // initial state
+    updateUI();
+  })();
+</script>
+{%endblock%}

@@ -1,0 +1,22 @@
+        <!-- STEP 2: Offer type (range, type, value) -->
+        <div class="step-pane active" id="step2">
+          <div class="pane-header">
+            <h2><i class="fa-regular fa-percent"></i> Offer type</h2>
+          </div>
+          <div class="form-group">
+            <label for="{{form.offer_range.id_for_label}}"><i class="fa-regular fa-layer-group"></i> {{form.offer_range.label}}</label>
+            {{form.offer_range}}
+            <div class="form-text">e.g. "phone range" exists</div>
+          </div>
+          <div class="row-duo">
+            <div class="form-group">
+              <label for="{{form.type.id_for_label}}"><i class="fa-regular fa-gear"></i>{{form.type.label}}</label>
+              {{form.type}}
+            </div>
+            <div class="form-group">
+              <label for="{{form.value.id_for_label}}"><i class="fa-regular fa-calculator"></i>{{form.value.label}}</label>
+              {{form.value}}
+
+            </div>
+          </div>
+        </div>
