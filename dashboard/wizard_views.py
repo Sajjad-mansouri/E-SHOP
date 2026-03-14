@@ -104,7 +104,6 @@ class OfferWizardStepView(FormView):
 
 
 	def save_offer(self):
-		print('save offfer')
 		step = 1
 		step1_model = self._fetch_object(step)
 

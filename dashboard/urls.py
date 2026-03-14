@@ -23,7 +23,8 @@ from .views import (
 					OfferListView,
 					CreateOfferView,
 					OfferStepView,
-					UpdateOfferView
+					UpdateOfferView,
+					DeleteOfferView
 					)
 
 
@@ -62,6 +63,9 @@ urlpatterns = [
 	path("offer/update/<int:offer_pk>/", UpdateOfferView.as_view(), name="offer_update"),
 	path("offer/update/<int:offer_pk>/<int:offer_step>/", UpdateOfferView.as_view(), name="offer_step_update"),
 	path("offer/<int:offer_pk>/<int:offer_step>/", OfferStepView.as_view(), name="update_offer_form"),
+
+	path("offer/delete/<int:pk>/", DeleteOfferView.as_view(), name="delete_offer"),
+
 
 
 

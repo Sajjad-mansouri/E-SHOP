@@ -283,5 +283,14 @@ class OfferStepView(View):
 
 
 class UpdateOfferView(CreateOfferView):
-
 	update = True
+
+class DeleteOfferView(DeleteView):
+	template_name = "dashboard/offer/offer/delete.html"
+	model = Offer
+	success_url = reverse_lazy("dashboard:offer_list")
+
+	def form_valid(self, form):
+		success_url = self.get_success_url()
+		self.object.offer_type.delete()
+		return HttpResponseRedirect(success_url)
