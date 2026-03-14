@@ -2,6 +2,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth import get_user_model
+
+UserModel = get_user_model()
 
 class Coupon(models.Model):
 	code = models.CharField(_("code"), max_length=50, unique=True)
@@ -53,3 +56,19 @@ class Coupon(models.Model):
 			raise exceptions.ValidationError(
 				_("End date should be later than start date")
 			)
+
+class CouponApplication(models.Model):
+	user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="applications", verbose_name=_("User"))
+	coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, verbose_name=_("Coupon"))
+	created = models.DateTimeField(_("created"), auto_now_add=True)
+	updated = models.DateTimeField(_("updated"), auto_now=True)
+
+
+	def __str__(self):
+		return f"{self.user} use {self.coupon}"
+
+	class Meta:
+		verbose_name = _("Coupon Application")
+		verbose_name_plural = _("Coupon Applications")
+
+
