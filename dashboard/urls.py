@@ -28,7 +28,8 @@ from .views import (
 
 
 					CouponListView,
-					CouponCreateView
+					CouponCreateView,
+					CouponUpdateView
 					)
 
 
@@ -73,6 +74,8 @@ urlpatterns = [
 
 	path("offer/coupon/", CouponListView.as_view(), name="coupon_list"),
 	path("offer/coupon/create/", CouponCreateView.as_view(), name="coupon_create"),
+	path("offer/coupon/update/<int:pk>/", CouponUpdateView.as_view(), name="coupon_update"),
+
 
 
 
