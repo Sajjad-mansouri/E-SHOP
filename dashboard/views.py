@@ -13,6 +13,7 @@ from .forms import (
 					ProductForm, 
 					ProductCategoryInline, 
 					StockRecordInlineForm, 
+					StockRecordForm,
 					ProductClassForm,
 					ProductTypeForm,
 					product_type_attr_formset,
@@ -53,16 +54,19 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		product_class_id = request.GET.get('product_class')
 		product_id = kwargs.get('pk')
 		if product_id:
-			self.product = get_object_or_404(Product, id=product_id)
+			self.stock = get_object_or_404(StockRecord, id=product_id)
+			self.product = self.stock.product
 			self.product_class = self.product.product_class
 
 		elif product_class_id:
 			self.product_class = get_object_or_404(ProductClass, id=product_class_id)
 			self.product=None
+			self.stock = None
 
 		else:
 			self.product_class = None
 			self.product=None
+			self.stock = None
 
 
 		return super().dispatch(request, *args, **kwargs)
@@ -73,12 +77,14 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		product_form = ProductForm(self.product_class , instance=self.product,prefix="product")
 
 		product_category_form = ProductCategoryInline(instance=self.product, prefix="category")
-		stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
+		# stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
+		stock_record_form = StockRecordForm(instance=self.stock)
+
 		return self.render_to_response({
 			"img_formset":img_formset, 
 			"product_form":product_form, 
 			"product_category_form":product_category_form,
-			"stock_record_inline":stock_record_inline,
+			"stock_record_form":stock_record_form,
 			"product_class":self.product_class
 
 
@@ -88,40 +94,50 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 		product_form = ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
 		if product_form.is_valid():
+			
 			self.object = product_form.save()
+		else:
 
+			return render(request, "dashboard/catalog/_errors.html", {
+				"items":{
+				"product":{"errors":product_form.errors}}
+
+				}
+				)
 
 		img_formset = image_formset(data=request.POST,files=request.FILES,instance=self.object, prefix="img")
 		product_category_form = ProductCategoryInline(data=request.POST,instance=self.object,  prefix="category")
-		stock_record_inline = StockRecordInlineForm(data=request.POST,instance=self.object,  prefix="stock")
+		stock_record_form = StockRecordForm(data=request.POST, instance=self.stock)
 
-		if img_formset.is_valid() and product_category_form.is_valid() and stock_record_inline.is_valid():
+		if img_formset.is_valid() and product_category_form.is_valid() and stock_record_form.is_valid():
+
 			img_formset.save()
 			product_category_form.save()
 
-			stocks = stock_record_inline.save(commit=False)
-			for stock in stocks:
-				stock.seller = request.user
-				stock.save()
+			stock = stock_record_form.save(commit=False)
+			stock.product = self.object
+			stock.seller = request.user
+			stock.save()
+
 				
 
 		else:
-			return self.render_to_response({
-				"img_formset":img_formset, 
-				"product_form":product_form,
-				"product_category_form":product_category_form,
-				"stock_record_inline":stock_record_inline
+			self.object.delete()
+			return render(request, "dashboard/catalog/_errors.html", {
+				"items":{
+					"stock":{"errors":stock_record_form.errors}
+				}
+
 				})
 
-		return redirect("products")
-
+		return HttpResponse("")
 
 
 
 class DeleteProductView(DeleteView):
 	template_name = "dashboard/delete_product.html"
 	model = Product
-	success_url = reverse_lazy("products")
+	success_url = reverse_lazy("dashboard:products")
 
 
 class SearchProduct(View):

@@ -145,6 +145,11 @@ image_formset = inlineformset_factory(Product, ProductImage,fields = ["image", "
 
 
 class StockRecordForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		# self.fields["sku"].required = True
+
 	class Meta:
 		model = StockRecord
 		fields = ["sku", "num_in_stock", "price",]
@@ -193,8 +198,8 @@ class CategoryForm(CategoryFormFactory):
 class OfferRangeForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.fields["included_products"].queryset = Product.objects.filter(is_public=True)
-		self.fields["excluded_products"].queryset = Product.objects.filter(is_public=True)
+		self.fields["included_products"].queryset = Product.objects.filter(stockrecords__is_public=True)
+		self.fields["excluded_products"].queryset = Product.objects.filter(stockrecords__is_public=True)
 		
 	class Meta:
 		model = OfferRange

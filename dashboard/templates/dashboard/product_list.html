@@ -106,7 +106,7 @@
     event.preventDefault();
     const productClass  = document.getElementById('id_product_class').value
 
-    window.open("{%url 'dashboard:create_product'%}?product_class="+productClass)
+    window.location.href= "{%url 'dashboard:create_product'%}?product_class="+productClass
   })
 
 

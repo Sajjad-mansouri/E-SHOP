@@ -89,7 +89,7 @@ class Product(models.Model):
 	meta_description = models.TextField(blank=True, verbose_name=_('meta description'))
 	view_count = models.PositiveIntegerField(default=0)
 	
-	is_public = models.BooleanField(default=True)
+	
 
 	
 	def save(self, *args, **kwargs):
