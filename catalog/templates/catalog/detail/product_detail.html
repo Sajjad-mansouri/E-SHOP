@@ -247,7 +247,7 @@
 
   let addCartBtn = document.querySelector('.add_to_cart');
   let removeCartBtn = document.querySelector('.remove_from_cart');
-
+  let cartCountSpan = document.querySelector('.cart-count');
   
   function cartFunc(funcType, btn, altBtn){
     console.log()
@@ -274,7 +274,11 @@
     .then(response=>response.json())
     .then(data=>{
       if(data.status==true){
-
+        if (data.type=='add'){
+          cartCountSpan.innerText = Number(cartCountSpan.innerText) + 1
+        }else if (data.type == 'remove'){
+          cartCountSpan.innerText = Number(cartCountSpan.innerText) - 1
+        }
         altBtn.style.display="block"
         btn.style.display="none"
 
