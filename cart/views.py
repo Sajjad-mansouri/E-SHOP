@@ -12,13 +12,34 @@ class AddToCartView(View):
 			cart_item_form = CartItemForm(request.POST)
 			if cart_item_form.is_valid():
 				try:
-					cart = Cart.objects.get(submited=True)
+					cart = Cart.objects.get(submited=False)
 				except Cart.DoesNotExist:
 					cart = Cart.objects.create(user=request.user)
 				cart_item = cart_item_form.save(commit=False)
 				cart_item.cart = cart
 				cart_item.save()
-				return JsonResponse({"add":True})
+				return JsonResponse({"status":True, "type":"add"})
+
+			else:
+				return JsonResponse({"errors":cart_item_form.errors})
+
+
+class RemoveFromCartView(View):
+	def post(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			cart_item_form = CartItemForm(request.POST)
+			if cart_item_form.is_valid():
+				stock_pk = cart_item_form.cleaned_data["stock"]
+				try:
+
+					cart = Cart.objects.get(submited=False)
+					cart_item = CartItem.objects.get(stock=stock_pk, cart=cart)
+					cart_item.delete()
+
+					return JsonResponse({"status":True, "type":"remove"})
+
+				except (Cart.DoesNotExist,CartItem.DoesNotExist):
+					pass	
 
 			else:
 				return JsonResponse({"errors":cart_item_form.errors})

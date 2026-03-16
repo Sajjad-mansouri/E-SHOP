@@ -66,10 +66,12 @@
       <button class="btn-primary"><i class="fa-regular fa-bolt"></i> Buy now</button>
       {% is_bookmarked as is_bookmarked%}
       {%if is_bookmarked%}
-        <button class="btn-secondary add-to-cart"><i class="fa-regular fa-cart-plus"></i> remove from Cart</button>
+        <button class="btn-secondary remove_from_cart"><i class="fa-regular fa-cart-plus"></i> remove from Cart</button>
+        <button class="btn-secondary add_to_cart" style="display:none"><i class="fa-regular fa-cart-plus"></i> add to Cart</button>
 
       {%else%}
-        <button class="btn-secondary add-to-cart"><i class="fa-regular fa-cart-plus"></i> add to Cart</button>
+        <button class="btn-secondary remove_from_cart" style="display:none"><i class="fa-regular fa-cart-plus"></i> remove from Cart</button>
+        <button class="btn-secondary add_to_cart" style="display:block"><i class="fa-regular fa-cart-plus"></i> add to Cart</button>
       {%endif%}
       <button class="btn-wishlist" id="wishlistBtn"><i class="fa-regular fa-heart"></i> add to Wishlist</button>
     </div>
@@ -243,12 +245,26 @@
     item.addEventListener('click',removeComment)
   })
 
-  let addCartBtn = document.querySelector('.add-to-cart');
-  addCartBtn.addEventListener('click',()=>{
+  let addCartBtn = document.querySelector('.add_to_cart');
+  let removeCartBtn = document.querySelector('.remove_from_cart');
+
+  
+  function cartFunc(funcType, btn, altBtn){
+    console.log()
+    let url;
+    let btnText;
+    if(funcType=="add"){
+       url = "{%url 'cart:add_cart_item'%}"
+       btnText = "remove from cart";
+    }else if(funcType=="remove"){
+       url = "{%url 'cart:remove_cart_item'%}"
+       btnText = "add to cart";
+
+    }
     let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     let formData = new FormData()
     formData.append('stock',"{{stock_record.id}}")
-    fetch("{%url 'cart:add_cart'%}",{
+    fetch(url,{
       method:'POST',
       headers:{
         'X-CSRFToken':csrfToken
@@ -257,10 +273,16 @@
     })
     .then(response=>response.json())
     .then(data=>{
-      if(data.add==true){
-        addCartBtn.innerText = "remove from cart"
+      if(data.status==true){
+
+        altBtn.style.display="block"
+        btn.style.display="none"
+
       }
     })
-  })
+  }
+  addCartBtn.addEventListener('click',()=>cartFunc("add", addCartBtn, removeCartBtn))
+  removeCartBtn.addEventListener('click',()=>cartFunc("remove", removeCartBtn, addCartBtn))
+
 </script>
 {%endblock%}
