@@ -8,7 +8,7 @@ UserModel = get_user_model()
 # Create your models here.
 class Cart(models.Model):
 	user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, blank=True, related_name="carts", verbose_name=_("user"))
-
+	submited = models.BooleanField(_("submited"), default=False)
 	date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
 	date_merged = models.DateTimeField(_("Date merged"), null=True, blank=True)
 	date_submitted = models.DateTimeField(_("Date submitted"), null=True, blank=True)
@@ -19,6 +19,7 @@ class Cart(models.Model):
 	class Meta:
 		verbose_name = _("Cart")
 		verbose_name_plural = _("Carts")
+
 
 class CartItem(models.Model):
 	cart = models.ForeignKey(

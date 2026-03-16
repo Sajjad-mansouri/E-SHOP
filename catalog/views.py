@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 from catalog.models import Category, Product
 from stock.models import StockRecord
 from comment.forms import CommentForm
-
+from cart.forms import CartItemForm
 
 class HomePageView(TemplateResponseMixin, View):
 	template_name = "catalog/list/home.html"
@@ -40,6 +40,7 @@ class ProductDetailView(DetailView):
 		context["stock_record"] = stock_record
 		context["attributes_values"] = attributes_values
 		context['comment_form']=comment_form
+		context['cart_form'] = CartItemForm()
 
 		return context
 
