@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from stock.models import StockRecord
+from django.contrib import admin
 
 UserModel = get_user_model()
 
@@ -19,6 +20,14 @@ class Cart(models.Model):
 	class Meta:
 		verbose_name = _("Cart")
 		verbose_name_plural = _("Carts")
+
+	@property
+	@admin.display(description="Total Items price")
+	def get_items_price(self):
+		total = 0
+		for item in self.items.all():
+			total += item.get_item_price
+		return total
 
 
 class CartItem(models.Model):
@@ -43,3 +52,10 @@ class CartItem(models.Model):
 	class Meta:
 		verbose_name = _("Cart Item")
 		verbose_name_plural = _("Cart Items")
+
+	@property
+	@admin.display(description="Item price")
+	def get_item_price(self):
+		stock_final_price = self.stock.get_final_price
+		return stock_final_price * self.quantity
+
