@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateResponseMixin
 from django.http import JsonResponse
 from .models import Cart, CartItem
 from .forms import CartItemForm
@@ -43,3 +43,19 @@ class RemoveFromCartView(View):
 
 			else:
 				return JsonResponse({"errors":cart_item_form.errors})
+
+class CartView(TemplateResponseMixin, View):
+	template_name = "cart/items.html"
+
+
+	def get(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			try:
+				cart = Cart.objects.get(submited=False)
+			except Cart.DoesNotExist:
+				cart = Cart.objects.create(user=request.user)
+
+			cart_items = cart.items.all()
+		else:
+			cart_items = []
+		return self.render_to_response({"items":cart_items})

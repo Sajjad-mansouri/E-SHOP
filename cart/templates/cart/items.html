@@ -1,0 +1,246 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/cart_style.css'%}">
+{%endblock%}
+
+{%block content%}
+
+  <!-- main content -->
+  <div class="container">
+    <h2 class="section-title">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span>Your Shopping Cart</span>
+    </h2>
+
+    <!-- Coupon Section -->
+    <div class="coupon-section">
+      <h3 style="margin-bottom: 16px; color: var(--primary); font-size: 1.1rem;">Apply Coupon</h3>
+      <div class="coupon-input">
+        <input type="text" id="coupon-code" placeholder="Enter coupon code (e.g. SAVE10)" />
+        <button class="apply-btn" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div id="coupon-message" class="coupon-message"></div>
+    </div>
+
+    <!-- Cart Table -->
+    <div class="cart-table">
+      <div class="cart-header">
+        <div>Product</div>
+        <div>Price</div>
+        <div>Quantity</div>
+        <div>Subtotal</div>
+        <div>Remove</div>
+      </div>
+
+      <!-- Cart Items -->
+      <div id="cart-items">
+        <!-- Item 1: With Product Discount -->
+        {%for item in items%}
+        <div class="cart-item" data-id="1" data-original-price="89.00" data-discount="30%">
+          <div class="product-info">
+            <img src="{{item.stock.product.images.all.0.image.url}}" alt="Noise cancelling headphones" class="product-img">
+            <div>
+              <div class="product-name">{{item.stock.product.title}}</div>
+              <div class="product-discount">−30% off</div>
+            </div>
+          </div>
+          <div class="price">
+            <span class="old-price">${{item.stock.price}}</span>
+            <span class="discounted-price">$89.00</span>
+          </div>
+          <div class="quantity-control">
+            <button class="quantity-btn minus">−</button>
+            <span class="quantity-value">{{item.quantity}}</span>
+            <button class="quantity-btn plus">+</button>
+          </div>
+          <div class="price subtotal">$89.00</div>
+          <button class="remove-btn" onclick="removeItem(this)">✕</button>
+        </div>
+        {%endfor%}
+
+      </div>
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+      <div class="summary-row">
+        <span>Subtotal (3 items)</span>
+        <span id="subtotal">$1436.00</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span id="shipping">$9.99</span>
+      </div>
+      <div class="summary-row">
+        <span>Tax (8.5%)</span>
+        <span id="tax">$122.06</span>
+      </div>
+      <div class="summary-row" style="border-top: 1px solid var(--border); padding-top: 10px;">
+        <strong>Total</strong>
+        <strong id="total">$1568.05</strong>
+      </div>
+
+      <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+    </div>
+
+    <!-- Empty Cart State -->
+    <div id="empty-cart" class="empty-cart" style="display: none;">
+      <i class="fa-regular fa-cart-shopping"></i>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet.</p>
+      <a href="index.html">Continue Shopping →</a>
+    </div>
+  </div>
+
+{%endblock%}
+
+
+
+{%block script%}
+<script>
+    // Coupon Codes (in real app, fetch from server)
+    const COUPONS = {
+      "SAVE10": { type: "percentage", value: 10 },
+      "SAVE20": { type: "percentage", value: 20 },
+      "FREESHIP": { type: "fixed", value: 9.99 },
+      "WELCOME": { type: "percentage", value: 15 }
+    };
+
+    // DOM Elements
+    const couponInput = document.getElementById("coupon-code");
+    const couponMessage = document.getElementById("coupon-message");
+    const cartItems = document.querySelectorAll(".cart-item");
+
+    // Update cart count
+    const cartCount = document.querySelector('.cart-count');
+    cartCount.textContent = cartItems.length;
+
+    // Update totals
+    function updateTotals() {
+      let subtotal = 0;
+      let originalTotal = 0;
+
+      document.querySelectorAll('.cart-item').forEach(item => {
+        const price = parseFloat(item.querySelector('.discounted-price')?.textContent.replace('$', '') || 
+                                  item.querySelector('.price').textContent.replace('$', ''));
+        const qty = parseInt(item.querySelector('.quantity-value').textContent);
+        const total = price * qty;
+        item.querySelector('.subtotal').textContent = `$${total.toFixed(2)}`;
+        subtotal += total;
+        originalTotal += price * qty;
+      });
+
+      const taxRate = 0.085;
+      const tax = subtotal * taxRate;
+      const shipping = 9.99;
+
+      // Apply coupon if active
+      const couponCode = couponInput.value.trim().toUpperCase();
+      let discountAmount = 0;
+      let discountType = '';
+
+      if (COUPONS[couponCode]) {
+        const coupon = COUPONS[couponCode];
+        if (coupon.type === "percentage") {
+          discountAmount = (subtotal * coupon.value) / 100;
+          discountType = `${coupon.value}%`;
+        } else if (coupon.type === "fixed") {
+          discountAmount = Math.min(coupon.value, subtotal);
+          discountType = `Fixed $${coupon.value.toFixed(2)}`;
+        }
+      }
+
+      const finalTotal = subtotal + tax + shipping - discountAmount;
+
+      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('shipping').textContent = `$${shipping.toFixed(2)}`;
+      document.getElementById('total').textContent = `$${finalTotal.toFixed(2)}`;
+
+      // Show discount info
+      if (discountAmount > 0) {
+        const discountRow = document.createElement("div");
+        discountRow.className = "summary-row";
+        discountRow.innerHTML = `<span><strong>Coupon: ${couponCode} (${discountType})</strong></span><span>- $${discountAmount.toFixed(2)}</span>`;
+        const existing = document.querySelector('.summary-row:nth-child(5)');
+        if (existing) {
+          existing.parentNode.insertBefore(discountRow, existing.nextSibling);
+        } else {
+          document.querySelector('.cart-summary').appendChild(discountRow);
+        }
+      }
+
+      // Show/hide empty cart
+      const emptyCart = document.getElementById('empty-cart');
+      if (cartItems.length === 0) {
+        emptyCart.style.display = 'block';
+      } else {
+        emptyCart.style.display = 'none';
+      }
+    }
+
+    // Quantity controls
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const item = this.closest('.cart-item');
+        const valueEl = item.querySelector('.quantity-value');
+        let value = parseInt(valueEl.textContent);
+
+        if (this.classList.contains('plus')) {
+          value++;
+        } else if (this.classList.contains('minus') && value > 1) {
+          value--;
+        }
+
+        valueEl.textContent = value;
+        updateTotals();
+      });
+    });
+
+    // Remove item
+    function removeItem(button) {
+      const item = button.closest('.cart-item');
+      item.remove();
+      updateTotals();
+    }
+
+    // Apply Coupon
+    function applyCoupon() {
+      const code = couponInput.value.trim().toUpperCase();
+      const messageEl = document.getElementById("coupon-message");
+
+      if (!code) {
+        showMessage("Please enter a coupon code.", "error");
+        return;
+      }
+
+      if (COUPONS[code]) {
+        showMessage(`Coupon ${code} applied!`, "success");
+        updateTotals();
+      } else {
+        showMessage("Invalid or expired coupon.", "error");
+      }
+    }
+
+    // Helper: Show message
+    function showMessage(text, type) {
+      const msg = document.getElementById("coupon-message");
+      msg.textContent = text;
+      msg.className = `coupon-message ${type}`;
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000);
+    }
+
+    // Checkout
+    function checkout() {
+      alert('Proceeding to checkout... (In a real app, this would redirect to payment page)');
+      // window.location.href = 'checkout.html';
+    }
+
+    // Initialize
+    updateTotals();
+  </script>
+{%endblock%}
