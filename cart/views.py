@@ -58,4 +58,4 @@ class CartView(TemplateResponseMixin, View):
 			cart_items = cart.items.all()
 		else:
 			cart_items = []
-		return self.render_to_response({"items":cart_items})
+		return self.render_to_response({"items":cart_items, "cart":cart})

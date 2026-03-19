@@ -47,14 +47,14 @@
           </div>
           <div class="price">
             <span class="old-price">${{item.stock.price}}</span>
-            <span class="discounted-price">$89.00</span>
+            <span class="discounted-price">${{item.stock.get_final_price}}</span>
           </div>
           <div class="quantity-control">
             <button class="quantity-btn minus">−</button>
             <span class="quantity-value">{{item.quantity}}</span>
             <button class="quantity-btn plus">+</button>
           </div>
-          <div class="price subtotal">$89.00</div>
+          <div class="price subtotal">${{item.get_item_price}}</div>
           <button class="remove-btn" onclick="removeItem(this)">✕</button>
         </div>
         {%endfor%}
@@ -65,20 +65,16 @@
     <!-- Cart Summary -->
     <div class="cart-summary">
       <div class="summary-row">
-        <span>Subtotal (3 items)</span>
+        <span>Subtotal ({{items|length}} items)</span>
         <span id="subtotal">$1436.00</span>
       </div>
       <div class="summary-row">
-        <span>Shipping</span>
-        <span id="shipping">$9.99</span>
-      </div>
-      <div class="summary-row">
-        <span>Tax (8.5%)</span>
-        <span id="tax">$122.06</span>
+        <span>Coupon</span>
+        <span id="coupon">-$0.00</span>
       </div>
       <div class="summary-row" style="border-top: 1px solid var(--border); padding-top: 10px;">
         <strong>Total</strong>
-        <strong id="total">$1568.05</strong>
+        <strong id="total">${{cart.get_items_price}}</strong>
       </div>
 
       <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
