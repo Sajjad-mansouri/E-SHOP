@@ -87,6 +87,7 @@ class OfferRange(models.Model):
 				& excluded_products_filter & excluded_categories_filter & public_filter
 				)
 		offer_products = Product.objects.filter(_filter)
+
 		return offer_products
 
 	@property

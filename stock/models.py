@@ -1,11 +1,14 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib import admin
 
 from comment.models import Comment
+from offer.models import OfferRange, OfferType, Offer
 
 User = get_user_model()
 
@@ -40,7 +43,7 @@ class StockRecord(models.Model):
 	low_stock_threshold = models.PositiveIntegerField(
 		blank=True, null=True, verbose_name=_("Low Stock Threshold")
 	)
-	discount = models.IntegerField(_("discount"), validators=[MinValueValidator(0),MaxValueValidator(100)])
+	discount = models.IntegerField(_("discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 
 
 	# Date information
@@ -57,4 +60,41 @@ class StockRecord(models.Model):
 		return f"record: seller {self.seller}, product {self.product}"
 
 
-	
+	@property
+	def get_product_discounts(self):
+
+		offers = Offer.objects.filter(Q(status="open"))
+		product_discounts = []
+		for offer in offers:
+			product = offer.offer_type.offer_range.get_products.filter(id=self.product.id).exists()
+			product_discounts.append((offer.offer_type.value, offer.priority, offer.name))
+
+
+		if not product_discounts:
+			last_offer_priority = 0
+		else:
+			last_offer_priority = product_discounts[-1][1]+1
+
+		product_discounts.sort(key=lambda x:x[1])
+		product_discounts.append((self.discount, last_offer_priority, "personal"))
+		return product_discounts
+
+	@property
+	@admin.display(description="discount(%)")
+	def get_discount(self):
+		product_discounts = self.get_product_discounts
+		return product_discounts[0][0]
+
+	@property
+	@admin.display(description="discount type")
+	def get_type_of_discount(self):
+		product_discounts = self.get_product_discounts
+
+		return product_discounts[0][2]
+
+	@property
+	@admin.display(description="price after discount")
+	def get_final_price(self):
+		discount = self.get_discount
+
+		return self.price - (self.price * (discount/100))
