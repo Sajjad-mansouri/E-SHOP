@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 from comment.models import Comment
 
 User = get_user_model()
@@ -38,6 +40,8 @@ class StockRecord(models.Model):
 	low_stock_threshold = models.PositiveIntegerField(
 		blank=True, null=True, verbose_name=_("Low Stock Threshold")
 	)
+	discount = models.IntegerField(_("discount"), validators=[MinValueValidator(0),MaxValueValidator(100)])
+
 
 	# Date information
 	date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
@@ -51,3 +55,6 @@ class StockRecord(models.Model):
 
 	def __str__(self):
 		return f"record: seller {self.seller}, product {self.product}"
+
+
+	
