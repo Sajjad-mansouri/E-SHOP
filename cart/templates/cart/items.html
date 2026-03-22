@@ -31,6 +31,7 @@
         <div>Quantity</div>
         <div>Subtotal</div>
         <div>Remove</div>
+
       </div>
 
       <!-- Cart Items -->
@@ -38,12 +39,12 @@
         <!-- Item 1: With Product Discount -->
         {%csrf_token%}
         {%for item in items%}
-        <div class="cart-item" data-id="1" data-original-price="89.00" data-discount="30%">
+        <div class="cart-item" data-id="{{item.id}}" data-original-price="{{item.stock.price}}" data-discount="{{item.stock.get_discount}}">
           <div class="product-info">
             <img src="{{item.stock.product.images.all.0.image.url}}" alt="Noise cancelling headphones" class="product-img">
             <div>
               <div class="product-name">{{item.stock.product.title}}</div>
-              <div class="product-discount">−30% off</div>
+              <div class="product-discount">−{{item.stock.get_discount}}% off</div>
             </div>
           </div>
           <div class="price">
@@ -56,6 +57,8 @@
             <button class="quantity-btn plus">+</button>
           </div>
           <div class="price subtotal">${{item.get_item_price}}</div>
+
+
           <button class="remove-btn" onclick="removeItem(this)">✕</button>
         </div>
         {%endfor%}
@@ -101,21 +104,38 @@
     const couponInput = document.getElementById("coupon-code");
     const couponMessage = document.getElementById("coupon-message");
     const cartItems = document.querySelectorAll(".cart-item");
+    let couponDiscount;
 
     // Update cart count
     const cartCount = document.querySelector('.cart-count');
     cartCount.textContent = cartItems.length;
 
     // Update totals
-    function updateTotals(data) {
-      const discount = data.discount
-      const subtotal = Number(document.getElementById('subtotal').getAttribute("data-subtotal"));
-      const finalTotal = subtotal - (discount/100)*subtotal;
-      const couponSpan = document.getElementById('coupon');
-      couponSpan.parentNode.style.display='flex'
-      couponSpan.innerText = `-${discount}%`
-      document.getElementById('total').textContent = `$${finalTotal.toFixed(2)}`;
+    function updateTotals() {
+      const discount = couponDiscount
+      let subtotal = 0;
+      let originalTotal = 0;
+      document.querySelectorAll('.cart-item').forEach(item => {
+        const price = parseFloat(item.querySelector('.discounted-price')?.textContent.replace('$', '') || 
+                                  item.querySelector('.price').textContent.replace('$', ''));
+        const qty = parseInt(item.querySelector('.quantity-value').textContent);
+        const total = price * qty;
+        item.querySelector('.subtotal').textContent = `$${total.toFixed(2)}`;
+        subtotal += total;
+        originalTotal += price * qty;
+      });
+      console.log(originalTotal)
+      // const subtotal = Number(document.getElementById('subtotal').getAttribute("data-subtotal"));
+      if(couponDiscount){
 
+        const couponSpan = document.getElementById('coupon');
+
+        couponSpan.parentNode.style.display='flex'
+        couponSpan.innerText = `-${discount}%`
+        originalTotal = originalTotal - (discount/100)*originalTotal;
+      }
+      document.getElementById('total').textContent = `$${originalTotal.toFixed(2)}`;
+      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
 
 
       // Show/hide empty cart
@@ -127,16 +147,38 @@
       }
     }
 
+    function change_quantity(dataId, func){
+      let formData = new FormData()
+      formData.append('id', dataId);
+      formData.append('func', func)
+      let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+      fetch("{%url 'cart:change_item_quantity' %}",{
+        method:'POST',
+        headers:{
+          'X-CSRFToken':csrftoken
+        },
+        body:formData
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        console.log(data)
+      })
+    }
     // Quantity controls
     document.querySelectorAll('.quantity-btn').forEach(btn => {
       btn.addEventListener('click', function () {
         const item = this.closest('.cart-item');
         const valueEl = item.querySelector('.quantity-value');
+        const itemId = item.getAttribute('data-id');
         let value = parseInt(valueEl.textContent);
 
+
         if (this.classList.contains('plus')) {
+          change_quantity(itemId, 'plus')
           value++;
         } else if (this.classList.contains('minus') && value > 1) {
+          change_quantity(itemId, 'minus')
+
           value--;
         }
 
@@ -177,7 +219,8 @@
         if(data.is_valid==true){
 
           showMessage(`Coupon ${code} applied!`, "success",);
-          updateTotals(data);
+          couponDiscount = data.discount
+          updateTotals();
         }else{
           showMessage("Invalid or expired coupon.", "error");
         }
