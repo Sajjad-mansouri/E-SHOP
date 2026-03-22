@@ -62,7 +62,7 @@ class CartView(TemplateResponseMixin, View):
 		return self.render_to_response({"items":cart_items, "cart":cart})
 
 
-class CartItemQuantity(View):
+class ModifyCartItemView(View):
 	def post(self, request, *args, **kwargs):
 		cart_item_id = int(request.POST.get('id'))
 		func = request.POST.get('func')
@@ -72,7 +72,11 @@ class CartItemQuantity(View):
 				cart_item.quantity = F("quantity") + 1
 			elif func == "minus":
 				cart_item.quantity = F("quantity") - 1
-			cart_item.save()
+			elif func == "remove":
+				cart_item.delete()
+
+			if func != "remove":
+				cart_item.save()
 
 			return JsonResponse({"status":True}) 
 		except CartItem.DoesNotExist:

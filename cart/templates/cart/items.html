@@ -13,6 +13,7 @@
       <span>Your Shopping Cart</span>
     </h2>
 
+    {%if items%}
     <!-- Coupon Section -->
     <div class="coupon-section">
       <h3 style="margin-bottom: 16px; color: var(--primary); font-size: 1.1rem;">Apply Coupon</h3>
@@ -83,13 +84,13 @@
 
       <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
     </div>
-
+    {%endif%}
     <!-- Empty Cart State -->
-    <div id="empty-cart" class="empty-cart" style="display: none;">
+    <div id="empty-cart" class="empty-cart" {%if items%}style="display: none;"{%endif%}>
       <i class="fa-regular fa-cart-shopping"></i>
       <h3>Your cart is empty</h3>
       <p>Looks like you haven't added anything yet.</p>
-      <a href="index.html">Continue Shopping →</a>
+      <a href="{%url 'catalog:home'%}">Continue Shopping →</a>
     </div>
   </div>
 
@@ -103,15 +104,14 @@
     // DOM Elements
     const couponInput = document.getElementById("coupon-code");
     const couponMessage = document.getElementById("coupon-message");
-    const cartItems = document.querySelectorAll(".cart-item");
     let couponDiscount;
 
     // Update cart count
-    const cartCount = document.querySelector('.cart-count');
-    cartCount.textContent = cartItems.length;
+
 
     // Update totals
     function updateTotals() {
+      let  cartItems = document.querySelectorAll(".cart-item");
       const discount = couponDiscount
       let subtotal = 0;
       let originalTotal = 0;
@@ -140,33 +140,48 @@
 
       // Show/hide empty cart
       const emptyCart = document.getElementById('empty-cart');
+      const cartSummary = document.querySelector('.cart-summary');
+      const couponSection = document.querySelector('.coupon-section');
+      const cartTable = document.querySelector('.cart-table');
+
+
+      console.log('cart item length',cartItems.length)
       if (cartItems.length === 0) {
         emptyCart.style.display = 'block';
+        cartSummary.style.display = 'none';
+        couponSection.style.display = 'none';
+        cartTable.style.display = 'none';
+
+
       } else {
         emptyCart.style.display = 'none';
+        cartSummary.style.display = 'block';
+        couponSection.style.display = 'block';
+        cartTable.style.display = 'block';
+
+
       }
     }
 
-    function change_quantity(dataId, func){
+    async function modify_item(dataId, func){
       let formData = new FormData()
       formData.append('id', dataId);
       formData.append('func', func)
       let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
-      fetch("{%url 'cart:change_item_quantity' %}",{
+      const response = await fetch("{%url 'cart:modify_item' %}",{
         method:'POST',
         headers:{
           'X-CSRFToken':csrftoken
         },
         body:formData
       })
-      .then(response=>response.json())
-      .then(data=>{
-        console.log(data)
-      })
+      const data = response.json()
+      return data
+      
     }
     // Quantity controls
     document.querySelectorAll('.quantity-btn').forEach(btn => {
-      btn.addEventListener('click', function () {
+      btn.addEventListener('click', async function () {
         const item = this.closest('.cart-item');
         const valueEl = item.querySelector('.quantity-value');
         const itemId = item.getAttribute('data-id');
@@ -174,12 +189,15 @@
 
 
         if (this.classList.contains('plus')) {
-          change_quantity(itemId, 'plus')
-          value++;
+          let data = await modify_item(itemId, 'plus')
+          if(data.status){
+            value++;
+          }
         } else if (this.classList.contains('minus') && value > 1) {
-          change_quantity(itemId, 'minus')
-
-          value--;
+          let data = await modify_item(itemId, 'minus')
+          if(data.status){
+            value--;
+          }
         }
 
         valueEl.textContent = value;
@@ -188,10 +206,15 @@
     });
 
     // Remove item
-    function removeItem(button) {
+    async function removeItem(button) {
       const item = button.closest('.cart-item');
-      item.remove();
-      updateTotals();
+      let itemId = item.getAttribute('data-id');
+      let data = await modify_item(itemId, 'remove')
+      if(data.status){
+
+            item.remove();
+            updateTotals();
+          }
     }
 
     // Apply Coupon
