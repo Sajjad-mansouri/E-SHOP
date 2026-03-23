@@ -2,6 +2,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+UserModel = get_user_model()
 
 
 class ProductClass(models.Model):
@@ -88,6 +92,7 @@ class Product(models.Model):
 	meta_title = models.CharField(max_length=255, blank=True, verbose_name=_('meta title'))
 	meta_description = models.TextField(blank=True, verbose_name=_('meta description'))
 	view_count = models.PositiveIntegerField(default=0)
+	rating = models.ManyToManyField(UserModel, through='UserRating', verbose_name=_("rating"))
 	
 	
 
@@ -231,3 +236,18 @@ class ProductImage(models.Model):
 		verbose_name_plural = _("Product images")
 	def __str__(self):
 		return f'{self.product} image'
+
+class UserRating(models.Model):
+	user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="ratings", verbose_name=_("user"))
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("product"))
+	rating = models.IntegerField(_("rating"), validators=[MinValueValidator(0),MaxValueValidator(5)])
+
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+
+	class Meta:
+		verbose_name = _("User Rating")
+		verbose_name_plural = _("User Ratings")
+	def __str__(self):
+		return f'{self.user} rate {self.product} {self.rating}'

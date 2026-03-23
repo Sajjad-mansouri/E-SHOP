@@ -449,24 +449,34 @@
       align-items: center;
       gap: 10px;
     }
+.rating-container{
+  display: inline-block;
+}
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
 
-    .rating-input {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin: 20px 0;
-      padding: 10px 0;
-    }
-    .rating-stars i {
-      font-size: 1.8rem;
-      color: #aaa;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .rating-stars i:hover,
-    .rating-stars i.selected {
-      color: #f5b342;
-    }
+.rating input {
+  display: none;
+}
+
+.rating label {
+  font-size: 28px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.rating label:hover,
+.rating label:hover ~ label {
+  color: #ffc107;
+}
+
+.rating input:checked ~ label {
+  color: #ffc107;
+}
 
     .form-group { margin: 22px 0; }
     .form-group input,

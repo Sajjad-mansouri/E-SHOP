@@ -18,7 +18,7 @@
 </div>
 
 <!-- PRODUCT DETAIL MAIN -->
-<div class="product-detail">
+<div class="product-detail" data-id="{{product.id}}">
   <!-- LEFT: gallery with thumbnails -->
   <div class="gallery-section">
     <div class="main-image" id="mainImageContainer">
@@ -40,9 +40,10 @@
     <!-- rating above -->
     <div class="rating-row">
       <div class="stars">
-        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-alt"></i>
+      <label>★</label>
+
       </div>
-      <span class="rating-count">4.6 (2,384 reviews)</span>
+      <span class="rating-count">{{product_ratings}} ({{product_ratings_count}} reviews)</span>
     </div>
 
     <h1>{{product.title}}</h1>
@@ -112,12 +113,24 @@
         <h3><i class="fa-regular fa-pen-to-square"></i> Write a review</h3>
         <div class="rating-input">
           <span style="font-weight:600;">Your rating:</span>
-          <div class="rating-stars" id="ratingStars">
-            <i class="fa-regular fa-star" data-value="1"></i>
-            <i class="fa-regular fa-star" data-value="2"></i>
-            <i class="fa-regular fa-star" data-value="3"></i>
-            <i class="fa-regular fa-star" data-value="4"></i>
-            <i class="fa-regular fa-star" data-value="5"></i>
+          <div class="rating-container">
+            <div class="rating">
+              <input type="radio" name="rating" id="star5" data-rating=5 {%if user_product_rating|length == 5%}checked{%endif%}>
+              <label for="star5">★</label>
+
+              <input type="radio" name="rating" id="star4" data-rating=4 {%if user_product_rating|length == 4%}checked{%endif%}>
+              <label for="star4">★</label>
+
+              <input type="radio" name="rating" id="star3" data-rating=3 {%if user_product_rating|length == 3%}checked{%endif%}>
+              <label for="star3">★</label>
+
+              <input type="radio" name="rating" id="star2" data-rating=2 {%if user_product_rating|length == 2%}checked{%endif%}>
+              <label for="star2">★</label>
+
+              <input type="radio" name="rating" id="star1" data-rating=1 {%if user_product_rating|length == 1%}checked{%endif%}>
+              <label for="star1">★</label>
+            </div>
+
           </div>
         </div>
 
@@ -160,41 +173,29 @@
   }
 
   // interactive rating stars (UI only)
-  const stars = document.querySelectorAll('#ratingStars i');
-  stars.forEach(star => {
-    star.addEventListener('mouseenter', function() {
-      const val = parseInt(this.dataset.value);
-      stars.forEach((s, idx) => {
-        if (idx < val) {
-          s.classList.remove('fa-regular');
-          s.classList.add('fa-solid');
-        } else {
-          s.classList.remove('fa-solid');
-          s.classList.add('fa-regular');
-        }
-      });
-    });
-    star.addEventListener('mouseleave', function() {
-      // reset all to regular (clear selection)
-      stars.forEach(s => {
-        s.classList.remove('fa-solid');
-        s.classList.add('fa-regular');
-      });
-    });
-    star.addEventListener('click', function() {
-      const val = parseInt(this.dataset.value);
-      stars.forEach((s, idx) => {
-        if (idx < val) {
-          s.classList.remove('fa-regular');
-          s.classList.add('fa-solid');
-        } else {
-          s.classList.remove('fa-solid');
-          s.classList.add('fa-regular');
-        }
-      });
-    });
-  });
+document.querySelectorAll('.rating input').forEach((radio) => {
+  radio.addEventListener('change', () => {
+    const ratingValue = document.querySelector('.rating input:checked').getAttribute('data-rating');
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const productId = document.querySelector('.product-detail').getAttribute('data-id')
 
+    const formData = new FormData();
+    formData.append('rating', ratingValue);
+    formData.append('product_id', productId);
+
+    fetch("{%url 'catalog:apply_rating' %}",{
+      method:"POST",
+      headers:{
+        "X-CSRFToken":csrftoken
+      },
+      body:formData
+  })
+    .then(response=>response.json())
+    .then(data=>{
+      console.log(data)
+    })
+});
+})
 
   let submitReview = document.querySelector('.submit-review');
   submitReview.addEventListener('click', ()=>{

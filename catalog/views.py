@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.http import JsonResponse
+from django.db.models import Avg
 
-from catalog.models import Category, Product
+from catalog.models import Category, Product, UserRating
 from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
@@ -39,10 +41,23 @@ class ProductDetailView(DetailView):
 		stock_record = get_object_or_404(StockRecord, id=stock_record_id)
 		attributes_values = self.get_attribute_values()
 		comment_form = CommentForm(initial={'stock_record':stock_record})
+		try:
+			user_product_rating = range(UserRating.objects.get(user=self.request.user, product=self.object).rating)
+		except UserRating.DoesNotExist:
+			user_product_rating = []
+
+		product_ratings = UserRating.objects.filter(product=self.object).aggregate(rating_mean=Avg("rating", default=0))
+		product_ratings_count = UserRating.objects.filter(product=self.object).distinct().count()
+
+
 		context["stock_record"] = stock_record
 		context["attributes_values"] = attributes_values
-		context['comment_form']=comment_form
-		context['cart_form'] = CartItemForm()
+		context["comment_form"]=comment_form
+		context["cart_form"] = CartItemForm()
+		context["user_product_rating"] = user_product_rating
+		context["product_ratings"] = product_ratings["rating_mean"]
+		context["product_ratings_count"] = product_ratings_count
+
 
 		return context
 
@@ -77,3 +92,21 @@ class CategoryProducts(ListView):
 		stocks = StockRecord.objects.filter(product__categories__in=descendants).distinct()
 		return stocks
 
+
+class ApplyRating(View):
+	def post(self, request, *args, **kwargs):
+
+		rating = int(request.POST.get("rating"))
+		product_id = request.POST.get("product_id")
+		try:
+			product = Product.objects.get(id=product_id)
+		except Product.DoesNotExist:
+			return JsonResponse({"status":False})
+
+		try:
+			user_rating = UserRating.objects.get(user=request.user, product=product)
+			user_rating.rating = rating
+			user_rating.save()
+		except UserRating.DoesNotExist:
+			UserRating.objects.create(user=request.user, product=product, rating=rating)
+		return JsonResponse({"status":True})
