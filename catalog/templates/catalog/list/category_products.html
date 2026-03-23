@@ -1,0 +1,559 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/category_products.css'%}">
+{%endblock%}
+{%block content%}
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="{%url 'catalog:home'%}">Home</a>
+  <span>/</span>
+  {%for cat in breadcrumb%}
+  <a href="{%url 'catalog:category' cat.slug%}">{{cat.name}}</a>
+  {% if not forloop.last %}
+  <span>/</span>
+  {%endif%}
+  {%endfor%}
+
+</div>
+
+<!-- CATEGORY PAGE CONTENT -->
+<div class="category-page-container">
+  <!-- FILTER SIDEBAR -->
+  <aside class="filter-sidebar">
+    <div class="filter-header">
+      <h3>Filters</h3>
+      <button class="clear-filters" id="clearFilters">Clear All</button>
+    </div>
+
+    <!-- Price Filter -->
+    <div class="filter-section">
+      <div class="filter-title">Price Range</div>
+      <div class="price-range">
+        <div class="price-inputs">
+          <input type="number" class="price-input" id="minPrice" placeholder="Min" value="0">
+          <input type="number" class="price-input" id="maxPrice" placeholder="Max" value="2000">
+        </div>
+        <button class="apply-price" id="applyPrice">Apply Price</button>
+      </div>
+    </div>
+
+    <!-- Brand Filter -->
+    <div class="filter-section">
+      <div class="filter-title">Brand</div>
+      <div class="filter-options">
+        <div class="filter-option">
+          <input type="checkbox" id="brand-samsung" checked>
+          <label for="brand-samsung">Samsung</label>
+          <span class="filter-count">(12)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="brand-apple">
+          <label for="brand-apple">Apple</label>
+          <span class="filter-count">(8)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="brand-xiaomi">
+          <label for="brand-xiaomi">Xiaomi</label>
+          <span class="filter-count">(6)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="brand-google">
+          <label for="brand-google">Google</label>
+          <span class="filter-count">(4)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="brand-oneplus">
+          <label for="brand-oneplus">OnePlus</label>
+          <span class="filter-count">(5)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RAM Filter -->
+    <div class="filter-section">
+      <div class="filter-title">RAM</div>
+      <div class="filter-options">
+        <div class="filter-option">
+          <input type="checkbox" id="ram-8gb">
+          <label for="ram-8gb">8 GB</label>
+          <span class="filter-count">(15)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="ram-12gb">
+          <label for="ram-12gb">12 GB</label>
+          <span class="filter-count">(10)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="ram-16gb">
+          <label for="ram-16gb">16 GB</label>
+          <span class="filter-count">(6)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="ram-4gb">
+          <label for="ram-4gb">4 GB</label>
+          <span class="filter-count">(4)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage Filter -->
+    <div class="filter-section">
+      <div class="filter-title">Storage</div>
+      <div class="filter-options">
+        <div class="filter-option">
+          <input type="checkbox" id="storage-128gb">
+          <label for="storage-128gb">128 GB</label>
+          <span class="filter-count">(12)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="storage-256gb">
+          <label for="storage-256gb">256 GB</label>
+          <span class="filter-count">(18)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="storage-512gb">
+          <label for="storage-512gb">512 GB</label>
+          <span class="filter-count">(8)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="storage-1tb">
+          <label for="storage-1tb">1 TB</label>
+          <span class="filter-count">(3)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Filter -->
+    <div class="filter-section">
+      <div class="filter-title">Customer Rating</div>
+      <div class="filter-options">
+        <div class="filter-option">
+          <input type="radio" id="rating-5" name="rating">
+          <label for="rating-5">5 Stars & above <span class="rating-stars">★★★★★</span></label>
+          <span class="filter-count">(12)</span>
+        </div>
+        <div class="filter-option">
+          <input type="radio" id="rating-4" name="rating">
+          <label for="rating-4">4 Stars & above <span class="rating-stars">★★★★☆</span></label>
+          <span class="filter-count">(25)</span>
+        </div>
+        <div class="filter-option">
+          <input type="radio" id="rating-3" name="rating">
+          <label for="rating-3">3 Stars & above <span class="rating-stars">★★★☆☆</span></label>
+          <span class="filter-count">(30)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability Filter -->
+    <div class="filter-section">
+      <div class="filter-title">Availability</div>
+      <div class="filter-options">
+        <div class="filter-option">
+          <input type="checkbox" id="in-stock" checked>
+          <label for="in-stock">In Stock</label>
+          <span class="filter-count">(32)</span>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="out-of-stock">
+          <label for="out-of-stock">Out of Stock</label>
+          <span class="filter-count">(3)</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCT LISTING AREA -->
+  <main class="listing-area">
+    <div class="listing-header">
+      <div>
+        <h1 class="category-title">{{category.name}}</h1>
+      </div>
+      
+      <div class="view-controls">
+        <select class="sort-select" id="sortSelect">
+          <option value="featured">Sort by: Featured</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="rating">Customer Rating</option>
+          <option value="newest">Newest Arrivals</option>
+          <option value="name">Name: A to Z</option>
+        </select>
+        
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridView">
+            <i class="fa-solid fa-grip"></i>
+          </button>
+          <button class="view-btn" id="listView">
+            <i class="fa-solid fa-list"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT GRID VIEW (Default) -->
+    <div class="product-grid-view" id="productGridView">
+      {%for stock in object_list%}
+      <a href="{%url 'catalog:product_detail' stock.product.slug stock.id%}">
+        
+      <div class="product-card" data-price="{{stock.price}}" >
+        <span class="badge">−{{stock.get_discount}}%</span>
+        <img src="{{stock.product.images.all.0.image.url}}" alt="Samsung Galaxy S24 Ultra" class="product-img">
+        <h3>{{stock.product.title}}</h3>
+        <div class="rating">
+          <div class="stars">★★★★★</div>
+          <div class="review-count">(124)</div>
+        </div>
+        <div class="price">
+          <span class="old-price">${{stock.price}}</span> ${{stock.get_final_price}}
+        </div>
+
+      </div>
+      </a>
+      {%endfor%}
+
+    </div>
+
+    <!-- PRODUCT LIST VIEW (Hidden by default) -->
+    <div class="product-list-view" id="productListView">
+      <!-- List view items will be populated dynamically -->
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <button class="page-btn disabled">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3
+
+      <button class="page-btn">4</button>
+      <span class="page-dots">...</span>
+      <button class="page-btn">8</button>
+      <button class="page-btn">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </main>
+</div>
+
+{%endblock%}
+
+
+{%block script%}
+<script>
+  // DOM Elements
+  const productGridView = document.getElementById('productGridView');
+  const productListView = document.getElementById('productListView');
+  const gridViewBtn = document.getElementById('gridView');
+  const listViewBtn = document.getElementById('listView');
+  const sortSelect = document.getElementById('sortSelect');
+  const clearFiltersBtn = document.getElementById('clearFilters');
+  const applyPriceBtn = document.getElementById('applyPrice');
+  const minPriceInput = document.getElementById('minPrice');
+  const maxPriceInput = document.getElementById('maxPrice');
+  const searchInput = document.getElementById('searchInput');
+  const resultsCount = document.getElementById('resultsCount');
+  
+  // Get all product cards
+  const productCards = Array.from(productGridView.querySelectorAll('.product-card'));
+  
+  // Initialize list view with product data
+  function initializeListView() {
+    productListView.innerHTML = '';
+    
+    productCards.forEach(card => {
+      const title = card.querySelector('h3').textContent;
+      const specs = card.querySelector('.product-specs').textContent;
+      const ratingHTML = card.querySelector('.rating').innerHTML;
+      const priceHTML = card.querySelector('.price').innerHTML;
+      const imgSrc = card.querySelector('.product-img').src;
+      const imgAlt = card.querySelector('.product-img').alt;
+      const badge = card.querySelector('.badge') ? card.querySelector('.badge').outerHTML : '';
+      const isOutOfStock = card.querySelector('.badge.out-of-stock') ? true : false;
+      
+      const listCard = document.createElement('div');
+      listCard.className = 'product-list-card';
+      listCard.setAttribute('data-price', card.getAttribute('data-price'));
+      listCard.setAttribute('data-rating', card.getAttribute('data-rating'));
+      listCard.setAttribute('data-brand', card.getAttribute('data-brand'));
+      listCard.setAttribute('data-ram', card.getAttribute('data-ram'));
+      listCard.setAttribute('data-storage', card.getAttribute('data-storage'));
+      
+      listCard.innerHTML = `
+        ${badge}
+        <img src="${imgSrc}" alt="${imgAlt}" class="list-image">
+        <div class="list-details">
+          <h3>${title}</h3>
+          <div class="list-specs">${specs}</div>
+          <div class="list-price-section">
+            <div class="list-price">${priceHTML}</div>
+            <div class="list-rating">${ratingHTML}</div>
+          </div>
+          <div class="list-actions">
+            <button class="list-btn add-to-cart-list" ${isOutOfStock ? 'disabled' : ''}>
+              <i class="fa-regular fa-cart-plus"></i> Add to Cart
+            </button>
+            <button class="list-btn wishlist-btn">
+              <i class="fa-regular fa-heart"></i> Wishlist
+            </button>
+          </div>
+        </div>
+      `;
+      
+      productListView.appendChild(listCard);
+    });
+  }
+  
+  // Initialize list view on page load
+  initializeListView();
+  
+  // View toggle functionality
+  gridViewBtn.addEventListener('click', () => {
+    gridViewBtn.classList.add('active');
+    listViewBtn.classList.remove('active');
+    productGridView.style.display = 'grid';
+    productListView.classList.remove('active');
+  });
+  
+  listViewBtn.addEventListener('click', () => {
+    listViewBtn.classList.add('active');
+    gridViewBtn.classList.remove('active');
+    productGridView.style.display = 'none';
+    productListView.classList.add('active');
+  });
+  
+  // Filtering functionality
+  function applyFilters() {
+    const minPrice = parseFloat(minPriceInput.value) || 0;
+    const maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+    
+    // Get selected brands
+    const selectedBrands = [];
+    document.querySelectorAll('#filter-sidebar input[type="checkbox"][id^="brand-"]:checked').forEach(cb => {
+      selectedBrands.push(cb.id.replace('brand-', ''));
+    });
+    
+    // Get selected RAM
+    const selectedRAM = [];
+    document.querySelectorAll('#filter-sidebar input[type="checkbox"][id^="ram-"]:checked').forEach(cb => {
+      selectedRAM.push(parseInt(cb.id.replace('ram-', '').replace('gb', '')));
+    });
+    
+    // Get selected storage
+    const selectedStorage = [];
+    document.querySelectorAll('#filter-sidebar input[type="checkbox"][id^="storage-"]:checked').forEach(cb => {
+      selectedStorage.push(cb.id.replace('storage-', ''));
+    });
+    
+    // Get selected rating
+    const ratingInput = document.querySelector('input[name="rating"]:checked');
+    const minRating = ratingInput ? parseFloat(ratingInput.id.replace('rating-', '')) : 0;
+    
+    // Get availability
+    const inStockChecked = document.getElementById('in-stock').checked;
+    const outOfStockChecked = document.getElementById('out-of-stock').checked;
+    
+    // Search term
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    let visibleCount = 0;
+    
+    // Filter grid view
+    productCards.forEach(card => {
+      const price = parseFloat(card.getAttribute('data-price'));
+      const rating = parseFloat(card.getAttribute('data-rating'));
+      const brand = card.getAttribute('data-brand');
+      const ram = parseInt(card.getAttribute('data-ram'));
+      const storage = card.getAttribute('data-storage');
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      const specs = card.querySelector('.product-specs').textContent.toLowerCase();
+      const isOutOfStock = card.querySelector('.badge.out-of-stock') ? true : false;
+      
+      // Price filter
+      if (price < minPrice || price > maxPrice) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // Brand filter
+      if (selectedBrands.length > 0 && !selectedBrands.includes(brand)) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // RAM filter
+      if (selectedRAM.length > 0 && !selectedRAM.includes(ram)) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // Storage filter
+      if (selectedStorage.length > 0 && !selectedStorage.includes(storage)) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // Rating filter
+      if (rating < minRating) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // Availability filter
+      if ((!inStockChecked && !isOutOfStock) || (!outOfStockChecked && isOutOfStock)) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      // Search filter
+      if (searchTerm && !title.includes(searchTerm) && !specs.includes(searchTerm)) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      card.style.display = 'block';
+      visibleCount++;
+    });
+    
+    // Filter list view
+    const listCards = productListView.querySelectorAll('.product-list-card');
+    listCards.forEach(card => {
+      const price = parseFloat(card.getAttribute('data-price'));
+      const rating = parseFloat(card.getAttribute('data-rating'));
+      const brand = card.getAttribute('data-brand');
+      const ram = parseInt(card.getAttribute('data-ram'));
+      const storage = card.getAttribute('data-storage');
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      const specs = card.querySelector('.list-specs').textContent.toLowerCase();
+      const isOutOfStock = card.querySelector('.badge.out-of-stock') ? true : false;
+      
+      // Apply same filters
+      if (price < minPrice || price > maxPrice ||
+          (selectedBrands.length > 0 && !selectedBrands.includes(brand)) ||
+          (selectedRAM.length > 0 && !selectedRAM.includes(ram)) ||
+          (selectedStorage.length > 0 && !selectedStorage.includes(storage)) ||
+          rating < minRating ||
+          ((!inStockChecked && !isOutOfStock) || (!outOfStockChecked && isOutOfStock)) ||
+          (searchTerm && !title.includes(searchTerm) && !specs.includes(searchTerm))) {
+        card.style.display = 'none';
+      } else {
+        card.style.display = 'flex';
+      }
+    });
+    
+    // Update results count
+    resultsCount.textContent = `Showing ${visibleCount} of ${productCards.length} products`;
+  }
+  
+  // Sorting functionality
+  function sortProducts() {
+    const sortValue = sortSelect.value;
+    
+    // Create arrays of products with their data
+    const gridProducts = Array.from(productCards);
+    const listProducts = Array.from(productListView.querySelectorAll('.product-list-card'));
+    
+    // Sort function
+    const sortFunctions = {
+      'featured': (a, b) => 0, // Keep original order
+      'price-low': (a, b) => parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price')),
+      'price-high': (a, b) => parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price')),
+      'rating': (a, b) => parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating')),
+      'newest': (a, b) => {
+        // Simulate newest by checking for "new" badge
+        const aIsNew = a.querySelector('.badge.new') ? 1 : 0;
+        const bIsNew = b.querySelector('.badge.new') ? 1 : 0;
+        return bIsNew - aIsNew;
+      },
+      'name': (a, b) => {
+        const aName = a.querySelector('h3').textContent;
+        const bName = b.querySelector('h3').textContent;
+        return aName.localeCompare(bName);
+      }
+    };
+    
+    // Sort grid products
+    gridProducts.sort(sortFunctions[sortValue]);
+    
+    // Reappend sorted grid products
+    gridProducts.forEach(product => {
+      productGridView.appendChild(product);
+    });
+    
+    // Sort list products
+    listProducts.sort(sortFunctions[sortValue]);
+    
+    // Reappend sorted list products
+    listProducts.forEach(product => {
+      productListView.appendChild(product);
+    });
+  }
+  
+  // Event listeners for filtering
+  document.querySelectorAll('#filter-sidebar input').forEach(input => {
+    input.addEventListener('change', applyFilters);
+  });
+  
+  applyPriceBtn.addEventListener('click', applyFilters);
+  clearFiltersBtn.addEventListener('click', () => {
+    // Reset all filters
+    document.querySelectorAll('#filter-sidebar input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+    });
+    
+    // Check Samsung brand by default
+    document.getElementById('brand-samsung').checked = true;
+    document.getElementById('in-stock').checked = true;
+    
+    // Reset price inputs
+    minPriceInput.value = 0;
+    maxPriceInput.value = 2000;
+    
+    // Reset rating
+    document.querySelectorAll('input[name="rating"]').forEach(radio => {
+      radio.checked = false;
+    });
+    
+    // Reset search
+    searchInput.value = '';
+    
+    // Apply filters
+    applyFilters();
+  });
+  
+  // Event listener for sorting
+  sortSelect.addEventListener('change', sortProducts);
+  
+  // Event listener for search
+  searchInput.addEventListener('input', applyFilters);
+  
+
+  
+
+  
+  // Pagination functionality
+  document.querySelectorAll('.page-btn:not(.disabled)').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (this.classList.contains('active')) return;
+      
+      // Update active page
+      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Simulate page change
+      const pageNum = this.textContent;
+      if (!isNaN(pageNum)) {
+        resultsCount.textContent = `Showing ${(parseInt(pageNum)-1)*12+1}-${parseInt(pageNum)*12} of 35 products`;
+      }
+    });
+  });
+  
+  // Initialize filters on page load
+  applyFilters();
+</script>
+{%endblock%}
+

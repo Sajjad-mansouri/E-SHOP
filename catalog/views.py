@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+
 from catalog.models import Category, Product
 from stock.models import StockRecord
 from comment.forms import CommentForm
@@ -53,3 +55,25 @@ class ProductDetailView(DetailView):
 
 
 		return attributes_values
+
+
+class CategoryProducts(ListView):
+	model = Category
+	template_name = "catalog/list/category_products.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+
+		breadcrumb = self.category.get_ancestors()
+		breadcrumb = list(breadcrumb) + [self.category]
+		context["breadcrumb"] = breadcrumb
+		context['category'] = self.category
+		return context
+
+	def get_queryset(self):
+		slug = self.kwargs.get("category")
+		self.category = get_object_or_404(Category, slug=slug)
+		descendants = self.category.get_descendants(include_self=True)
+		stocks = StockRecord.objects.filter(product__categories__in=descendants).distinct()
+		return stocks
+
