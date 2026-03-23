@@ -1,5 +1,5 @@
 {%extends 'base.html'%}
-{%load static%}
+{%load static catalog_tags%}
 
 {%block style%}
 <link rel="stylesheet" type="text/css" href="{%static 'css/category_products.css'%}">
@@ -222,21 +222,8 @@
     </div>
 
     <!-- PAGINATION -->
-    <div class="pagination">
-      <button class="page-btn disabled">
-        <i class="fa-solid fa-chevron-left"></i>
-      </button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3
+    {%paginate%}
 
-      <button class="page-btn">4</button>
-      <span class="page-dots">...</span>
-      <button class="page-btn">8</button>
-      <button class="page-btn">
-        <i class="fa-solid fa-chevron-right"></i>
-      </button>
-    </div>
   </main>
 </div>
 

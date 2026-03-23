@@ -60,7 +60,7 @@ class ProductDetailView(DetailView):
 class CategoryProducts(ListView):
 	model = Category
 	template_name = "catalog/list/category_products.html"
-
+	paginate_by = 1
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
