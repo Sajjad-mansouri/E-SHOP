@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'offer',
     'coupon',
     'cart',
+    'wishlist',
 
     #third party
     'treebeard',
