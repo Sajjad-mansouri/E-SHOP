@@ -7,15 +7,10 @@
   {%endblock%}
 
 {%block content%}
-<!-- BREADCRUMB for categories -->
-<div class="breadcrumb-wrapper">
-  <div class="breadcrumb">
-    <a href="#">Home</a> <i class="fa-solid fa-chevron-right"></i>
-    <a href="#">Electronics</a> <i class="fa-solid fa-chevron-right"></i>
-    <a href="#">Headphones</a> <i class="fa-solid fa-chevron-right"></i>
-    <span style="color:#222; font-weight:500;">Noise Cancelling WH‑1000XM5</span>
-  </div>
-</div>
+
+  {% get_product_breadcrumb product%}
+
+
 
 <!-- PRODUCT DETAIL MAIN -->
 <div class="product-detail" data-id="{{product.id}}">

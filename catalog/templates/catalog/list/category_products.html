@@ -6,18 +6,7 @@
 {%endblock%}
 {%block content%}
 <!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="{%url 'catalog:home'%}">Home</a>
-  <span>/</span>
-  {%for cat in breadcrumb%}
-  <a href="{%url 'catalog:category' cat.slug%}">{{cat.name}}</a>
-  {% if not forloop.last %}
-  <span>/</span>
-  {%endif%}
-  {%endfor%}
-
-</div>
-
+{% get_product_breadcrumb '' category%}
 <!-- CATEGORY PAGE CONTENT -->
 <div class="category-page-container">
   <!-- FILTER SIDEBAR -->

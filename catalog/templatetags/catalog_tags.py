@@ -53,3 +53,14 @@ def product_rating_count(context, product_id):
 		product_ratings_count = 0
 
 	return product_ratings_count
+
+@register.inclusion_tag("catalog/partial/_breadcrumb.html",takes_context=True)
+def get_product_breadcrumb(context, product=None, category=None):
+
+		if product:
+			category = product.categories.first()
+
+		breadcrumb = category.get_ancestors()
+		breadcrumb = list(breadcrumb) + [category]
+		return {"breadcrumb":breadcrumb, "product":product}
+
