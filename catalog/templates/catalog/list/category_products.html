@@ -203,8 +203,8 @@
         <img src="{{stock.product.images.all.0.image.url}}" alt="Samsung Galaxy S24 Ultra" class="product-img">
         <h3>{{stock.product.title}}</h3>
         <div class="rating">
-          <div class="stars">★★★★★</div>
-          <div class="review-count">(124)</div>
+          <div class="stars">★ {% product_rating stock.product.id%}</div>
+          <div class="review-count">({% product_rating_count stock.product.id %})</div>
         </div>
         <div class="price">
           <span class="old-price">${{stock.price}}</span> ${{stock.get_final_price}}

@@ -1,5 +1,7 @@
 from django import template
+from django.db.models import Avg
 from cart.models import Cart
+from catalog.models import UserRating, Product
 
 register = template.Library()
 
@@ -29,3 +31,25 @@ def paginate(context):
 
 
 	return {"first_pages":first_pages, "current_pages":current_pages, "end_pages":end_pages, "page_obj":page_obj}
+
+
+@register.simple_tag(takes_context=True)
+def product_rating(context, product_id):
+	try:
+		product = Product.objects.get(id=product_id)
+		product_ratings = UserRating.objects.filter(product=product).aggregate(rating_mean=Avg("rating", default=0))["rating_mean"]
+
+	except Product.DoesNotExist:
+		product_ratings = 0
+
+	return product_ratings
+
+@register.simple_tag(takes_context=True)
+def product_rating_count(context, product_id):
+	try:
+		product = Product.objects.get(id=product_id)
+		product_ratings_count = UserRating.objects.filter(product=product).distinct().count()
+	except Product.DoesNotExist:
+		product_ratings_count = 0
+
+	return product_ratings_count
