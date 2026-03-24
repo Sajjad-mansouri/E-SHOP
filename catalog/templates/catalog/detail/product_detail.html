@@ -1,5 +1,5 @@
 {%extends 'base.html'%}
-{% load static  catalog_tags%}
+{% load static  catalog_tags wishlist_tags%}
 
   {%block style%}
   <link rel="stylesheet" type="text/css" href="{% static 'css/product_detail.css'%}">
@@ -69,7 +69,11 @@
         <button class="btn-secondary remove_from_cart" style="display:none"><i class="fa-regular fa-cart-plus"></i> remove from Cart</button>
         <button class="btn-secondary add_to_cart" style="display:block"><i class="fa-regular fa-cart-plus"></i> add to Cart</button>
       {%endif%}
-      <button class="btn-wishlist" id="wishlistBtn"><i class="fa-regular fa-heart"></i> add to Wishlist</button>
+
+      {%user_has_wishlist as user_has_wishlist%}
+
+      <button class="btn-wishlist" id="wishlistBtn" data-funcType="{% if user_has_wishlist %}remove{%else%}add{%endif%}"><i class="fa-regular fa-heart"></i><span> {% if user_has_wishlist %}remove from Wishlist{%else%}add to Wishlist{%endif%}</span></button>
+
     </div>
 
   </div>
@@ -284,5 +288,43 @@ document.querySelectorAll('.rating input').forEach((radio) => {
   addCartBtn.addEventListener('click',()=>cartFunc("add", addCartBtn, removeCartBtn))
   removeCartBtn.addEventListener('click',()=>cartFunc("remove", removeCartBtn, addCartBtn))
 
+  const WishlistBtn = document.getElementById("wishlistBtn");
+
+
+  WishlistBtn.addEventListener('click',()=>wishListFunc())
+  function wishListFunc(){
+
+    const funcType = WishlistBtn.getAttribute('data-funcType');
+
+    let url = "{%url 'wishlist:wishlist'%}"
+    console.log(url)
+
+    let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    let formData = new FormData()
+    formData.append('stock',"{{stock_record.id}}")
+    formData.append('funcType', funcType)
+    fetch(url,{
+      method:'POST',
+      headers:{
+        'X-CSRFToken':csrfToken
+      },
+      body:formData
+    })
+    .then(response=>response.json())
+    .then(data=>{
+      if(data.status==true){
+        if (funcType=="add"){
+          WishlistBtn.querySelector("span").innerText = "remove from Wishlist"
+          WishlistBtn.setAttribute("data-funcType", "remove")
+        }else if(funcType == "remove"){
+          WishlistBtn.querySelector("span").innerText = "add to Wishlist"
+          WishlistBtn.setAttribute("data-funcType", "add")
+
+
+        }
+
+      }
+    })
+  }
 </script>
 {%endblock%}
