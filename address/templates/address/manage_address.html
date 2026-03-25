@@ -131,9 +131,9 @@
         <p><strong>Phone:</strong> {{address.phone_number}}</p>
       </div>
       <div class="preview-actions">
-        <button class="preview-btn edit-btn" data-id="1">
+        <a class="preview-btn edit-btn" data-id="1" href="{%url 'address:update_address' address.pk%}">
           <i class="fa-solid fa-pen"></i> Edit
-        </button>
+        </a>
         <button class="preview-btn delete-btn" data-id="1">
           <i class="fa-solid fa-trash"></i> Delete
         </button>
