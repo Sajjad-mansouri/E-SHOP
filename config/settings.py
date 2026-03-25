@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'cart',
     'wishlist',
     'address',
+    'order',
 
     #third party
     'treebeard',
