@@ -19,19 +19,26 @@ class Address(models.Model):
 
 
 	]
-	full_name = models.CharField(_("Full name"), max_length=255, blank=True)
-	address_type = models.CharField(_("Address Type"), choices=ADDRESS_TYPE, max_length=20)
+	COUNTRIES=[
+		("IR", "Iran"),
+		("US", "United States"),
+		("CA", "Canada"),
+		("UK", "United Kingdom"),
+		("AU", "Australia"),
+	]
+	full_name = models.CharField(_("Full name"), max_length=255)
+	address_type = models.CharField(_("Address Type"), choices=ADDRESS_TYPE, max_length=20, blank=True)
 	phone_number = models.CharField(_("Phone Number"), max_length=15)
-	city = models.CharField(_("City"), max_length=255, blank=True)
-	province = models.CharField(_("Province/State"), max_length=255, blank=True)
-	country = models.CharField(_("country"), blank=True)
-	postcode = models.CharField(_("Post/Zip-code"), max_length=64, blank=True)
+	city = models.CharField(_("City"), max_length=255)
+	province = models.CharField(_("Province/State"), max_length=255)
+	country = models.CharField(_("country"),choices=COUNTRIES)
+	postcode = models.CharField(_("Post/Zip-code"), max_length=64)
 	line1 = models.CharField(_("First line of address"), max_length=255, help_text=_("Street address, P.O. box, company name"))
 	line2 = models.CharField(_("Second line of address"), max_length=255, blank=True, help_text=_("Apartment, suite, unit, building, floor, etc."))
-
+	is_default_address = models.BooleanField(_("Default"), default=False)
 
 	def __str__(self):
-		return f"{self.first_name} {self.last_name}"
+		return f"{self.full_name}"
 
 	class Meta:
 		verbose_name = _("Address")

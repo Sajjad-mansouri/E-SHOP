@@ -1,0 +1,206 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/address_style.css'%}">
+{%endblock%}
+
+{%block content%}
+<!-- ADD ADDRESS PAGE CONTENT -->
+<div class="address-header">
+  <h1><i class="fa-solid fa-map-location-dot"></i> Manage Addresses</h1>
+  <p>Add a new shipping address or edit existing ones</p>
+</div>
+
+<div class="address-container">
+  <!-- Address Form -->
+  <div class="address-form-section">
+    <div class="form-header">
+      <h2><i class="fa-solid fa-plus"></i> Add New Address</h2>
+      <p>Fill in the details below to add a new shipping address</p>
+    </div>
+
+
+    <form id="addressForm" method="POST">
+      {%csrf_token%}
+      <div class="form-grid">
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="{{form.full_name.id_for_label}}" class="form-label required">Full Name</label>
+          {{form.full_name}}
+          <span class="form-error" id="fullNameError">Please enter your full name</span>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label for="{{form.phone_number.id_for_label}}" class="form-label required">Phone Number</label>
+          {{form.phone_number}}
+          <span class="form-error" id="phoneError">Please enter a valid phone number</span>
+        </div>
+
+        <!-- Address Line 1 -->
+        <div class="form-group full-width">
+          <label for="{{form.line1.id_for_label}}" class="form-label required">Address Line 1</label>
+          {{form.line1}}
+          <span class="form-error" id="address1Error">Please enter your address</span>
+        </div>
+
+        <!-- Address Line 2 -->
+        <div class="form-group full-width">
+          <label for="{{form.line2.id_for_label}}" class="form-label">Address Line 2 (Optional)</label>
+          {{form.line2}}
+
+        </div>
+
+        <!-- City -->
+        <div class="form-group">
+          <label for="{{form.city.id_for_label}}" class="form-label required">City</label>
+          {{form.city}}
+          <span class="form-error" id="cityError">Please enter your city</span>
+        </div>
+
+        <!-- State/Province -->
+        <div class="form-group">
+          <label for="{{form.province.id_for_label}}" class="form-label required">State/Province</label>
+          {{form.province}}
+          <span class="form-error" id="stateError">Please enter your state/province</span>
+        </div>
+
+        <!-- ZIP/Postal Code -->
+        <div class="form-group">
+          <label for="{{form.postcode.id_for_label}}" class="form-label required">Postal Code</label>
+          {{form.postcode}}
+          <span class="form-error" id="zipCodeError">Please enter a valid ZIP/postal code</span>
+        </div>
+
+        <!-- Country -->
+        <div class="form-group">
+          <label for="{{form.country.id_for_label}}" class="form-label required">Country</label>
+          {{form.country}}
+          <span class="form-error" id="countryError">Please select your country</span>
+        </div>
+      </div>
+
+      <!-- Address Type -->
+      <div class="form-group">
+        <label for="{{form.address_type.id_for_label}}" class="form-label">Address Type</label>
+        {{form.address_type}}
+      </div>
+
+      <!-- Default Address Checkbox -->
+      <div class="form-checkbox-group">
+        {{form.is_default_address}}
+        <label for="{{form.is_default_address.id_for_label}}" class="form-checkbox-label">
+          Set as default shipping address
+        </label>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" id="cancelBtn">
+          <i class="fa-solid fa-arrow-left"></i> Back to Checkout
+        </button>
+        <button type="submit" class="btn-primary" id="saveAddressBtn">
+          <i class="fa-solid fa-floppy-disk"></i> Save Address
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Address Preview Sidebar -->
+  <div class="address-preview-sidebar">
+    <h2><i class="fa-solid fa-address-book"></i> Your Addresses</h2>
+    
+    {%for address in addresses%}
+    <div class="preview-card {%if object == address%}default{%endif%}">
+      <div class="preview-header">
+        <div>
+          <span class="preview-name">{{address.full_name}}</span>
+          <span class="preview-type home">{{address.address_type}}</span>
+        </div>
+        <div>
+          {%if address.is_default_address%}
+          <span style="color: var(--success); font-weight: 600; font-size: 0.9rem;">Default</span>
+          {%endif%}
+        </div>
+      </div>
+      <div class="preview-details">
+        <p>{{address.line1}}</p>
+        <p>{{address.city}}, {{address.postcode}}</p>
+        <p>{{address.country}}</p>
+        <p><strong>Phone:</strong> {{address.phone_number}}</p>
+      </div>
+      <div class="preview-actions">
+        <button class="preview-btn edit-btn" data-id="1">
+          <i class="fa-solid fa-pen"></i> Edit
+        </button>
+        <button class="preview-btn delete-btn" data-id="1">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+    {%endfor%}
+
+
+
+    <div class="preview-empty" id="emptyPreview" style="display: none;">
+      <i class="fa-solid fa-map-location-dot"></i>
+      <h3>No Addresses Yet</h3>
+      <p>Add your first shipping address to get started</p>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-icon">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h2>Address Saved!</h2>
+    <p>Your new shipping address has been saved successfully.</p>
+    <p>You can now use this address during checkout.</p>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="addAnotherBtn">
+        <i class="fa-solid fa-plus"></i> Add Another Address
+      </button>
+      <button class="modal-btn primary" id="backToCheckoutBtn">
+        <i class="fa-solid fa-arrow-right"></i> Back to Checkout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-icon" style="background: var(--error);">
+      <i class="fa-solid fa-trash"></i>
+    </div>
+    <h2>Delete Address?</h2>
+    <p>Are you sure you want to delete this address? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="cancelDeleteBtn">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      <button class="modal-btn primary" id="confirmDeleteBtn" style="background: var(--error);">
+        <i class="fa-solid fa-trash"></i> Delete Address
+      </button>
+    </div>
+  </div>
+</div>
+
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+  const saveAddressBtn = document.getElementById("saveAddressBtn")
+  saveAddressBtn.addEventListener("click", ()=>{
+    const form = document.getElementById("addressForm")    
+    form.submit()
+  })
+
+</script>
+{%endblock%}
