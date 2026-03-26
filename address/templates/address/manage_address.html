@@ -154,7 +154,7 @@
 
 
 <!-- Success Modal -->
-<div id="successModal" class="modal">
+<div id="successCreateModal" class="modal">
   <div class="modal-content">
     <div class="modal-icon">
       <i class="fa-solid fa-check"></i>
@@ -163,16 +163,34 @@
     <p>Your new shipping address has been saved successfully.</p>
     <p>You can now use this address during checkout.</p>
     <div class="modal-actions">
-      <button class="modal-btn secondary" id="addAnotherBtn">
+      <a class="modal-btn secondary" href="{%url 'address:new_address'%}">
         <i class="fa-solid fa-plus"></i> Add Another Address
-      </button>
+      </a>
       <button class="modal-btn primary" id="backToCheckoutBtn">
         <i class="fa-solid fa-arrow-right"></i> Back to Checkout
       </button>
     </div>
   </div>
 </div>
-
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-icon">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h2>Address Saved!</h2>
+    <p>Your  shipping address has been updated successfully.</p>
+    <p>You can now use this address during checkout.</p>
+    <div class="modal-actions">
+      <a class="modal-btn secondary" href="{%url 'address:new_address'%}">
+        <i class="fa-solid fa-plus"></i> Add Another Address
+      </a>
+      <button class="modal-btn primary" id="backToCheckoutBtn">
+        <i class="fa-solid fa-arrow-right"></i> Back to Checkout
+      </button>
+    </div>
+  </div>
+</div>
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
   <div class="modal-content">
@@ -197,10 +215,43 @@
 {%block script%}
 <script type="text/javascript">
   const saveAddressBtn = document.getElementById("saveAddressBtn")
+  const deleteModal = document.getElementById("deleteModal")
+
+  const successModal = document.getElementById('successModal');
+  const addAnotherBtn = document.getElementById
+  const successCreateModal = document.getElementById('successCreateModal');
+
   saveAddressBtn.addEventListener("click", ()=>{
-    const form = document.getElementById("addressForm")    
-    form.submit()
+    event.preventDefault()
+    const form = document.getElementById("addressForm");
+    const formData = new FormData(form)
+    const xCSRFToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    fetch("{{request.path}}",{
+      method:"POST",
+      headers:{
+        "X-CSRFToken":xCSRFToken
+      },
+      body:formData
+    })
+    .then(response=>response.json())
+    .then(data=>{
+      if(data.status){
+        if(data.created){
+          successCreateModal.style.display = 'flex';
+
+        }else{
+
+          successModal.style.display = 'flex';
+        }
+      }
+    })
+
   })
+
+
+
+
 
 </script>
 {%endblock%}

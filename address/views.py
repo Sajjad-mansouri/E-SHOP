@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from .models import Address
 from .forms import AddressForm
 
@@ -21,8 +22,13 @@ class AddressCreateView(AddressesMixin, CreateView):
 	def form_valid(self, form):
 		if self.request.user.is_authenticated:
 			form.instance.user = self.request.user
+		form.save()
+		return JsonResponse({"status":True, "created":True})
 
-		return super().form_valid(form)
+	def form_invalid(self, form):
+		return JsonResponse({"status":False, "error":form.errors, "created":True})
+
+
 
 
 class AddressUpdateView(AddressesMixin, UpdateView):
@@ -31,3 +37,10 @@ class AddressUpdateView(AddressesMixin, UpdateView):
 	template_name = "address/manage_address.html"
 	success_url = reverse_lazy("address:new_address")
 
+	def form_valid(self, form):
+		form.save()
+		return JsonResponse({"status":True, "created":False})
+
+	def form_invalid(self, form):
+
+		return JsonResponse({"status":False, "error":form.errors, "created":False})
