@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from stock.models import StockRecord
 from cart.models import Cart
 from address.models import Address
+from shipping.models import Shipping
 
 UserModel = get_user_model()
 
@@ -40,6 +41,7 @@ class Order(models.Model):
         verbose_name=_("Shipping Address"),
         on_delete=models.SET_NULL,
     )
+    shipping_method = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, verbose_name=_("Shipping Method"))
     order_number = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
