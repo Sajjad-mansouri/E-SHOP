@@ -112,7 +112,7 @@
     <h2><i class="fa-solid fa-address-book"></i> Your Addresses</h2>
     
     {%for address in addresses%}
-    <div class="preview-card {%if object == address%}default{%endif%}">
+    <div class="preview-card {%if object == address%}default{%endif%}" data-id="{{address.id}}">
       <div class="preview-header">
         <div>
           <span class="preview-name">{{address.full_name}}</span>
@@ -134,7 +134,7 @@
         <a class="preview-btn edit-btn" data-id="1" href="{%url 'address:update_address' address.pk%}">
           <i class="fa-solid fa-pen"></i> Edit
         </a>
-        <button class="preview-btn delete-btn" data-id="1">
+        <button class="preview-btn delete-btn" data-id="{{address.id}}">
           <i class="fa-solid fa-trash"></i> Delete
         </button>
       </div>
@@ -215,8 +215,10 @@
 {%block script%}
 <script type="text/javascript">
   const saveAddressBtn = document.getElementById("saveAddressBtn")
-  const deleteModal = document.getElementById("deleteModal")
-
+  const deleteModal = document.getElementById("deleteModal");
+  const deleteBtns = document.querySelectorAll(".delete-btn");
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+  const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
   const successModal = document.getElementById('successModal');
   const addAnotherBtn = document.getElementById
   const successCreateModal = document.getElementById('successCreateModal');
@@ -249,9 +251,49 @@
 
   })
 
+  deleteBtns.forEach(deleteBtn=>{
+    deleteBtn.addEventListener("click",()=>{
+      let dataId = deleteBtn.getAttribute("data-id");
+      deleteModal.style.display = "flex";
+      confirmDeleteBtn.setAttribute("data-id", dataId)
+    })
+  })
+
+confirmDeleteBtn.addEventListener("click",()=>{
+  let dataId = confirmDeleteBtn.getAttribute("data-id")
+  const xCSRFToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  const formData = new FormData()
+  formData.append("id",dataId)
+
+  fetch("{%url 'address:delete_address'%}", {
+    method:"POST",
+    headers:{
+      "X-CSRFToken":xCSRFToken
+    },
+    body:formData
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    if (data.status){
+      let previewCard = document.querySelector(`.preview-card[data-id="${dataId}"]`)
+      console.log(previewCard)
+      previewCard.remove()
+      deleteModal.style.display = "none";
 
 
+    }
+  })
+})
 
+cancelDeleteBtn.addEventListener("click",()=>{
+  deleteModal.style.display = "none"
+})
 
+deleteModal.addEventListener("click",function(event){
+  if(event.target===this){
+    deleteModal.style.display = "none"
+
+  }
+})
 </script>
 {%endblock%}

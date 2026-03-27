@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from .models import Address
@@ -44,3 +44,25 @@ class AddressUpdateView(AddressesMixin, UpdateView):
 	def form_invalid(self, form):
 
 		return JsonResponse({"status":False, "error":form.errors, "created":False})
+
+
+class AddressDeleteView(DeleteView):
+	model = Address
+
+	def form_valid(self, form):
+		if self.object:
+			self.object.delete()
+			return JsonResponse({"status":True})
+		else:
+			return JsonResponse({"status":False})
+
+
+	def get_object(self, queryset=None):
+		if queryset is None:
+			queryset = self.get_queryset()
+		obj_id = self.request.POST.get("id")
+		try:
+			obj = queryset.get(id=obj_id)
+		except queryset.model.DoesNotExist:
+			obj = None
+		return obj
