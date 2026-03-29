@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
+from cart.models import Cart
 
 UserModel = get_user_model()
 
@@ -59,6 +60,7 @@ class Coupon(models.Model):
 
 class CouponApplication(models.Model):
 	user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="applications", verbose_name=_("User"))
+	cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, verbose_name=_("cart"))
 	coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, verbose_name=_("Coupon"))
 	created = models.DateTimeField(_("created"), auto_now_add=True)
 	updated = models.DateTimeField(_("updated"), auto_now=True)

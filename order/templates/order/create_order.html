@@ -1,0 +1,311 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/create_order.css'%}">
+{%endblock%}
+{%block content%}
+<!-- CHECKOUT PAGE CONTENT -->
+<div class="checkout-header">
+  <h1><i class="fa-solid fa-cart-arrow-down"></i> Checkout</h1>
+  <p>Complete your order with secure checkout</p>
+  
+  <!-- Checkout Steps -->
+  <div class="checkout-steps">
+    <div class="step completed">
+      <div class="step-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <span class="step-label">Cart</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <span class="step-label">Details</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step">
+      <div class="step-circle">3</div>
+      <span class="step-label">Payment</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step">
+      <div class="step-circle">4</div>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
+</div>
+
+<div class="checkout-container">
+  <!-- Main Checkout Form -->
+  <div class="checkout-main">
+    <!-- Shipping Address Section -->
+    <section class="checkout-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-truck-fast"></i> Shipping Address</h2>
+        <a class="edit-btn" id="editAddress" href="{%url 'address:new_address'%}">
+          <i class="fa-solid fa-pen"></i> Add New Address
+        </a>
+      </div>
+      
+      <div class="address-list">
+        {%for address in addresses%}
+        <div class="address-card {%if address.is_default_address%}selected{%endif%}" data-address="{{address.id}}">
+          <div class="address-header">
+            <div>
+              <span class="address-name">{{address.full_name}}</span>
+
+            </div>
+            <div>
+              <i class="fa-solid fa-check-circle" style="color: var(--success);"></i>
+            </div>
+          </div>
+          <div class="address-details">
+            <p>{{address.line1}}</p>
+            <p>{{address.city}}, {{address.postcode}}</p>
+            <p>{{address.country}}</p>
+            <p><strong>Phone:</strong> {{address.phone_number}}</p>
+          </div>
+        </div>
+        {%endfor%}
+        
+
+      </div>
+    </section>
+    
+    <!-- Shipping Method Section -->
+    <section class="checkout-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-shipping-fast"></i> Shipping Method</h2>
+      </div>
+      
+      <div class="shipping-methods">
+        {%for shipping_method in shipping_methods%}
+
+        <div class="payment-method {%if forloop.first%}selected{%endif%}" data-shipping="{{shipping_method.id}}">
+          <div class="payment-icon-large">
+            <i class="fa-solid fa-truck"></i>
+          </div>
+          <div class="payment-details">
+            <div class="payment-name">{{shipping_method.shipping_type}} Shipping</div>
+            <div class="payment-desc">Delivery in {{shipping_method.delivery_time}} business days </div>
+            {%if shipping_method.free_shipping%}
+            <div class="payment-desc"><strong>Free</strong> (Orders over ${{shipping_method.free_shipping_threshold}})</div>
+            {%endif%}
+          </div>
+          {%if shipping_method.free_shipping%}
+          {%if cart.get_items_price > shipping_method.free_shipping_threshold%}
+          <div style="font-weight: 700; font-size: 1.2rem;"><span class="shipping-cost">Free</span></div>
+          {%else%}
+          <div style="font-weight: 700; font-size: 1.2rem;">$<span class="shipping-cost">{{shipping_method.price}}</span></div>
+
+          {%endif%}
+
+          {%else%}
+          <div style="font-weight: 700; font-size: 1.2rem;">$<span class="shipping-cost">{{shipping_method.price}}</span></div>
+          {%endif%}
+        </div>
+        {%endfor%}
+        
+
+      </div>
+    </section>
+    
+    <!-- Payment Method Section -->
+    <section class="checkout-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-credit-card"></i> Payment Method</h2>
+      </div>
+      
+      <div class="payment-methods-list">
+        <h2>No Payment Method Now(Added in Real World Ecomm)</h2>
+      </div>
+    </section>
+    
+    <!-- Order Items Preview -->
+    <section class="checkout-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-box"></i> Order Items</h2>
+        <a href="{%url 'cart:cart_items'%}" class="edit-btn">
+          <i class="fa-solid fa-pen"></i> Edit Cart
+        </a>
+      </div>
+      
+      <div class="order-items">
+        {%for item in items%}
+        <div class="order-item">
+          <img src="{{item.stock.product.images.all.0.image.url}}" alt="Noise cancelling headphones" class="order-item-img">
+          <div class="order-item-details">
+            <div class="order-item-name">{{item.stock.product.title}}</div>
+            <div class="order-item-quantity">Quantity: {{item.quantity}}</div>
+          </div>
+          <div class="order-item-price">${{item.get_item_price}}</div>
+        </div>
+        {%endfor%}
+
+      </div>
+    </section>
+  </div>
+  
+  <!-- Order Summary Sidebar -->
+  <div class="order-summary-sidebar">
+    <h2>Order Summary</h2>
+    
+    <div class="summary-row">
+      <span>Subtotal ({{items|length}} items)</span>
+      <span>${{cart.get_items_price}}</span>
+    </div>
+    
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span id="shippingCost">-</span>
+    </div>
+    
+    {%if coupon_application%}
+    <div class="summary-row discount">
+      <span>Discount ({{coupon_application.coupon.code}})</span>
+      <span>-%{{coupon_application.coupon.discount}}</span>
+    </div>
+    {%endif%}
+    
+    <div class="summary-row total">
+      <span>Total</span>
+      <span id="orderTotal">${{final_price}} {{final_price}}</span>
+    </div>
+    
+    <div class="secure-checkout">
+      <i class="fa-solid fa-shield-check"></i>
+      <div class="secure-text">
+        <h4>Secure Checkout</h4>
+        <p>Your payment information is encrypted and secure</p>
+      </div>
+    </div>
+    {%csrf_token%}
+    <button class="place-order-btn" id="placeOrderBtn">
+      <i class="fa-solid fa-lock"></i> Place Order
+    </button>
+    
+    <a href="cart.html" class="back-to-cart">
+      <i class="fa-solid fa-arrow-left"></i> Back to Cart
+    </a>
+    
+    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
+      <p style="color: #666; font-size: 0.9rem; text-align: center;">
+        By placing your order, you agree to our <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+{%endblock%}
+{%block script%}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const addressCards = document.querySelectorAll('.address-card');
+    const shippingMethods = document.querySelectorAll('.payment-method[data-shipping]');
+    const paymentMethods = document.querySelectorAll('.payment-method[data-payment]');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    const shippingCostEl = document.getElementById('shippingCost');
+    const orderTotalEl = document.getElementById('orderTotal');
+    const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+    
+    // Order data
+    let subtotal = Number("{{cart.get_items_price}}");
+    let discount = Number("{{discount}}");
+    let shippingCost = 0.00;
+    
+    // Update order total display
+    function updateOrderTotal() {
+      const total = subtotal + shippingCost - discount;
+      orderTotalEl.textContent = '$' + total.toFixed(2);
+    }
+    
+    // Initialize
+    updateOrderTotal();
+    
+    // Address selection
+    addressCards.forEach(card => {
+      card.addEventListener('click', function() {
+        addressCards.forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+    
+    // Shipping method selection
+    shippingMethods.forEach(method => {
+      method.addEventListener('click', function() {
+        shippingMethods.forEach(m => m.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        // Update shipping cost
+
+        const shippingCostRaw = this.querySelector(".shipping-cost").innerText
+        shippingCostEl.textContent = shippingCostRaw;
+
+        if(shippingCostRaw=="Free"){
+          shippingCost = 0.00;
+
+        }else{
+          shippingCost = Number(shippingCostRaw)
+        }
+        
+        updateOrderTotal();
+      });
+    });
+    
+    // Payment method selection
+    paymentMethods.forEach(method => {
+      method.addEventListener('click', function() {
+        paymentMethods.forEach(m => m.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+    
+    
+    // Place order button
+    placeOrderBtn.addEventListener('click', function() {
+      // Validate selections
+      const selectedAddress = document.querySelector('.address-card.selected');
+      const selectedShipping = document.querySelector('.payment-method[data-shipping].selected');
+
+      
+      if (!selectedAddress || !selectedShipping ) {
+        alert('Please complete all checkout steps before placing your order.');
+        return;
+      }
+      const address = selectedAddress.getAttribute('data-address');
+      const shipping = selectedShipping.getAttribute('data-shipping');
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      let formData = new FormData()
+      formData.append("shipping_address", address)
+      formData.append("shipping_method", shipping)
+
+      fetch("{% url 'order:order'%}", {
+        method:"POST",
+        headers:{
+          "X-CSRFToken":csrfToken
+        },
+        body:formData
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if (data.status){
+          window.location.href=""
+        }
+      })
+      
+
+    });
+    
+
+  });
+</script>
+
+<!-- Font Awesome for icons (using CDN) -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script> -->
+{%endblock%}
