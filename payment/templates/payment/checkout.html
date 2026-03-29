@@ -1,0 +1,157 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/payment.css'%}">
+{%endblock%}
+{%block content%}
+<!-- PAYMENT PAGE CONTENT -->
+<div class="payment-header">
+  <h1><i class="fa-solid fa-credit-card"></i> Payment</h1>
+  <p>Complete your payment to finalize the order</p>
+  
+  <!-- Checkout Steps -->
+  <div class="checkout-steps">
+    <div class="step completed">
+      <div class="step-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <span class="step-label">Cart</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step completed">
+      <div class="step-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <span class="step-label">Details</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step active">
+      <div class="step-circle">3</div>
+      <span class="step-label">Payment</span>
+      <div class="step-line"></div>
+    </div>
+    
+    <div class="step">
+      <div class="step-circle">4</div>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
+</div>
+
+<div class="payment-container">
+  <!-- Main Payment Content -->
+  <div class="payment-main">
+    <!-- Saved Payment Methods -->
+    <section class="payment-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-wallet"></i> Payment Methods</h2>
+
+      </div>
+      
+      <div class="payment-method-list" id="savedPayments">
+        <!-- Payment methods will be loaded here -->
+      </div>
+      
+      <!-- New Payment Form (hidden by default) -->
+      <div class="payment-form" id="paymentForm">
+        No payment methods are currently active. This store is a demo project for portfolio purposes.
+      </div>
+    </section>
+    
+
+  </div>
+  
+  <!-- Order Summary Sidebar -->
+  <div class="order-summary-sidebar">
+    <h2>Order Summary</h2>
+    
+    <div class="summary-row">
+
+      <span>Subtotal ({{order.cart.items.all|length}} items)</span>
+      <span>${{order.calc_items_price}}</span>
+    </div>
+    
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span>${{order.calc_shipping_cost}}</span>
+    </div>
+    
+    <div class="summary-row">
+      <span>Tax</span>
+      <span>${{order.calc_tax}}</span>
+    </div>
+    
+    <div class="summary-row discount">
+      <span>Discount ({{order.get_coupon}})</span>
+      <span>-%{{order.get_percent_coupon_discount}} (${{order.calc_discount}})</span>
+    </div>
+    
+    <div class="summary-row total">
+      <span>Total</span>
+      <span>${{order.calc_total_cost}}</span>
+    </div>
+    
+    <div class="secure-checkout">
+      <i class="fa-solid fa-shield-check"></i>
+      <div class="secure-text">
+        <h4>Secure Payment</h4>
+        <p>Your payment is encrypted and secure</p>
+      </div>
+    </div>
+    
+    <div class="payment-actions-bottom">
+      {%csrf_token%}
+      <button class="pay-btn" id="payBtn">
+        <i class="fa-solid fa-lock"></i> Pay ${{order.calc_total_cost}}
+      </button>
+      
+      <a href="checkout.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Details
+      </a>
+    </div>
+    
+    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
+      <p style="color: #666; font-size: 0.9rem; text-align: center;">
+        By placing your order, you agree to our <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+{%endblock%}
+
+{%block script%}
+<script>
+    const payBtn = document.getElementById("payBtn");
+
+    payBtn.addEventListener("click",()=>{
+      event.preventDefault()
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      let formData = new FormData()
+      formData.append("order", "{{order.id}}")
+      fetch("{%url 'payment:checkout' %}", {
+        method:"POST",
+        headers:{
+          "X-CSRFToken":csrfToken
+        },
+        body:formData
+      })
+      .then(response=>response.json())
+      .then(data=>{
+        if (data.status){
+          window.location.href = ""
+        }
+      })
+    })
+
+    // Go back to details page
+    function goBack() {
+        window.location.href = 'details.html';
+    }
+
+
+</script>
+{%endblock%}
