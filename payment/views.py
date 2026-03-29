@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from django.http import JsonResponse
 from order.models import Order
-from .models import Payment
-# Create your views here.
+from .models import Order
+
 class Checkout(View):
 
 	def get(self, request, *args, **kwargs):
@@ -29,3 +29,9 @@ class Checkout(View):
 
 		except Order.DoesNotExist:
 			return JsonResponse({"status":False})
+
+class CheckoutConfirmation(View):
+	def get(self, request, *args, **kwargs):
+		order = Order.objects.filter(user=request.user, status="paid")[0]
+
+		return render(request, "payment/confirmation.html", {"order":order})
