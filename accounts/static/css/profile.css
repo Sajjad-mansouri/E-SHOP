@@ -1,0 +1,159 @@
+
+  /* inherit variables from your home page */
+  :root {
+    --primary: #ef4056;
+    --primary-dark: #d32f2f;
+    --dark: #1a1a1a;
+    --gray: #444;
+    --light: #f8f9fa;
+    --border: #e0e0e0;
+    --card-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.05);
+    --hover-shadow: 0 12px 24px -8px rgba(239,64,86,0.15);
+  }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--light);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* container */
+  .account-wrapper {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+  }
+
+  /* left menu */
+  .account-sidebar {
+    width: 260px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 25px 0;
+    box-shadow: var(--card-shadow);
+    height: fit-content;
+  }
+
+  .account-sidebar h3 {
+    padding: 0 30px 15px;
+    font-size: 1.2rem;
+    color: var(--primary);
+    border-bottom: 1px dashed #eee;
+    margin-bottom: 20px;
+  }
+
+  .account-menu a {
+    display: block;
+    padding: 16px 30px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    position: relative;
+    transition: 0.25s;
+  }
+
+  .account-menu a:hover {
+    background: #fff4f6;
+    color: var(--primary);
+  }
+
+  .account-menu a.active {
+    background: #ffe9ec;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* right content */
+  .account-content {
+    flex: 1;
+    background: white;
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+
+  .account-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--dark);
+  }
+
+  .sub-text {
+    color: #777;
+    margin-bottom: 25px;
+  }
+
+  /* Profile details */
+  .profile-box {
+    background: #fafafa;
+    border: 1px solid #eee;
+    padding: 25px;
+    border-radius: 20px;
+  }
+
+  .profile-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 1rem;
+  }
+
+  .profile-row:last-child {
+    border-bottom: none;
+  }
+
+  .profile-row span {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  /* buttons */
+  .profile-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+  }
+
+  .btn-action {
+    padding: 12px 28px;
+    border-radius: 40px;
+    border: 1.5px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.2s;
+  }
+
+  .btn-edit {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-edit:hover {
+    background: var(--primary-dark);
+  }
+
+  .btn-delete {
+    background: #fff1f1;
+    color: #c0392b;
+    border-color: #ffc7c7;
+  }
+  .btn-delete:hover {
+    background: #ffe0e0;
+  }
+
+  .btn-password {
+    background: #ece6ff;
+    color: #4b2994;
+    border-color: #d4caff;
+  }
+  .btn-password:hover {
+    background: #ddd2ff;
+  }
+

@@ -1,11 +1,17 @@
 from django.urls import path, include
-from .views import RegistrationView, RegistrationConfirmView, RegistrationDoneView
+from .views import (RegistrationView, RegistrationConfirmView, RegistrationDoneView,
+					ProfileView
 
+	)
+
+app_name = "account"
 urlpatterns = [
 	path("register/<uidb64>/<token>/", RegistrationConfirmView.as_view(), name="register-confirm"),
 	path("", include("django.contrib.auth.urls")),
 	path("register/", RegistrationView.as_view(), name="register"),
 	path("register/registration_done/", RegistrationDoneView.as_view(), name="registration_done"),
+
+	path("profile/", ProfileView.as_view(), name="profile")
 
 
 ]

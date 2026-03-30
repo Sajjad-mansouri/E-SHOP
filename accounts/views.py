@@ -138,3 +138,7 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
             )
         return context
 
+
+
+class ProfileView(TemplateView):
+    template_name = "account/profile.html"

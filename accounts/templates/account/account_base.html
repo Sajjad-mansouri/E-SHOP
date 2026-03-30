@@ -1,0 +1,38 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{%block title%} {%endblock%}</title>
+{%block style%}
+
+{%endblock%}
+</head>
+<body>
+
+<!-- ACCOUNT PAGE LAYOUT -->
+<div class="account-wrapper">
+
+  <!-- sidebar -->
+  <div class="account-sidebar">
+    <h3>My Account</h3>
+    <div class="account-menu">
+      <a href="#" class="active">Profile</a>
+      <a href="#">Order History</a>
+      <a href="#">Address Book</a>
+      <a href="#">Email History</a>
+      <a href="#">Wish Lists</a>
+      <a href="#">Payment Methods</a>
+    </div>
+  </div>
+
+  <!-- content -->
+  {%block content%}
+
+  {%endblock%}
+
+
+</div>
+</body>
+</html>
