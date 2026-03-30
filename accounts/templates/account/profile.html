@@ -30,11 +30,16 @@
 {%block script%}
 <script type="text/javascript">
   const editBtn = document.querySelector(".btn-edit");
+  const deleteBtn = document.querySelector(".btn-delete");
+
 
   editBtn.addEventListener("click", ()=>{
        window.location.href = "{%url 'account:edit_profile' request.user.id%}"
 
   })
+  deleteBtn.addEventListener("click", ()=>{
+       window.location.href = "{%url 'account:delete_profile' request.user.id%}"
 
+  })
 </script>
 {%endblock%}

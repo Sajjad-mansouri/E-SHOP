@@ -1,0 +1,85 @@
+{%extends 'account/account_base.html'%}
+{%load static%}
+
+
+{%block title%}Edit Profile{%endblock%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/delete_profile.css'%}">
+
+{%endblock%}
+  {%block content%}
+
+  <!-- content -->
+<div class="account-content">
+
+<h2>Delete Profile</h2>
+<p class="sub-text">Permanently remove your account.</p>
+
+<div id="alertBox" class="alert"></div>
+
+<div class="delete-box">
+
+<div class="warning">
+⚠ Warning: Deleting your account is permanent.  
+All orders, wishlists, and personal information will be removed and cannot be recovered.
+</div>
+
+<div class="form-group">
+<label>Type DELETE to confirm</label>
+<input type="text" id="confirmDelete" placeholder="Type DELETE here">
+</div>
+
+<div class="actions">
+  <form method="POST" id="delete-form">
+    {%csrf_token%}
+  <button class="btn btn-delete" onclick="deleteAccount()">Delete My Account</button>
+    
+  </form>
+<button class="btn btn-cancel" onclick="history.back()">Cancel</button>
+</div>
+
+</div>
+
+</div>
+
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+  const form = document.getElementById("delete-form")
+function showMessage(type,msg){
+
+  const box=document.getElementById("alertBox");
+
+  box.className="alert";
+
+  if(type==="success"){
+    form.submit()
+  }
+
+  if(type==="error"){
+  box.classList.add("alert-error");
+  }
+
+  box.classList.add("show");
+  box.innerText=msg;
+
+}
+
+function deleteAccount(){
+  event.preventDefault();
+let value=document.getElementById("confirmDelete").value;
+
+if(value!=="DELETE"){
+showMessage("error","You must type DELETE to confirm.");
+return;
+}
+
+/* simulate delete */
+
+showMessage("success","Your account has been deleted.");
+
+}
+
+</script>
+{%endblock%}

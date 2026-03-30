@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponseRedirect, JsonResponse
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -157,3 +157,9 @@ class UpdateProfileView(UpdateView):
     def form_invalid(self, form):
         errors = form.errors
         return JsonResponse({"status":False, "errors":errors})
+
+
+class DeleteProfileView(DeleteView):
+    model = UserModel
+    template_name = "account/delete_profile.html"
+    success_url = "login"

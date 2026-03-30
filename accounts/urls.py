@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (RegistrationView, RegistrationConfirmView, RegistrationDoneView,
-					ProfileView, UpdateProfileView
+					ProfileView, UpdateProfileView, DeleteProfileView
 
 	)
 
@@ -13,6 +13,8 @@ urlpatterns = [
 
 	path("profile/", ProfileView.as_view(), name="profile"),
 	path("profile/edit/<int:pk>/", UpdateProfileView.as_view(), name="edit_profile"),
+	path("profile/delete/<int:pk>/", DeleteProfileView.as_view(), name="delete_profile"),
+
 
 
 
