@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.contrib.auth.tokens import default_token_generator
-from django.http import HttpResponseRedirect
-from django.views.generic.edit import CreateView
+from django.http import HttpResponseRedirect, JsonResponse
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -13,7 +13,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 
-from .forms import UserRegistrationForm
+
+from .forms import UserRegistrationForm, UserProfileForm
 
 UserModel = get_user_model()
 INTERNAL_REGISTRATION_SESSION_TOKEN = "_registration_token"
@@ -142,3 +143,17 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
 
 class ProfileView(TemplateView):
     template_name = "account/profile.html"
+
+class UpdateProfileView(UpdateView):
+    model = UserModel
+    form_class = UserProfileForm
+    template_name = "account/edit_profile.html"
+
+
+    def form_valid(self, form):
+        obj = form.save()
+        return JsonResponse({"status":True})
+
+    def form_invalid(self, form):
+        errors = form.errors
+        return JsonResponse({"status":False, "errors":errors})

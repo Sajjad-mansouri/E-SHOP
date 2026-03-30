@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
@@ -130,3 +131,9 @@ class UserRegistrationForm(UserCreationForm):
 		return user
 
 
+
+
+class UserProfileForm(forms.ModelForm):
+	class Meta:
+		model = UserModel
+		fields = ["first_name", "last_name", "email", ]

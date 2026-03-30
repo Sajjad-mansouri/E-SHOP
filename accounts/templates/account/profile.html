@@ -27,3 +27,14 @@
     </div>
   </div>
   {%endblock%}
+{%block script%}
+<script type="text/javascript">
+  const editBtn = document.querySelector(".btn-edit");
+
+  editBtn.addEventListener("click", ()=>{
+       window.location.href = "{%url 'account:edit_profile' request.user.id%}"
+
+  })
+
+</script>
+{%endblock%}
