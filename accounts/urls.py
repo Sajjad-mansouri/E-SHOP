@@ -20,6 +20,8 @@ urlpatterns = [
 
 	path("order_history/", views.OrderHistoryView.as_view(), name="order_history"),
 	path("order/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
+	path("addresses/", views.AddressBookView.as_view(), name="addresses"),
+
 
 
 

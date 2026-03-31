@@ -20,6 +20,7 @@ from django.contrib.auth import update_session_auth_hash
 
 from .forms import UserRegistrationForm, UserProfileForm
 from order.models import Order
+from address.models import Address
 
 UserModel = get_user_model()
 INTERNAL_REGISTRATION_SESSION_TOKEN = "_registration_token"
@@ -195,3 +196,13 @@ class OrderDetailView(DetailView):
     model = Order
     template_name = "account/order/order_detail.html"
 
+
+class AddressBookView(ListView):
+    model = Address
+    template_name = "account/address/address_book.html"
+
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        return qs.filter(user=self.request.user)

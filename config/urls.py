@@ -20,11 +20,11 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
+    path('dashboard/',include('dashboard.urls')),
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),
     path('comment/',include('comment.urls')),
     path('account/',include('accounts.urls')),
-    path('dashboard/',include('dashboard.urls')),
     path('cart/',include('cart.urls')),
     path('coupon/',include('coupon.urls')),
     path('wishlist/',include('wishlist.urls')),
