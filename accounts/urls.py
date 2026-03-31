@@ -16,7 +16,12 @@ urlpatterns = [
 	path("profile/edit/<int:pk>/", UpdateProfileView.as_view(), name="edit_profile"),
 	path("profile/delete/<int:pk>/", DeleteProfileView.as_view(), name="delete_profile"),
 
-	path("password_change/", views.PasswordChangeView.as_view(), name="password_change")
+	path("password_change/", views.PasswordChangeView.as_view(), name="password_change"),
+
+	path("order_history/", views.OrderHistoryView.as_view(), name="order_history"),
+	path("order/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
+
+
 
 
 

@@ -1,0 +1,57 @@
+{%extends 'account/account_base.html'%}
+{%load static%}
+
+
+{%block title%}Order History{%endblock%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/order_history.css'%}">
+
+{%endblock%}
+  {%block content%}
+
+  <!-- content -->
+<div class="account-content">
+
+<h2>Order History</h2>
+<p class="sub-text">View and track all your past orders.</p>
+
+{%if object_list%}
+<div class="table-container">
+
+	<table>
+		<thead>
+			<tr>
+				<th>Order ID</th>
+				<th>Date</th>
+				<th>Total</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+
+		<tbody>
+
+			{%for order in object_list%}
+			<tr>
+				<td>#{{order.order_number|truncatechars:10}}</td>
+				<td>{{order.created_at}}</td>
+				<td>${{order.total_amount}}</td>
+				<td><span class="badge badge-delivered">{{order.status}}</span></td>
+				<td><a class="btn-view" href="{%url 'account:order_detail' order.pk %}">View Details</a></td>
+			</tr>
+
+			{%endfor%}
+
+		</tbody>
+	</table>
+
+</div>
+{%endif%}
+
+</div>
+
+{%endblock%}
+
+{%block script%}
+
+{%endblock%}

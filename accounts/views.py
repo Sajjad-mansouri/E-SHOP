@@ -5,6 +5,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +19,7 @@ from django.contrib.auth import update_session_auth_hash
 
 
 from .forms import UserRegistrationForm, UserProfileForm
+from order.models import Order
 
 UserModel = get_user_model()
 INTERNAL_REGISTRATION_SESSION_TOKEN = "_registration_token"
@@ -176,3 +179,19 @@ class PasswordChangeView(auth_views.PasswordChangeView):
     def form_invalid(self, form):
 
         return JsonResponse({"status":False, "errors":form.errors})
+
+
+class OrderHistoryView(ListView):
+    model = Order
+    template_name = "account/order/order_history.html"
+
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        return qs.filter(user=self.request.user)
+
+class OrderDetailView(DetailView):
+    model = Order
+    template_name = "account/order/order_detail.html"
+

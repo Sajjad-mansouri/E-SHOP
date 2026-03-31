@@ -7,7 +7,6 @@ from stock.models import StockRecord
 from cart.models import Cart
 from address.models import Address
 from shipping.models import Shipping
-from coupon.models import CouponApplication
 
 UserModel = get_user_model()
 
@@ -60,13 +59,18 @@ class Order(models.Model):
 
     @property
     def get_user_coupon_application(self):
-        coupon_application = CouponApplication.objects.get(user=self.user, cart=self.cart)
-        return coupon_application
+        try:
+            return self.order_coupon_applications.all()[0]
+        except IndexError:
+            return None
 
     @property
     def get_coupon(self):
         coupon_application = self.get_user_coupon_application
-        return coupon_application.coupon.code
+        if coupon_application:
+            return coupon_application.coupon.code
+        else:
+            return None
 
     @property
     def get_percent_coupon_discount(self):
@@ -109,3 +113,5 @@ class Order(models.Model):
         final_cost = items_price - discount + tax + shipping_cost
 
         return final_cost
+
+

@@ -61,6 +61,7 @@ class Coupon(models.Model):
 class CouponApplication(models.Model):
 	user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="applications", verbose_name=_("User"))
 	cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, verbose_name=_("cart"))
+	order = models.ForeignKey("order.Order", on_delete=models.CASCADE, related_name="order_coupon_applications", null=True, verbose_name=_("order"))
 	coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, verbose_name=_("Coupon"))
 	created = models.DateTimeField(_("created"), auto_now_add=True)
 	updated = models.DateTimeField(_("updated"), auto_now=True)

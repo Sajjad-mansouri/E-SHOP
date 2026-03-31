@@ -1,0 +1,131 @@
+{%extends 'account/account_base.html'%}
+{%load static%}
+
+
+{%block title%}Order Detail{%endblock%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/order_detail.css'%}">
+
+{%endblock%}
+  {%block content%}
+
+  <!-- content -->
+<div class="account-content">
+
+<h2>Order #{{order.order_number}}</h2>
+<p class="sub-text">Placed on {{order.created_at}}</p>
+
+<div class="order-info">
+
+<div class="info-box">
+<strong>Status</strong>
+<span class="badge">{{order.status}}</span>
+</div>
+
+<div class="info-box">
+<strong>Payment Method</strong>
+{{order.payment.payment_method}}
+</div>
+
+<div class="info-box">
+<strong>Shipping Address</strong>
+{{request.user.get_full_name}}<br>
+{{order.shipping_address.line1}}<br>
+{{order.shipping_address.province}}, {{order.shipping_address.postcode}}
+</div>
+
+<div class="info-box">
+<strong>Email</strong>
+{{request.user.email}}
+
+</div>
+
+</div>
+
+<!-- product table -->
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+<th>Product</th>
+<th>Price</th>
+<th>Qty</th>
+<th>Total</th>
+</tr>
+</thead>
+
+<tbody>
+{%for item in order.cart.items.all%}
+<tr>
+
+	<td>
+		<div class="product">
+		<img src="{{item.stock.product.images.all.0.image.url}}">
+		<span>{{item.stock.product.title}}</span>
+		</div>
+	</td>
+
+	<td>
+		<span class="old-price">${{item.stock.price}}</span>
+		<span class="new-price">${{item.stock.get_final_price}}</span>
+	</td>
+
+	<td>{{item.quantity}}</td>
+
+	<td>${{item.get_item_price}}</td>
+
+</tr>
+{%endfor%}
+
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- totals -->
+
+<div class="totals">
+
+<div class="total-row">
+<span>Subtotal</span>
+<span>${{order.calc_items_price}}</span>
+</div>
+
+
+<div class="total-row">
+<span>Coupon Discount</span>
+<span>- ${{order.calc_discount}}</span>
+</div>
+
+<div class="total-row">
+<span>Shipping</span>
+<span>${{order.calc_shipping_cost}}</span>
+</div>
+<div class="total-row">
+<span>Tax</span>
+<span>${{order.calc_tax}}</span>
+</div>
+
+<div class="total-row final">
+<span>Total</span>
+<span>${{order.calc_total_cost}}</span>
+</div>
+
+<span class="coupon-badge">Coupon {{order.get_coupon}} applied</span>
+
+</div>
+
+<a href="{%url 'account:order_history'%}" class="btn-back">Back to Orders</a>
+
+</div>s
+
+{%endblock%}
+
+{%block script%}
+
+{%endblock%}
