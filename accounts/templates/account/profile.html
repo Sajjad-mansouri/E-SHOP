@@ -31,6 +31,8 @@
 <script type="text/javascript">
   const editBtn = document.querySelector(".btn-edit");
   const deleteBtn = document.querySelector(".btn-delete");
+  const PasswordBtn = document.querySelector(".btn-password");
+
 
 
   editBtn.addEventListener("click", ()=>{
@@ -39,6 +41,11 @@
   })
   deleteBtn.addEventListener("click", ()=>{
        window.location.href = "{%url 'account:delete_profile' request.user.id%}"
+
+  })
+
+  PasswordBtn.addEventListener("click", ()=>{
+       window.location.href = "{%url 'account:password_change'%}"
 
   })
 </script>
