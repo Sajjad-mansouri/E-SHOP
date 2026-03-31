@@ -21,6 +21,7 @@ from django.contrib.auth import update_session_auth_hash
 from .forms import UserRegistrationForm, UserProfileForm
 from order.models import Order
 from address.models import Address
+from wishlist.models import WishList
 
 UserModel = get_user_model()
 INTERNAL_REGISTRATION_SESSION_TOKEN = "_registration_token"
@@ -200,6 +201,16 @@ class OrderDetailView(DetailView):
 class AddressBookView(ListView):
     model = Address
     template_name = "account/address/address_book.html"
+
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        return qs.filter(user=self.request.user)
+
+class WishlistView(ListView):
+    model = WishList
+    template_name = "account/wishlist/wishlist.html"
 
 
     def get_queryset(self):

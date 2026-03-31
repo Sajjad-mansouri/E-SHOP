@@ -86,6 +86,13 @@ class StockRecord(models.Model):
 		return product_discounts[0][0]
 
 	@property
+	def has_dicounted(self):
+		if self.get_discount > 0:
+			return True
+		else:
+			return False
+
+	@property
 	@admin.display(description="discount type")
 	def get_type_of_discount(self):
 		product_discounts = self.get_product_discounts

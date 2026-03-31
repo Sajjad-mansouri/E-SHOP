@@ -1,0 +1,194 @@
+{%extends 'account/account_base.html'%}
+{%load static%}
+
+
+{%block title%}Edit Profile{%endblock%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/wishlist.css'%}">
+
+{%endblock%}
+{%block content%}
+
+  <!-- content -->
+
+  <div class="account-content">
+
+    <h2>My Wishlist</h2>
+    <p class="sub-text">Products you saved for later.</p>
+
+    <div class="wishlist-grid">
+
+    {%for object in object_list%}
+
+    <div class="wishlist-card" data-product-id="{{object.stock_record.id}}" data-product-name="{{object.stock_record.product.title}}">
+      <a href="{%url 'catalog:product_detail' object.stock_record.product.slug  object.stock_record.id%}">
+        <img src="{{object.stock_record.product.images.all.0.image.url}}" class="product-img">
+        <div class="product-name">{{object.stock_record.product.title}}</div>
+        
+      </a>
+
+  <div>
+    {%if object.stock_record.has_dicounted%}
+      <span class="old-price">${{object.stock_record.price}}</span>
+    {%endif%}
+    <span class="new-price">${{object.stock_record.get_final_price}}</span>
+  </div>
+    <div class="card-actions">
+    <button class="btn btn-add" data-action="add">Add to Cart</button>
+    <button class="btn btn-remove" data-action="remove">Remove</button>
+    </div>
+    </div>
+    {%endfor%}
+    </div>
+  </div>
+{%endblock%}
+
+
+{%block extra%}
+<!-- --- MODAL FOR REMOVE CONFIRMATION --- -->
+<div id="removeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            Remove Item
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently remove <strong id="productNameToRemove"></strong> from your Wish List?</p>
+            <p style="font-size: 0.85rem; color: var(--primary);">You must type <strong style="text-transform: uppercase;">REMOVE</strong> below to confirm.</p>
+            <input type="text" id="confirmRemoveInput" class="modal-confirm-input" placeholder="Type REMOVE to confirm">
+        </div>
+        <div class="modal-footer">
+            <button class="modal-cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="modal-confirm-btn" id="confirmRemoveButton" disabled>Confirm Removal</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- --- ALERT BOX CONTAINER --- -->
+<div id="alertContainer" class="alert-box"></div>
+
+{%endblock%}
+{%block script%}
+<script type="text/javascript">
+  
+  // --- 1. ALERT/MESSAGE SYSTEM (Reused from Edit Profile) ---
+const alertContainer = document.getElementById('alertContainer');
+
+/**
+ * Displays a temporary, styled message box.
+ * @param {string} message - The text content of the message.
+ * @param {string} type - 'success' or 'error'.
+ */
+function showMessage(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    
+    alertContainer.appendChild(alertDiv);
+    
+    // Show the alert box
+    alertContainer.style.opacity = '1';
+    alertContainer.style.transform = 'translateX(0)';
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        alertDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            alertContainer.removeChild(alertDiv);
+            // Hide the container if it's now empty
+            if (alertContainer.children.length === 0) {
+                 alertContainer.style.opacity = '0';
+                 alertContainer.style.transform = 'translateX(100%)';
+            }
+        }, 500); // Match transition time
+    }, 4000);
+}
+
+
+// --- 2. MODAL HANDLING FOR REMOVE ---
+const removeModal = document.getElementById('removeModal');
+const productNameToRemove = document.getElementById('productNameToRemove');
+const confirmRemoveInput = document.getElementById('confirmRemoveInput');
+const confirmRemoveButton = document.getElementById('confirmRemoveButton');
+let activeProductId = null;
+
+document.querySelectorAll('.btn-remove').forEach(button => {
+    button.addEventListener('click', function() {
+        const card = this.closest('.wishlist-card');
+        activeProductId = card.dataset.productId;
+        const productName = card.dataset.productName;
+        
+        productNameToRemove.textContent = productName;
+        
+        // Reset input and button state
+        confirmRemoveInput.value = '';
+        confirmRemoveButton.disabled = true;
+        
+        // Show modal
+        removeModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent body scroll
+    });
+});
+
+function closeModal() {
+    removeModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    activeProductId = null;
+}
+
+// Enable/Disable confirmation button based on input
+confirmRemoveInput.addEventListener('input', function() {
+    confirmRemoveButton.disabled = this.value.toUpperCase() !== 'REMOVE';
+});
+
+// Handle final confirmation click
+confirmRemoveButton.addEventListener('click', function() {
+    if (confirmRemoveInput.value.toUpperCase() === 'REMOVE' && activeProductId) {
+        // --- SIMULATED BACKEND CALL ---
+        console.log('Simulating removal of Product ID:', activeProductId);
+        
+        // Find the card element and remove it from the DOM
+        const cardToRemove = document.querySelector(`.wishlist-card[data-product-id="${activeProductId}"]`);
+        if (cardToRemove) {
+            cardToRemove.style.opacity = '0';
+            cardToRemove.style.transition = 'opacity 0.3s, transform 0.3s';
+            cardToRemove.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                cardToRemove.remove();
+                closeModal();
+                showMessage('Product successfully removed from Wish List.', 'success');
+                
+                // Check if grid is now empty
+                const grid = document.querySelector('.wishlist-grid');
+                if (grid && grid.children.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #777; padding: 40px;">Your Wish List is empty. Start adding items!</p>';
+                }
+            }, 300);
+        }
+    }
+});
+
+// --- 3. ADD TO CART HANDLING ---
+document.querySelectorAll('.btn-add').forEach(button => {
+    button.addEventListener('click', function() {
+        const card = this.closest('.wishlist-card');
+        const productId = card.dataset.productId;
+        const productName = card.dataset.productName;
+        
+        // --- SIMULATED BACKEND CALL ---
+        console.log('Simulating adding Product ID:', productId, 'to cart.');
+        
+        // Display success message
+        showMessage(productName + ' has been added to your cart!', 'success');
+    });
+});
+
+// Initialize modal state (ensure cancel button works immediately)
+document.querySelector('.modal-cancel-btn').onclick = closeModal;
+
+</script>
+
+{%endblock%}
