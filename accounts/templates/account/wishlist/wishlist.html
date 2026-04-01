@@ -1,5 +1,5 @@
 {%extends 'account/account_base.html'%}
-{%load static%}
+{%load static catalog_tags %}
 
 
 {%block title%}Edit Profile{%endblock%}
@@ -17,10 +17,11 @@
     <p class="sub-text">Products you saved for later.</p>
 
     <div class="wishlist-grid">
-
+      {%csrf_token%}
     {%for object in object_list%}
 
-    <div class="wishlist-card" data-product-id="{{object.stock_record.id}}" data-product-name="{{object.stock_record.product.title}}">
+    {% is_bookmarked object.stock_record as is_bookmarked%}
+    <div class="wishlist-card" data-stock-id="{{object.stock_record.id}}" data-product-name="{{object.stock_record.product.title}}" >
       <a href="{%url 'catalog:product_detail' object.stock_record.product.slug  object.stock_record.id%}">
         <img src="{{object.stock_record.product.images.all.0.image.url}}" class="product-img">
         <div class="product-name">{{object.stock_record.product.title}}</div>
@@ -34,7 +35,8 @@
     <span class="new-price">${{object.stock_record.get_final_price}}</span>
   </div>
     <div class="card-actions">
-    <button class="btn btn-add" data-action="add">Add to Cart</button>
+
+    <button class="btn btn-add" data-action="{%if is_bookmarked %}remove{%else%}add{%endif%}">{%if is_bookmarked %}Remove from Cart{%else%}Add to Cart{%endif%}</button>
     <button class="btn btn-remove" data-action="remove">Remove</button>
     </div>
     </div>
@@ -172,17 +174,57 @@ confirmRemoveButton.addEventListener('click', function() {
 });
 
 // --- 3. ADD TO CART HANDLING ---
+async function AddToCart(funcType, stockId, productName, btn){
+    let url;
+    let btnText;
+    let message;
+    let nextAction;
+
+    if(funcType=="add"){
+       url = "{%url 'cart:add_cart_item'%}"
+       btnText = "Remove from Cart";
+       message = "has been added to your cart!"
+       nextAction = "remove"
+    }else if(funcType=="remove"){
+       url = "{%url 'cart:remove_cart_item'%}"
+       btnText = "Add to Cart";
+       message = "has been removed from your cart!";
+       nextAction = "add"
+
+    }
+
+  const csrf = document.querySelector("[name='csrfmiddlewaretoken']").value;
+  let formData = new FormData()
+  formData.append('stock', stockId)
+  const response = await fetch(url, {
+    method:'POST',
+    headers:{
+      "X-CSRFToken":csrf
+    },
+    body:formData
+  })
+
+  const data = await response.json()
+  if (data.status){
+      // Display success message
+    btn.innerText = btnText;
+    btn.setAttribute('data-action', nextAction)
+    showMessage(productName + message, 'success');  
+  }
+}
 document.querySelectorAll('.btn-add').forEach(button => {
     button.addEventListener('click', function() {
         const card = this.closest('.wishlist-card');
-        const productId = card.dataset.productId;
+        const stockId = card.dataset.stockId;
         const productName = card.dataset.productName;
+        const funcType = this.dataset.action
+
         
         // --- SIMULATED BACKEND CALL ---
-        console.log('Simulating adding Product ID:', productId, 'to cart.');
+        AddToCart(funcType, stockId, productName, this)
+
         
-        // Display success message
-        showMessage(productName + ' has been added to your cart!', 'success');
+
     });
 });
 

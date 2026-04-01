@@ -6,9 +6,9 @@ from catalog.models import UserRating, Product
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
-def is_bookmarked(context):
+def is_bookmarked(context, stock_record):
 	user = context["user"]
-	stock_record = context["stock_record"]
+	# stock_record = context["stock_record"]
 	try:
 		cart = Cart.objects.get(user=user)
 	except Cart.DoesNotExist:
