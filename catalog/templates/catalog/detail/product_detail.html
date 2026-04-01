@@ -60,7 +60,7 @@
 
     <div class="cta-buttons">
       <button class="btn-primary"><i class="fa-regular fa-bolt"></i> Buy now</button>
-      {% is_bookmarked as is_bookmarked%}
+      {% is_bookmarked stock_record as is_bookmarked%}
       {%if is_bookmarked%}
         <button class="btn-secondary remove_from_cart"><i class="fa-regular fa-cart-plus"></i> remove from Cart</button>
         <button class="btn-secondary add_to_cart" style="display:none"><i class="fa-regular fa-cart-plus"></i> add to Cart</button>

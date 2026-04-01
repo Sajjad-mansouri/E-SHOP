@@ -217,3 +217,21 @@ class WishlistView(ListView):
         qs = super().get_queryset()
 
         return qs.filter(user=self.request.user)
+
+class WishlistDeleteView(DeleteView):
+    model = WishList
+
+    def get_object(self, queryset=None):
+        wishlist_id = self.request.POST.get("id")
+        try:
+            wishlist_id = int(wishlist_id)
+            wishlist_object = WishList.objects.get(id=wishlist_id)
+        except (WishList.DoesNotExist, ValueError):
+            return None
+        return wishlist_object
+
+    def form_valid(self, form):
+        if self.object:
+            self.object.delete()
+            return JsonResponse({"status":True})
+        return JsonResponse({"status":False})

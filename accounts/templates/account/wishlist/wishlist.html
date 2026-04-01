@@ -21,7 +21,7 @@
     {%for object in object_list%}
 
     {% is_bookmarked object.stock_record as is_bookmarked%}
-    <div class="wishlist-card" data-stock-id="{{object.stock_record.id}}" data-product-name="{{object.stock_record.product.title}}" >
+    <div class="wishlist-card" data-stock-id="{{object.stock_record.id}}" data-product-name="{{object.stock_record.product.title}}"  data-object-id="{{object.id}}">
       <a href="{%url 'catalog:product_detail' object.stock_record.product.slug  object.stock_record.id%}">
         <img src="{{object.stock_record.product.images.all.0.image.url}}" class="product-img">
         <div class="product-name">{{object.stock_record.product.title}}</div>
@@ -119,7 +119,7 @@ let activeProductId = null;
 document.querySelectorAll('.btn-remove').forEach(button => {
     button.addEventListener('click', function() {
         const card = this.closest('.wishlist-card');
-        activeProductId = card.dataset.productId;
+        activeProductId = card.dataset.objectId;
         const productName = card.dataset.productName;
         
         productNameToRemove.textContent = productName;
@@ -145,15 +145,29 @@ confirmRemoveInput.addEventListener('input', function() {
     confirmRemoveButton.disabled = this.value.toUpperCase() !== 'REMOVE';
 });
 
+async function removeFromWishlist(activeProductId){
+  const csrf = document.querySelector("[name='csrfmiddlewaretoken']").value;
+  let formData = new FormData()
+
+  formData.append('id', activeProductId)
+  const response = await fetch("{%url 'account:wishlist_remove'%}", {
+    method:'POST',
+    headers:{
+      "X-CSRFToken":csrf
+    },
+    body:formData
+  })
+  const data = await response.json()
+  return data.status
+}
 // Handle final confirmation click
-confirmRemoveButton.addEventListener('click', function() {
+confirmRemoveButton.addEventListener('click', async function() {
     if (confirmRemoveInput.value.toUpperCase() === 'REMOVE' && activeProductId) {
-        // --- SIMULATED BACKEND CALL ---
-        console.log('Simulating removal of Product ID:', activeProductId);
         
         // Find the card element and remove it from the DOM
-        const cardToRemove = document.querySelector(`.wishlist-card[data-product-id="${activeProductId}"]`);
-        if (cardToRemove) {
+        const cardToRemove = document.querySelector(`.wishlist-card[data-object-id="${activeProductId}"]`);
+        const status = await removeFromWishlist(activeProductId)
+        if (cardToRemove && status) {
             cardToRemove.style.opacity = '0';
             cardToRemove.style.transition = 'opacity 0.3s, transform 0.3s';
             cardToRemove.style.transform = 'scale(0.9)';
@@ -169,6 +183,10 @@ confirmRemoveButton.addEventListener('click', function() {
                     grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #777; padding: 40px;">Your Wish List is empty. Start adding items!</p>';
                 }
             }, 300);
+        }else{
+
+            closeModal();
+            showMessage('Failed to remove product from Wish List.', 'error');
         }
     }
 });

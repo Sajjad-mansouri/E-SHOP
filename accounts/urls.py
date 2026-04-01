@@ -22,6 +22,8 @@ urlpatterns = [
 	path("order/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
 	path("addresses/", views.AddressBookView.as_view(), name="addresses"),
 	path("wishlist/", views.WishlistView.as_view(), name="wishlist"),
+	path("wishlist/remove/", views.WishlistDeleteView.as_view(), name="wishlist_remove"),
+
 
 
 
