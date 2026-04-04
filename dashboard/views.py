@@ -2,11 +2,14 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic.list import ListView
-from django.views.generic.base import View, TemplateResponseMixin
+from django.views.generic.base import View, TemplateResponseMixin, TemplateView
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
+from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from .wizard_views import OfferWizardStepView
 from .forms import (
 					image_formset, 
@@ -30,11 +33,57 @@ from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
 from offer.models import OfferRange, Offer
 from coupon.models import Coupon
+from order.models import Order
+
+UserModel = get_user_model()
 
 # Create your views here.
-def dashboard(request):
-	context = {}
-	return render(request, "dashboard/main.html",context)
+class DashboardOverView(TemplateView):
+	template_name = "dashboard/overview/overview.html"
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		customers = self.get_customers()
+		stock_records = self.get_stock_products()
+		orders = self.get_orders()
+		today_orders = self.get_today_order()
+		earns = self.get_revenue()
+
+		context["customers"] = customers
+		context["stock_records"] = stock_records
+		context["orders"] = orders
+		context["today_orders"] = today_orders
+		context["earns"] = earns
+
+
+
+
+		return context
+
+	def get_customers(self):
+		customers = UserModel.objects.filter(user_type="customer")
+		return customers
+
+	def get_stock_products(self):
+		stock_records = StockRecord.objects.filter(is_public=True, num_in_stock__gt=0)
+		return stock_records
+
+	def get_orders(self):
+		orders = Order.objects.all()
+		return orders
+
+	def get_today_order(self):
+		today = timezone.now()
+		orders = self.get_orders()
+		today_orders = orders.filter(created_at__date=today)
+		return today_orders
+
+	def get_revenue(self):
+		earns = 0
+		orders = self.get_orders().filter(status__in=["paid", "shipped", "delivered"])
+		for order in orders:
+			earns += order.pure_price
+
+		return earns
 
 
 class ProductListView(ListView):

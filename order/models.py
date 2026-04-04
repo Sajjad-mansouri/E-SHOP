@@ -105,12 +105,19 @@ class Order(models.Model):
         return self.cart.get_items_price
 
     @property
-    def calc_total_cost(self):
+    def pure_price(self):
         items_price = self.calc_items_price
-        shipping_cost = self.calc_shipping_cost
         discount = self.calc_discount
+
+        return items_price - discount
+
+    @property
+    def calc_total_cost(self):
+
+        pure_price = self.pure_price
+        shipping_cost = self.calc_shipping_cost
         tax = self.calc_tax
-        final_cost = items_price - discount + tax + shipping_cost
+        final_cost = pure_price + tax + shipping_cost
 
         return final_cost
 

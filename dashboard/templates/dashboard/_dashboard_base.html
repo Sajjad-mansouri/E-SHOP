@@ -1,0 +1,94 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/dashboard_base.css'%}">
+
+{%block style%} {%endblock%}
+<title>E‑SHOP Admin | Overview</title>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="top-header">
+<div class="brand-logo">E‑SHOP Admin</div>
+<a href="{%url 'catalog:home'%}" class="view-store-btn">Return to Store</a>
+</header>
+
+
+<!-- NAVBAR -->
+
+<nav class="nav-bar">
+
+<a class="nav-item active" href="{%url 'dashboard:overview'%}">Overview</a>
+
+<div class="nav-group">
+<a class="nav-item" href="catalog-products.html">Catalog</a>
+<div class="sub-nav">
+<a href="catalog-products.html">Products</a>
+<a href="catalog-types.html">Product Types</a>
+<a href="catalog-categories.html">Categories</a>
+</div>
+</div>
+
+<div class="nav-group">
+<a class="nav-item" href="orders.html">Fulfilment</a>
+<div class="sub-nav">
+<a href="orders.html">Orders</a>
+<a href="order-statistics.html">Statistics</a>
+<a href="partners.html">Partners</a>
+</div>
+</div>
+
+<div class="nav-group">
+<a class="nav-item" href="customers.html">Customers</a>
+<div class="sub-nav">
+<a href="customers.html">Customer List</a>
+</div>
+</div>
+
+<div class="nav-group">
+<a class="nav-item" href="offers.html">Offers</a>
+<div class="sub-nav">
+<a href="offers.html">Offers</a>
+<a href="offer-range.html">Offer Range</a>
+<a href="coupons.html">Coupons</a>
+</div>
+</div>
+
+<div class="nav-group">
+<a class="nav-item" href="email-templates.html">Content</a>
+<div class="sub-nav">
+<a href="email-templates.html">Email Templates</a>
+<a href="reviews.html">Reviews</a>
+</div>
+</div>
+
+<div class="nav-group">
+<a class="nav-item" href="sales-report.html">Reports</a>
+<div class="sub-nav">
+<a href="sales-report.html">Sales Report</a>
+<a href="traffic-report.html">Traffic Report</a>
+</div>
+</div>
+
+</nav>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+{%block content%}
+
+{%endblock%}
+
+</main>
+
+</body>
+</html>

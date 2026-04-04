@@ -1,0 +1,81 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/overview.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+{%block content%}
+<!-- Main Content -->
+
+    <div class="page-title">Dashboard Overview</div>
+
+    <!-- STATS -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-title">Total Revenue</div>
+            <div class="stat-value">${{earns|floatformat:2}}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Total order</div>
+            <div class="stat-value">{{orders|length}}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Orders Today</div>
+            <div class="stat-value">{{today_orders|length}}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Customers</div>
+            <div class="stat-value">{{customers|length}}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Products</div>
+            <div class="stat-value">{{stock_records|length}}</div>
+        </div>
+
+    </div>
+
+
+    <!-- RECENT ORDERS -->
+
+    <div class="table-card">
+
+        <div class="table-title">Recent Orders</div>
+
+        <table>
+
+        <thead>
+        <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Date</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {%for order in orders|slice:":5"%}
+        <tr>
+            <td>#{{order.order_number}}</td>
+            <td>{{order.shipping_address.full_name}}</td>
+            <td>${{order.calc_total_cost|floatformat:2}}</td>
+            <td><span class="status delivered">{{order.status}}</span></td>
+            <td>{{order.created_at}}</td>
+        </tr>
+        {%endfor%}
+        </tbody>
+
+        </table>
+
+    </div>
+{%endblock%}
