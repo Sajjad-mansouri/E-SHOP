@@ -1,0 +1,43 @@
+{%for stock_record in object_list%}
+ <tr>
+    <td><img class="product-img" src="{{stock_record.get_product_image}}"></td>
+
+    <td>{{stock_record.product.title}}</td>
+
+    <td>{{stock_record.product.upc}}</td>
+
+    <td>
+    $1200
+    <div class="old">${{stock_record.price}}</div>
+    <div class="discount">-12%</div>
+    </td>
+
+    <td>{{stock_record.product.product_class.name}}</td>
+
+    <td>{{stock_record.num_in_stock}}</td>
+
+    <td>
+    <span class="status         
+    {%if stock_record.is_public%}
+        Public
+        {%else%}
+        Private
+        {%endif%}">
+        {%if stock_record.is_public%}
+        Public
+        {%else%}
+        Private
+        {%endif%}
+
+    </span>
+    </td>
+
+    <td>{{stock_record.date_updated|date}}</td>
+
+    <td>
+    <a class="btn update" href="{%url 'dashboard:update_product' stock_record.pk %}">Update</a>
+    <a class="btn delete" href="{%url 'dashboard:delete_product' stock_record.product.pk %}">Delete</a>
+    </td>
+
+</tr>   
+{%endfor%}

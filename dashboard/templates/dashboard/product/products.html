@@ -1,0 +1,156 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/products.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+{%block content%}
+<!-- Main Content -->
+<main class="main">
+
+<div class="page-title">Products</div>
+
+<div class="top-bar">
+
+<div class="filters">
+
+
+
+<input id="search" placeholder="Search product">
+
+</div>
+
+<button class="create-btn" onclick="openModal()">Create Product</button>
+
+</div>
+
+<div class="card">
+
+<table id="table">
+
+<thead>
+<tr>
+<th>Image</th>
+<th>Title</th>
+<th>UPC</th>
+<th>Price</th>
+<th>Type</th>
+<th>Stock</th>
+<th>Status</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{%include "dashboard/product/_records.html"%}
+</tbody>
+
+</table>
+
+<div class="pagination" id="pagination"></div>
+
+</div>
+
+</main>
+{%endblock%}
+
+{%block extra%}
+<!-- MODAL -->
+
+<div class="modal" id="modal">
+
+    <div class="modal-box">
+
+    <div class="modal-header">
+    <h3>Create Product</h3>
+    <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <p>Select the product type.</p>
+
+  <form method="GET" action="{%url 'dashboard:create_product'%}">
+    {{product_class_form}}
+  </form>
+
+    <div class="modal-actions">
+    <button class="cancel" onclick="closeModal()">Cancel</button>
+    <button class="continue" onclick="createProduct()">Continue</button>
+    </div>
+
+    </div>
+
+</div>
+
+{%endblock extra%}
+
+
+{%block script%}
+
+<script>
+
+const products=[
+{img:"https://via.placeholder.com/50",title:"iPhone 15",upc:"1111",old:1200,price:999,type:"Phone",stock:10,public:true,date:"2026‑03‑01"},
+{img:"https://via.placeholder.com/50",title:"MacBook Pro",upc:"2222",old:2400,price:2100,type:"Laptop",stock:6,public:true,date:"2026‑02‑20"},
+{img:"https://via.placeholder.com/50",title:"Galaxy S24",upc:"3333",old:1100,price:950,type:"Phone",stock:14,public:false,date:"2026‑03‑05"}
+]
+
+let filtered=[...products]
+let page=1
+const perPage=5
+
+
+async function search_product(searchTitle){
+    const tbody=document.querySelector("tbody")
+    const response = await fetch("{% url 'dashboard:search_product'%}"+"?search="+searchTitle)
+    const data = await response.text()
+    console.log(searchTitle, )
+
+    tbody.innerText=""
+
+    tbody.insertAdjacentHTML('afterbegin',data)
+
+}
+document.getElementById("search").addEventListener("input",e=>{
+
+    const q=e.target.value.toLowerCase()
+    search_product(q)
+
+})
+
+document.getElementById("typeFilter").addEventListener("change",e=>{
+
+    const type=e.target.value
+
+    filtered=type ? products.filter(p=>p.type===type) : [...products]
+
+    page=1
+    render()
+
+})
+
+function openModal(){
+    document.getElementById("modal").style.display="flex"
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display="none"
+}
+
+function createProduct(){
+
+    const productClass=document.getElementById("id_product_class").value
+
+
+    window.location.href= "{%url 'dashboard:create_product'%}?product_class="+productClass
+}
+
+
+</script>
+
+{%endblock%}

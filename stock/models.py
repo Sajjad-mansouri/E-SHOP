@@ -105,3 +105,7 @@ class StockRecord(models.Model):
 		discount = self.get_discount
 
 		return self.price - (self.price * (discount/100))
+
+	@property
+	def get_product_image(self):
+		return self.product.images.all()[0].image.url

@@ -87,7 +87,7 @@ class DashboardOverView(TemplateView):
 
 
 class ProductListView(ListView):
-	template_name = "dashboard/product_list.html"
+	template_name = "dashboard/product/products.html"
 	model = StockRecord
 
 	def get_context_data(self, **kwargs):
@@ -193,10 +193,15 @@ class SearchProduct(View):
 
 	def get(self, request, *args, **kwargs):
 		search = request.GET.get("search")
-		object_list = StockRecord.objects.filter(
-			Q(product__title__icontains=search)|
-			Q(product__upc__icontains=search)
-			)
+
+		if search:	
+			object_list = StockRecord.objects.filter(
+				Q(product__title__icontains=search)|
+				Q(product__upc__icontains=search)
+				)
+
+		else:
+			object_list = StockRecord.objects.all()
 		if object_list:
 			return render(request, "dashboard/_records.html", {"object_list":object_list, "search":True})
 		else:
