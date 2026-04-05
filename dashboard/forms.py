@@ -1,5 +1,6 @@
 from django.forms.models import inlineformset_factory
 from django import forms
+from django.forms.models import BaseInlineFormSet
 from django.utils import timezone
 from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
@@ -134,12 +135,14 @@ class ProductForm(forms.ModelForm):
 		return product
 
 class ProductImageForm(forms.ModelForm):
+
 	class Meta:
 		model=ProductImage
 		fields = ["image", "display_order","caption"]
 		widgets = {
 			"display_order":forms.HiddenInput(),
-			"caption":forms.TextInput(attrs={"class":"form-control", "placeholder":"Caption (optional)"})
+			"caption":forms.TextInput(attrs={"class":"form-control", "placeholder":"Caption (optional)"}),
+			"DELETE":forms.HiddenInput()
 		}
 image_formset = inlineformset_factory(Product, ProductImage,fields = ["image", "display_order","caption"],form=ProductImageForm,extra=1)
 
@@ -175,15 +178,21 @@ class ProductTypeForm(forms.ModelForm):
 			"name":forms.TextInput(attrs={"class":"form-control"})
 		}
 class ProductAttributeeForm(forms.ModelForm):
+
 	class Meta:
 		model = ProductAttribute
 		fields = ["name", "type"]
 		widgets = {
-			"name":forms.TextInput(attrs={"class":"form-control"}),
+			"name":forms.TextInput(attrs={"class":"form-control", "placeholder":"Attribute name"}),
 			"type":forms.Select(attrs={"class":"form-control"}),
 
 		}
-product_type_attr_formset = inlineformset_factory(ProductClass, ProductAttribute,fields = ["name", "type"], form=ProductAttributeeForm,extra=1)
+class CustomInlineFormSet(BaseInlineFormSet):
+	def add_fields(self, form, index):
+		super().add_fields(form, index)
+		form.fields["DELETE"].widget = forms.HiddenInput(attrs={"class":"delete-flag"})
+
+product_type_attr_formset = inlineformset_factory(ProductClass, ProductAttribute,fields = ["name", "type"], form=ProductAttributeeForm, formset=CustomInlineFormSet,extra=0,can_delete=True)
 
 
 CategoryFormFactory = movenodeform_factory(Category)

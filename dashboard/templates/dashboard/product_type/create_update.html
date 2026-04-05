@@ -1,0 +1,139 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_product_type.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+
+{%block breadcrumb%}
+
+{%endblock%}
+
+{%block content%}
+
+
+    <a class="back-link" href="{%url 'dashboard:product_type_list' %}">← Back to Product Types</a>
+
+    <div id="errorBox" class="error-box"></div>
+
+    <form method="POST">
+        {%csrf_token%}
+    <!-- PRODUCT TYPE -->
+
+    <div class="card">
+
+    <div class="section-title">Product Type</div>
+
+    <div class="form-group">
+    <label>Name</label>
+    {{form.name}}
+    </div>
+
+    </div>
+
+    <!-- ATTRIBUTES -->
+
+    <div class="card">
+
+    <div class="section-title">Product Attributes</div>
+
+    <div id="attributesContainer">
+        {{attrs_formset.management_form }}
+        {%for form in attrs_formset%}
+        <div class="attr-row">
+            {{form.name}}
+
+            {{form.type}}
+
+
+            <button type="button" class="remove-btn">✕</button>
+              {%for field in form.hidden_fields%}
+              {{field}}
+              {%endfor%}
+        
+        </div>
+        {%endfor%}
+    </div>
+
+    <button type="button" class="add-btn" onclick="addAttribute()">
+    + Add Attribute
+    </button>
+
+    </div>
+
+    <div class="actions">
+    <button class="save-btn" type="submit">Create Product Type</button>
+    <a class="cancel-btn" type="button" href="{%url 'dashboard:product_type_list'%}">Cancel</a>
+    </div>
+
+    </form>
+
+
+{%endblock%}
+
+{%block extra%}
+
+
+{%endblock extra%}
+
+
+{%block script%}
+<script>
+
+const container=document.getElementById("attributesContainer");
+const totalForm = document.getElementById("id_attributes-TOTAL_FORMS");
+const initialForm = document.getElementById("id_attributes-INITIAL_FORMS");
+
+const selectForm = `{{attrs_formset.empty_form.type}}`
+const attrNameForm = `{{attrs_formset.empty_form.name}}`
+function addAttribute(){
+
+    const row=document.createElement("div")
+    let attrRows = container.querySelectorAll(".attr-row");
+    let index = attrRows.length
+    let cloneSelectForm = selectForm.replace(/__prefix__/g, index) 
+    let cloneNameForm = attrNameForm.replace(/__prefix__/g, index) 
+
+    row.className = "attr-row"
+    row.innerHTML=`
+
+                ${cloneNameForm}
+
+                ${cloneSelectForm}
+
+                <button type="button" class="remove-btn">✕</button>
+
+                `
+
+    row.querySelector(".remove-btn").onclick=()=>{
+        row.remove();
+        totalForm.value = Number(totalForm.value) - 1;
+        initialForm.value = Number(initialForm.value) - 1;
+
+    }
+    container.appendChild(row)
+    totalForm.value = Number(totalForm.value) + 1;
+
+
+
+}
+
+document.querySelectorAll(".remove-btn").forEach(btn=>{
+    btn.onclick=()=>{
+    let row = btn.closest(".attr-row")
+    let deleteInput = row.querySelector(".delete-flag");
+    row.style.display="none";
+    deleteInput.value="true"
+
+    }
+
+})
+
+</script>
+
+
+{%endblock%}

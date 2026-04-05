@@ -227,8 +227,8 @@ class ProductTypeView(ListView):
 class ProductTypeCreateUpdateView(UpdateView):
 	model = ProductClass
 	form_class = ProductTypeForm
-	template_name = "dashboard/product_type/product_type_create_update.html"
-	success_url = reverse_lazy("product_type_list")
+	template_name = "dashboard/product_type/create_update.html"
+	success_url = reverse_lazy("dashboard:product_type_list")
 
 
 	def get_context_data(self, **kwargs):
@@ -265,8 +265,10 @@ class ProductTypeCreateUpdateView(UpdateView):
 
 
 	def get_formset(self):
+		formset = product_type_attr_formset(**self.get_form_kwargs())
 
-		return product_type_attr_formset(**self.get_form_kwargs())
+
+		return formset
 
 	def form_valid(self, form, formset):
 		success_url = self.get_success_url()
