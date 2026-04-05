@@ -23,7 +23,7 @@ class ProductCategoryForm(forms.ModelForm):
 		}
 
 
-ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1)
+ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
 
 def _text_form(attr):
 	return forms.CharField(widget=forms.TextInput(attrs={"class":"form-control"}), label=attr.name)
@@ -139,7 +139,7 @@ class ProductImageForm(forms.ModelForm):
 		fields = ["image", "display_order","caption"]
 		widgets = {
 			"display_order":forms.HiddenInput(),
-			"caption":forms.TextInput(attrs={"class":"form-control"})
+			"caption":forms.TextInput(attrs={"class":"form-control", "placeholder":"Caption (optional)"})
 		}
 image_formset = inlineformset_factory(Product, ProductImage,fields = ["image", "display_order","caption"],form=ProductImageForm,extra=1)
 
@@ -152,11 +152,13 @@ class StockRecordForm(forms.ModelForm):
 
 	class Meta:
 		model = StockRecord
-		fields = ["sku", "num_in_stock", "price",]
+		fields = ["sku", "num_in_stock", "price", "discount"]
 		widgets = {
-			"sku":forms.TextInput(attrs={"class":"form-control"}),
+			"sku":forms.TextInput(attrs={"class":"form-control", "placeholder":"SKU"}),
 			"num_in_stock":forms.NumberInput(attrs={"class":"form-control"}),
-			"price":forms.NumberInput(attrs={"class":"form-control"})
+			"price":forms.NumberInput(attrs={"class":"form-control"}),
+			"discount":forms.NumberInput(attrs={"class":"form-control", "placeholder":"percent"}),
+
 
 		}
 

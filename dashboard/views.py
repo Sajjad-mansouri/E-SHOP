@@ -97,7 +97,7 @@ class ProductListView(ListView):
 		return context
 
 class CreateUpdateProductView(TemplateResponseMixin, View):
-	template_name = "dashboard/create_update_product.html"
+	template_name = "dashboard/product/create_update.html"
 
 	def dispatch(self, request, *args, **kwargs):
 		product_class_id = request.GET.get('product_class')
@@ -147,10 +147,11 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 			self.object = product_form.save()
 		else:
 
-			return render(request, "dashboard/catalog/_errors.html", {
-				"items":{
-				"product":{"errors":product_form.errors}}
-
+			return render(request, "dashboard/product/create_update.html", {
+				"product_form":product_form,
+				"img_formset":img_formset,
+				"product_category_form":product_category_form,
+				"stock_record_form":stock_record_form,
 				}
 				)
 
@@ -171,15 +172,17 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 				
 
 		else:
+
 			self.object.delete()
-			return render(request, "dashboard/catalog/_errors.html", {
-				"items":{
-					"stock":{"errors":stock_record_form.errors}
-				}
+			return render(request, "dashboard/product/create_update.html", {
+				"product_form":product_form,
+				"img_formset":img_formset,
+				"product_category_form":product_category_form,
+				"stock_record_form":stock_record_form,
 
 				})
 
-		return HttpResponse("")
+		return redirect("dashboard:products")
 
 
 

@@ -108,4 +108,8 @@ class StockRecord(models.Model):
 
 	@property
 	def get_product_image(self):
-		return self.product.images.all()[0].image.url
+		images = self.product.images.all()
+		if images.count()>0:
+			return self.product.images.all()[0].image.url
+		else:
+			return ""

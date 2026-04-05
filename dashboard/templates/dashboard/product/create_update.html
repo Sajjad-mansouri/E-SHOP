@@ -1,0 +1,289 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_product.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+
+{%block breadcrumb%}
+<div class="top-nav">
+<a href="{%url 'dashboard:products'%}" class="back-link">← Back to Products</a>
+</div>
+{%endblock%}
+
+{%block content%}
+    <!-- LEFT NAV -->
+    <div class="sidebar">
+        <h3>Sections</h3>
+        <ul class="nav">
+        <li><a href="#details" class="active">Product Details</a></li>
+        {%if product_class.has_attributes%}
+        <li><a href="#attributes">Product Attributes</a></li>
+        
+        {%endif%}
+        <li><a href="#categories">Categories</a></li>
+        <li><a href="#images">Images</a></li>
+        <li><a href="#stock">Stock & Pricing</a></li>
+        <li><a href="#seo">SEO</a></li>
+        </ul>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <form class="content" id="create_update_product_form" method="POST" enctype="multipart/form-data">
+        {%csrf_token%}
+        <div id="form-errors" class="error-box" 
+        {%if not product_form.errors and not product_category_form.errors and not stock_record_form.errors and not simg_formset %}
+        style="display:none;"
+        {%endif%}
+        >
+        <strong>There were problems creating the product:</strong>
+        <ul id="error-list">
+            {% for field, errors in product_form.errors.items %}
+            <strong>{{ field}}:</strong>
+              {% for error in errors %}
+              <li>{{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+
+            {% for field, errors in product_category_form.errors.items %}
+            <strong>{{ field}}:</strong>
+              {% for error in errors %}
+              <li>{{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+
+            {% for field, errors in stock_record_form.errors.items %}
+            <strong>{{ field}}:</strong>
+              {% for error in errors %}
+              <li>{{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+
+            {% for form in img_formset %}
+              {% for field, errors in form.errors.items %}
+              <strong>{{ field}}:</strong>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+        </ul>
+        </div>
+        <div class="page-title">
+            <!-- SVG for icon -->
+            <svg viewBox="0 0 24 24"><path d="M3.5 19.5v-15a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-11l-4 4v-4zm2-15a1 1 0 0 0-1 1v13.586l2.293-2.293a1 1 0 0 1 .707-.293h11a1 1 0 0 0 1-1v-13a1 1 0 0 0-1-1h-13zm3 3.5h7v1.5h-7v-1.5zm0 3h7v1.5h-7v-1.5z"/></svg>
+            Create Product
+        </div>
+
+        <!-- DETAILS -->
+        <section class="tab" id="details">
+            <div class="form-group">
+            <label>Product Title</label>
+            {{product_form.title}}
+            </div>
+            <div class="form-group">
+            <label>UPC</label>
+            {{product_form.upc}}
+            </div>
+            <div class="form-group">
+            <label>Description</label>
+            {{product_form.description}}
+            </div>
+
+
+        </section>
+
+        <!-- attributes -->
+        <section class="tab" id="attributes">
+            {%for field in product_form%}
+              {% if "attr" in field.id_for_label %}
+                <div class="form-group">
+                  {{field.label}}
+                  {{field}}
+                </div>
+              {%endif%}
+            {%endfor%}
+        </section>
+        <!-- categories -->
+        <section class="tab" id="categories">
+
+                <div class="form-group">
+                {{product_category_form}}
+                </div>
+
+        </section>
+        <!-- IMAGES -->
+        <section class="tab" id="images">
+            {{ img_formset.management_form }}
+            <h3 style="margin-bottom:15px;">Upload Images</h3>
+            <ol class="image-list" id="imageList">
+            {%for form in img_formset%}
+                {%for field in form.hidden_fields%}
+                {{field}}
+                {%endfor%}
+                <li class="image-item">
+                    {%if form.instance.image%}
+                    <img class="thumb" src="{{form.instance.image.url}}" alt="">
+
+                    {%else%}
+                    <img class="thumb" src="" alt="">
+                    {%endif%}
+                    {{form.image}}
+                    {{form.caption}}
+
+                    <button type="button" class="remove-btn">Delete</button>
+                </li>
+            {%endfor%}
+            </ol>
+            <button type="button" onclick="addImageField()" class="add-image-btn">
+            <!-- Plus SVG -->
+            <svg viewBox="0 0 16 16"><path d="M8 1v14M1 8h14" stroke="#2a5bd7" stroke-width="2" stroke-linecap="round"/></svg>
+            Add Image
+            </button>
+        </section>
+
+        <!-- STOCK -->
+        <section class="tab" id="stock" style="margin-top:25px;">
+            <div class="form-group">
+                <label>SKU</label>
+                {{stock_record_form.sku}}
+            </div>
+
+            <div class="form-group">
+                <label>Quantity in stock</label>
+                {{stock_record_form.num_in_stock}}
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                {{stock_record_form.price}}
+            </div>
+            <div class="form-group">
+                <label>discount</label>
+                {{stock_record_form.discount}}
+            </div>
+
+        </section>
+
+        <!-- SEO -->
+        <section class="tab" id="seo" style="margin-top:25px;">
+            <h3 style="margin-bottom:10px;">SEO</h3>
+            <div class="form-group">
+            <label>Slug</label>
+            {{product_form.slug}}
+            </div>
+            <div class="form-group">
+            <label>Meta title</label>
+            {{product_form.meta_title}}
+            </div>
+            <div class="form-group">
+            <label>Meta description</label>
+            {{product_form.meta_description}}
+            </div>
+        </section>
+
+        <div class="actions">
+        <a href="{%url 'dashboard:products'%}" class="btn btn-secondary">Cancel</a>
+        <button  class="btn btn-primary">Save Product</button>
+        </div>
+
+    </form>
+{%endblock%}
+
+{%block extra%}
+
+
+{%endblock extra%}
+
+
+{%block script%}
+
+<script>
+// --- Tab switching ---
+const totalForm = document.getElementById('id_img-TOTAL_FORMS')
+const navLinks=document.querySelectorAll('.nav a');
+const tabs=document.querySelectorAll('.tab');
+navLinks.forEach(link=>{
+link.addEventListener('click',e=>{
+e.preventDefault();
+const id=link.getAttribute('href').substring(1);
+navLinks.forEach(l=>l.classList.remove('active'));
+link.classList.add('active');
+tabs.forEach(t=>t.style.display=t.id===id?'block':'none');
+});
+});
+tabs.forEach((t,i)=>t.style.display=i===0?'block':'none');
+
+// --- Dynamic image upload with thumbnail ---
+function bindImageInput(imgInput, thumb) {
+  imgInput.addEventListener('change', function() {
+    const file = this.files && this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        thumb.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    } else {
+      thumb.src = "";
+    }
+  });
+}
+
+function addImageField(){
+
+  const list=document.getElementById('imageList');
+  const index = list.children.length
+  
+  const li=document.createElement('li');
+  li.className='image-item';
+  li.innerHTML=`
+    <img class="thumb" src="" alt="">
+    <input type="file" name="img-${index}-image" accept="image/*">
+    <input type="text" name="img-${index}-caption" class="form-control" placeholder="Caption (optional)">
+    <button type="button" class="remove-btn">Delete</button>
+  `;
+  // Set up live thumbnail update
+  const imgInput = li.querySelector('input[type="file"]');
+  const thumb = li.querySelector('.thumb');
+  bindImageInput(imgInput, thumb);
+
+  // Remove logic
+  li.querySelector('.remove-btn').onclick=()=>{
+    li.remove();
+    totalForm.value = Number(totalForm.value) - 1
+};
+  list.appendChild(li);
+  totalForm.value = Number(totalForm.value) + 1
+}
+
+// Ensure thumbnail works for initial field
+document.querySelectorAll('.image-item').forEach(function(item){
+  const imgInput = item.querySelector('input[type="file"]');
+  const thumb = item.querySelector('.thumb');
+  bindImageInput(imgInput, thumb);
+  item.querySelector('.remove-btn').onclick=()=>{
+    item.remove();
+    totalForm.value = Number(totalForm.value) - 1;
+};
+});
+
+function showErrors(errors){
+    const box=document.getElementById('form-errors');
+    const list=document.getElementById('error-list');
+
+    list.innerHTML='';
+    errors.forEach(err=>{
+    const li=document.createElement('li');
+    li.textContent=err;
+    list.appendChild(li);
+    });
+
+    box.style.display='block';
+}
+
+</script>
+{%endblock%}
