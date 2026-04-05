@@ -28,6 +28,9 @@
 
 </div>
 
+<div id="message-container">
+     <div class="alert"></div>
+</div>
 <div class="card">
 
 <table id="table">
@@ -87,6 +90,21 @@
 
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-box">
+    {%csrf_token%}
+    <h2>Delete Product</h2>
+    <p id="deleteModalMessage">Are you sure you want to delete this product?</p>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="deleteCancelBtn">Cancel</button>
+      <button id="deleteConfirmBtn" class="btn-danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+
 {%endblock extra%}
 
 
@@ -94,15 +112,7 @@
 
 <script>
 
-const products=[
-{img:"https://via.placeholder.com/50",title:"iPhone 15",upc:"1111",old:1200,price:999,type:"Phone",stock:10,public:true,date:"2026‑03‑01"},
-{img:"https://via.placeholder.com/50",title:"MacBook Pro",upc:"2222",old:2400,price:2100,type:"Laptop",stock:6,public:true,date:"2026‑02‑20"},
-{img:"https://via.placeholder.com/50",title:"Galaxy S24",upc:"3333",old:1100,price:950,type:"Phone",stock:14,public:false,date:"2026‑03‑05"}
-]
 
-let filtered=[...products]
-let page=1
-const perPage=5
 
 
 async function search_product(searchTitle){
@@ -123,16 +133,7 @@ document.getElementById("search").addEventListener("input",e=>{
 
 })
 
-document.getElementById("typeFilter").addEventListener("change",e=>{
 
-    const type=e.target.value
-
-    filtered=type ? products.filter(p=>p.type===type) : [...products]
-
-    page=1
-    render()
-
-})
 
 function openModal(){
     document.getElementById("modal").style.display="flex"
@@ -149,6 +150,89 @@ function createProduct(){
 
     window.location.href= "{%url 'dashboard:create_product'%}?product_class="+productClass
 }
+
+
+
+
+async function deleteProduct(url){
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const formData = new FormData()
+    const response = await fetch(url, {
+        method:"POST",
+        headers:{
+            "X-CSRFToken":csrfToken,   
+        },
+        body:formData
+
+    })
+    const data = await response.json()
+    return data
+}
+
+  const modal = document.getElementById("deleteModal");
+  const message = document.getElementById("deleteModalMessage");
+  const confirmBtn = document.getElementById("deleteConfirmBtn");
+  const cancelBtn = document.getElementById("deleteCancelBtn");
+const container = document.getElementById("message-container");
+const alertDiv = container.querySelector(".alert");
+
+  // Handle every delete button inside the table
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      const title = btn.getAttribute("data-title");
+      const url = btn.getAttribute("data-url");
+      const productId = btn.getAttribute("data-id");
+      message.textContent = `Are you sure you want to delete "${title}"?`;
+      confirmBtn.setAttribute("data-url", url);
+      confirmBtn.setAttribute("data-id", productId);
+      confirmBtn.setAttribute("data-title", title);
+
+
+
+      modal.style.display = "flex";
+    });
+  });
+
+  confirmBtn.addEventListener("click",async ()=>{
+      let url = confirmBtn.getAttribute("data-url");
+      let productId = confirmBtn.getAttribute("data-id");
+      let productTitle = confirmBtn.getAttribute("data-title");
+
+      let tr = document.querySelector(`tr[data-id="${productId}"]`)
+      let data = await deleteProduct(url);
+      if (data.status){
+        tr.remove();
+        modal.style.display = "none";
+        alertDiv.innerText = `Product "${productTitle}" was deleted successfully.`
+        alertDiv.classList.add("success");
+        container.style.opacity = "1"
+      }else{
+        modal.style.display = "none";
+        alertDiv.innerText = `Failed to delete Product "${productTitle}"`
+        alertDiv.classList.add("error");
+        container.style.opacity = "1"
+      }
+      setTimeout(() => {
+        container.style.transition = "opacity 0.5s ease";
+        container.style.opacity = "0";
+
+
+      }, 10000);
+
+  })
+  // Cancel button closes modal
+  cancelBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // Prevent closing modal when clicking inside the box
+  document.querySelector(".modal-box").addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  // Clicking outside DOES NOT close the modal (per your UI rule)
+
 
 
 </script>

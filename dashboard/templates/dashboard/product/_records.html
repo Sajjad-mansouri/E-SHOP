@@ -1,5 +1,5 @@
 {%for stock_record in object_list%}
- <tr>
+ <tr data-id="{{stock_record.product.id}}">
     <td><img class="product-img" src="{{stock_record.get_product_image}}"></td>
 
     <td>{{stock_record.product.title}}</td>
@@ -36,7 +36,7 @@
 
     <td>
     <a class="btn update" href="{%url 'dashboard:update_product' stock_record.pk %}">Update</a>
-    <a class="btn delete" href="{%url 'dashboard:delete_product' stock_record.product.pk %}">Delete</a>
+    <button class="btn delete delete-btn" data-title="{{stock_record.product.title}}" data-url="{%url 'dashboard:delete_product' stock_record.product.id%}" data-id="{{stock_record.product.id}}">Delete</button>
     </td>
 
 </tr>   
