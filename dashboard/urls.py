@@ -1,10 +1,6 @@
 from django.urls import path
 from . import views
 from .views import (  
-					ProductTypeView,
-					ProductTypeCreateUpdateView,
-					ProductTypeDeleteView,
-
 					CategoryListView,
 					SubCategoryView,
 					CategoryCreateView,
@@ -39,13 +35,13 @@ urlpatterns = [
 	path("product/delete/<int:pk>/", views.DeleteProductView.as_view(), name="delete_product"),
 	path("product/search", views.SearchProduct.as_view(), name="search_product"),
 
-	path("product-type/", ProductTypeView.as_view(), name="product_type_list"),
-	path("product-type/create/", ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
-	path("product-type/update/<int:pk>/", ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
-	path("product-type/delete/<int:pk>/", ProductTypeDeleteView.as_view(), name="product_type_delete"),
+	path("product-type/", views.ProductTypeView.as_view(), name="product_type_list"),
+	path("product-type/create/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
+	path("product-type/update/<int:pk>/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
+	path("product-type/delete/<int:pk>/", views.ProductTypeDeleteView.as_view(), name="product_type_delete"),
 
 
-	path("category/", CategoryListView.as_view(), name="category"),
+	path("categories/", CategoryListView.as_view(), name="categories"),
 	path("category/<int:pk>/", SubCategoryView.as_view(), name="sub_category"),
 	path("category/create/", CategoryCreateView.as_view(), name="category_create"),
 	path("category/update/<int:pk>/", CategoryUpdateView.as_view(), name="category_update"),

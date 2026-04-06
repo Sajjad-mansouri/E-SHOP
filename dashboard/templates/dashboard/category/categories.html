@@ -1,0 +1,158 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/categories.css'%}">
+{%endblock%}
+
+{%block content%}
+
+<main class="main">
+
+    <div class="page-title">Categories</div>
+
+    <div id="messageBox" class="message"></div>
+
+    <div class="top-bar">
+        
+    {%if object%}
+    <div id="backContainer"><button class="back-btn" onclick="goBack()">← Back to Categories</button></div>
+    {%endif%}
+    <button class="create-btn"
+    onclick="goCreateCategory()">
+    Create Category
+    </button>
+
+    </div>
+
+    <div class="card">
+
+    <table>
+
+    <thead>
+    <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Children</th>
+    <th>Image</th>
+    <th>Action</th>
+    </tr>
+    </thead>
+
+    <tbody id="tableBody">
+          {%if object%}
+          {%include "dashboard/category/_sub_categories.html"%}
+          {%else%}
+          {%include "dashboard/category/_categories.html"%}
+          {%endif%}
+    </tbody>
+
+    </table>
+
+    </div>
+
+</main>
+{%endblock%}
+
+{%block extra%}
+<!-- DELETE MODAL -->
+
+<div class="modal" id="deleteModal">
+
+    <div class="modal-box">
+
+    <h3>Delete Category</h3>
+
+    <p id="deleteText">
+    Are you sure you want to delete this category?
+    </p>
+
+    <div class="modal-actions">
+    <button class="cancel" onclick="closeModal()">Cancel</button>
+    <button class="confirm" id="confirmDelete">Delete</button>
+    </div>
+
+    </div>
+
+</div>
+{%endblock%}
+
+{%block script%}
+<script>
+
+
+function goBack(){
+    window.location.href="{%url 'dashboard:categories'%}"
+}
+
+function goCreateCategory(){
+    window.location.href="{%url 'dashboard:category_create'%}"
+}
+
+/* DELETE */
+
+function openDelete(id,name){
+
+
+    document.getElementById("deleteText").innerText=
+    `Are you sure you want to delete "${name}"?`
+
+    document.getElementById("deleteModal").style.display="flex"
+
+}
+
+function closeModal(){
+    document.getElementById("deleteModal").style.display="none"
+}
+
+document.getElementById("confirmDelete").onclick=function(){
+
+    try{
+
+    const index=categories.findIndex(c=>c.id===deleteId)
+
+    if(index>-1){
+
+    categories.splice(index,1)
+
+    showMessage("Category deleted successfully","success")
+
+    }else{
+
+    showMessage("Failed to delete category","error")
+
+    }
+
+    }catch(err){
+
+    showMessage("Unexpected error occurred","error")
+
+    }
+
+    closeModal()
+    render()
+
+}
+
+/* MESSAGE */
+
+function showMessage(text,type){
+
+    const box=document.getElementById("messageBox")
+
+    box.innerText=text
+    box.className="message "+type
+    box.style.display="block"
+
+    setTimeout(()=>{
+    box.style.display="none"
+    },10000)
+
+}
+
+
+
+
+
+</script>
+{%endblock%}

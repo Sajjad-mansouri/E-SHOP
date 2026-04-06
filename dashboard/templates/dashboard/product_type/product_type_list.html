@@ -33,7 +33,7 @@
 
   <tbody id="tableBody">
     {%for object in object_list%}
-    <tr>
+    <tr data-id="{{object.id}}">
 
       <td>{{object.name}}</td>
 
@@ -64,7 +64,7 @@
 <!-- DELETE MODAL -->
 
 <div class="modal" id="deleteModal">
-
+    {%csrf_token%}
   <div class="modal-box">
 
   <h3>Delete Product Type</h3>
@@ -86,55 +86,16 @@
 {%block script%}
 <script>
 
-const types=[
-{id:1,name:"Phone",slug:"phone"},
-{id:2,name:"Laptop",slug:"laptop"},
-{id:3,name:"Tablet",slug:"tablet"}
-]
-
-let deleteId=null
-
-function render(){
-
-  const tbody=document.getElementById("tableBody")
-  tbody.innerHTML=""
-
-  types.forEach(t=>{
-
-  tbody.innerHTML+=`
-
-  <tr>
-
-  <td>${t.name}</td>
-
-  <td class="slug">${t.slug}</td>
-
-  <td>
-
-  <button class="btn update">Update</button>
-
-  <button class="btn delete" onclick="openDelete(${t.id},'${t.name}')">
-  Delete
-  </button>
-
-  </td>
-
-  </tr>
-
-  `
-
-  })
-
-}
 
 function openDelete(id,name){
 
-deleteId=id
+
 
 document.getElementById("deleteText").innerText=
 `Are you sure you want to delete "${name}"?`
 
 document.getElementById("deleteModal").style.display="flex"
+document.getElementById("confirmDelete").setAttribute("data-id", id)
 
 }
 
@@ -142,23 +103,27 @@ function closeModal(){
 document.getElementById("deleteModal").style.display="none"
 }
 
-document.getElementById("confirmDelete").onclick = function() {
+
+document.getElementById("confirmDelete").onclick = async function() {
 
     try {
-
-        const index = types.findIndex(t => t.id === deleteId);
-
-        if (index > -1) {
-            types.splice(index, 1);
+        const id = document.getElementById("confirmDelete").getAttribute("data-id")
+        const baseUrl = "{%url 'dashboard:product_type_delete' 0 %}"
+        const url = baseUrl.replace("0", id)
+        const data = await deleteObject(url)
+        if (data.status){
+            const tr = document.querySelector(`tr[data-id="${id}"]`)
+            tr.remove()
             showMessage("Product type deleted successfully", "success");
-        } else {
-            showMessage("Failed to delete product type", "error");
+
+        }else{
+            showMessage("An error occurred while deleting", "error");
         }
 
     } catch (error) {
 
         showMessage("An error occurred while deleting", "error");
-        console.error(error);
+
 
     }
 

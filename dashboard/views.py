@@ -285,13 +285,20 @@ class ProductTypeDeleteView(DeleteView):
 	model = ProductClass
 	success_url = reverse_lazy("product_type_list")
 
+	def form_valid(self, form):
+		self.object.delete()
+
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
 
 class CategoryListView(ListView):
-	template_name = "dashboard/category/category_list.html"
+	template_name = "dashboard/category/categories.html"
 	model = Category
 
 class SubCategoryView(DetailView):
-	template_name = "dashboard/category/category_list.html"
+	template_name = "dashboard/category/categories.html"
 	model = Category
 
 

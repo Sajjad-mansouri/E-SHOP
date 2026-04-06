@@ -1,9 +1,28 @@
-<tr>
-  <td><strong><a href="{%url 'category_update' object.pk %}">{{object.name}}</a></strong></td>
-  <td>{{object.description}}</span></td>
-  <td >{%if object.get_descendant_count > 0 %}<a href="{%url 'sub_category' object.pk %}">{{object.get_descendant_count}}</a>{%else%}0{%endif%}</td>
 
-  <td>{%if object.image%}<img src="{{object.image.url}}" class="product-thumb" alt="thumb">{%else%}-{%endif%}</td>
-  <td><a href="{%url 'category_update' object.pk %}">update</a> <a href="{%url 'category_delete' object.pk %}">del</a></td>
+
+<tr>
+
+<td><strong><a href="{%url 'dashboard:category_update' object.pk %}">{{object.name}}</a></strong></td>
+
+<td>{{object.description}}</td>
+
+<td>{%if object.get_descendant_count > 0 %}<a class="child-link" href="{%url 'dashboard:sub_category' object.pk %}">{{object.get_descendant_count}}</a>{%else%}0{%endif%}</td>
+
+<td>
+  {%if object.image%}<img src="{{object.image.url}}" class="category-img" alt="thumb">{%else%}-{%endif%}
+</td>
+
+<td>
+
+<button class="btn update">
+Update
+</button>
+
+<button class="btn delete"
+onclick="openDelete('{{object.id}}','{{object.name}}')">
+Delete
+</button>
+
+</td>
 
 </tr>

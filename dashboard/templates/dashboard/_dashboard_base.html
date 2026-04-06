@@ -32,7 +32,7 @@
 <div class="sub-nav">
 <a href="{%url 'dashboard:products'%}">Products</a>
 <a href="{%url 'dashboard:product_type_list'%}">Product Types</a>
-<a href="catalog-categories.html">Categories</a>
+<a href="{%url 'dashboard:categories'%}">Categories</a>
 </div>
 </div>
 
@@ -93,6 +93,24 @@
 {%block extra%}
 {%endblock%}
 
+<script type="text/javascript">
+async function deleteObject(url){
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const formData = new FormData()
+    const response = await fetch(url, {
+        method:"POST",
+        headers:{
+            "X-CSRFToken":csrfToken,   
+        },
+        body:formData
+
+    })
+    const data = await response.json()
+
+    return data
+}
+</script>
 {%block script%}
 {%endblock%}
 </body>
