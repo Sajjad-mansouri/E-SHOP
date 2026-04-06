@@ -1,0 +1,113 @@
+/* MAIN */
+
+.main{
+max-width:850px;
+margin:auto;
+padding:30px 20px;
+}
+
+.page-title{
+font-size:1.6rem;
+font-weight:700;
+margin-bottom:20px;
+}
+
+/* BACK LINK */
+
+.back-link{
+display:inline-block;
+margin-bottom:20px;
+text-decoration:none;
+color:#666;
+font-size:0.9rem;
+}
+
+.back-link:hover{
+color:var(--primary);
+}
+
+/* MESSAGE */
+
+.message{
+display:none;
+padding:12px 16px;
+border-radius:10px;
+margin-bottom:20px;
+font-size:0.9rem;
+}
+
+.message.error{
+background:#fdecec;
+color:#c93737;
+}
+
+.message.success{
+background:#e9f7ef;
+color:#1a7f47;
+}
+
+/* CARD */
+
+.card{
+background:white;
+padding:26px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+}
+
+/* FORM */
+
+.form-group{
+margin-bottom:16px;
+}
+
+label{
+display:block;
+font-size:0.85rem;
+font-weight:600;
+margin-bottom:6px;
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:0.9rem;
+}
+
+textarea{
+min-height:100px;
+resize:vertical;
+}
+
+input:focus,select:focus,textarea:focus{
+outline:none;
+border-color:var(--primary);
+}
+
+/* ACTIONS */
+
+.actions{
+margin-top:22px;
+display:flex;
+gap:10px;
+}
+
+.save-btn{
+background:var(--primary);
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+}
+
+.cancel-btn{
+background:#eee;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+}

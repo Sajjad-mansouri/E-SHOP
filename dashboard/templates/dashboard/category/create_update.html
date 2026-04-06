@@ -1,0 +1,126 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_category.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+
+{%block breadcrumb%}
+
+{%endblock%}
+
+{%block content%}
+    <a class="back-link" href="categories.html">← Back to Categories</a>
+
+    <div class="page-title">Create Category</div>
+
+    <div id="messageBox" class="message"></div>
+
+    <form id="categoryForm" method="POST">
+        {%csrf_token%}
+        {% for hidden in form.hidden_fields %}
+        {{hidden}}
+        {%endfor%}
+
+    <div class="card">
+
+    <!-- NAME -->
+
+    <div class="form-group">
+    <label>Name</label>
+    {{form.name}}
+
+    </div>
+
+    <!-- SLUG -->
+
+    <div class="form-group">
+    <label>Slug</label>
+    {{form.slug}}
+    </div>
+
+    <!-- DESCRIPTION -->
+
+    <div class="form-group">
+    <label>Description</label>
+    {{form.description}}
+    </div>
+
+    <!-- LONG DESCRIPTION -->
+
+    <div class="form-group">
+    <label>Long Description</label>
+    {{form.long_description}}
+    </div>
+
+    <!-- POSITION -->
+
+    <div class="form-group">
+        <label>Position</label>
+        {{form.treebeard_position}}
+    </div>
+
+    <!-- RELATIVE CATEGORY -->
+
+    <div class="form-group">
+    <label>Relative To</label>
+
+        {{form.treebeard_position}}
+
+    </div>
+
+    <div class="actions">
+
+    <button class="save-btn" type="submit">
+    Create Category
+    </button>
+
+    <button class="cancel-btn" type="button"
+    onclick="history.back()">
+    Cancel
+    </button>
+
+    </div>
+
+    </div>
+
+    </form>
+{%endblock%}
+
+{%block extra%}
+
+
+{%endblock extra%}
+
+
+{%block script%}
+
+<script>
+
+
+/* FORM SUBMIT */
+
+
+
+/* MESSAGE */
+
+function showMessage(text,type){
+
+    const box=document.getElementById("messageBox")
+
+    box.innerText=text
+    box.className="message "+type
+    box.style.display="block"
+
+    setTimeout(()=>{
+    box.style.display="none"
+    },10000)
+
+}
+
+</script>
+{%endblock%}

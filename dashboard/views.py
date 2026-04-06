@@ -303,21 +303,22 @@ class SubCategoryView(DetailView):
 
 
 class CategoryCreateView(CreateView):
-	template_name = "dashboard/category/category_create_update.html"
+	template_name = "dashboard/category/create_update.html"
 	model = Category
 	form_class = CategoryForm
-	success_url = reverse_lazy("category")
+	success_url = reverse_lazy("dashboard:categories")
 
 class CategoryUpdateView(UpdateView):
-	template_name = "dashboard/category/category_create_update.html"
+	template_name = "dashboard/category/create_update.html"
 	model = Category
 	form_class = CategoryForm
-	success_url = reverse_lazy("category")
+	success_url = reverse_lazy("dashboard:categories")
+
 
 class CategoryDeleteView(DeleteView):
 	template_name = "dashboard/category/category_delete.html"
 	model = Category
-	success_url = reverse_lazy("category")
+	success_url = reverse_lazy("dashboard:categories")
 
 
 

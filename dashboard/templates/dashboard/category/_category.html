@@ -14,9 +14,9 @@
 
 <td>
 
-<button class="btn update">
+<a class="btn update" href="{%url 'dashboard:category_update' object.id %}">
 Update
-</button>
+</a>
 
 <button class="btn delete"
 onclick="openDelete('{{object.id}}','{{object.name}}')">
