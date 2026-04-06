@@ -320,7 +320,13 @@ class CategoryDeleteView(DeleteView):
 	model = Category
 	success_url = reverse_lazy("dashboard:categories")
 
+	def form_valid(self, form):
+		self.object.delete()
 
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
 
 class OfferRangeListView(ListView):
 	model = OfferRange

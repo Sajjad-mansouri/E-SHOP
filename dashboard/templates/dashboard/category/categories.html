@@ -58,6 +58,7 @@
 <!-- DELETE MODAL -->
 
 <div class="modal" id="deleteModal">
+    {%csrf_token%}
 
     <div class="modal-box">
 
@@ -98,6 +99,7 @@ function openDelete(id,name){
     `Are you sure you want to delete "${name}"?`
 
     document.getElementById("deleteModal").style.display="flex"
+    document.getElementById("confirmDelete").setAttribute("data-id", id)
 
 }
 
@@ -105,15 +107,19 @@ function closeModal(){
     document.getElementById("deleteModal").style.display="none"
 }
 
-document.getElementById("confirmDelete").onclick=function(){
+document.getElementById("confirmDelete").onclick=async function(){
 
     try{
 
-    const index=categories.findIndex(c=>c.id===deleteId)
+    const id = document.getElementById("confirmDelete").getAttribute("data-id")
+    const baseUrl = "{%url 'dashboard:category_delete' 0 %}"
+    const url = baseUrl.replace("0", id)
+    const data = await deleteObject(url)
 
-    if(index>-1){
+    if (data.status){
 
-    categories.splice(index,1)
+    const tr = document.querySelector(`tr[data-id="${id}"]`)
+    tr.remove()
 
     showMessage("Category deleted successfully","success")
 
@@ -126,11 +132,12 @@ document.getElementById("confirmDelete").onclick=function(){
     }catch(err){
 
     showMessage("Unexpected error occurred","error")
+    console.log(err)
 
     }
 
     closeModal()
-    render()
+
 
 }
 
