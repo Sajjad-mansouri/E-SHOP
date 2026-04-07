@@ -1,8 +1,6 @@
 from django.urls import path
 from . import views
 from .views import (  
-					CategoryDeleteView,
-
 					OfferRangeListView,
 					OfferRangeCreateView,
 					OfferRangeUpdateView,
@@ -41,7 +39,7 @@ urlpatterns = [
 	path("category/<int:pk>/", views.SubCategoryView.as_view(), name="sub_category"),
 	path("category/create/", views.CategoryCreateView.as_view(), name="category_create"),
 	path("category/update/<int:pk>/", views.CategoryUpdateView.as_view(), name="category_update"),
-	path("category/delete/<int:pk>/", CategoryDeleteView.as_view(), name="category_delete"),
+	path("category/delete/<int:pk>/", views.CategoryDeleteView.as_view(), name="category_delete"),
 
 	path("offer/range/", OfferRangeListView.as_view(), name="offer_range"),
 	path("offer/range/create/", OfferRangeCreateView.as_view(), name="offer_range_create"),

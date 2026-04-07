@@ -1,62 +1,170 @@
-{%extends 'base.html'%}
+{%extends 'dashboard/_dashboard_base.html'%}
 {%load static%}
 
 {%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/product_list.css'%}">
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/offer_ranges.css'%}">
 {%endblock%}
 
 {%block content%}
 
+<main class="main">
 
-<!-- breadcrumb + create btn row -->
-<div class="page-header">
-  <div class="breadcrumb">
-    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
-    <a href="#">Offer</a> <i class="fa-solid fa-chevron-right"></i>
-    <span class="current">Offer Range</span>
+  <div class="page-title">Offer Ranges</div>
+
+  <div id="messageBox" class="message"></div>
+
+  <div class="top-bar">
+
+  <div></div>
+
+  <button class="create-btn"
+  onclick="window.location.href='create-offer-range.html'">
+  Create Offer Range
+  </button>
+
   </div>
 
-  <a class="btn-primary create-product" href="{%url 'dashboard:offer_range_create'%}"><i class="fa-regular fa-plus"></i> Create new Offer Range</a>
-</div>
-
-<div class="products-card">
   <div class="card">
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Num products</th>
-            <th>Description</th>
-            <th>created</th>
-            <th>action</th>
 
+  <table>
 
+  <thead>
+  <tr>
+  <th>Name</th>
+  <th>Slug</th>
+  <th>Num Products</th>
+  <th>Description</th>
+  <th>Created</th>
+  <th>Action</th>
+  </tr>
+  </thead>
 
-          </tr>
-        </thead>
-        <tbody>
-			{%for object in object_list%}
-			<!-- row 1: with discount (price after discount shown) -->
+  <tbody id="tableBody">
+    {%for object in object_list%}
+    <tr>
 
-			<tr>
-			  <td><strong><a href="">{{object.name}}</a></strong></td>
-			  <td>{{object.slug}}</td>
-        <td>{{object.product_count}}</td>
-        <td>{{object.description}}</td>
-        <td>{{object.created}}</td>
+      <td>{{object.name}}</td>
+      <td>{{object.slug}}</td>
+      <td>{{object.product_count}}</td>
+      <td>{{object.description}}</td>
+      <td>{{object.created}}</td>
 
+      <td>
 
-			  <td><a href="{%url 'dashboard:offer_range_delete' object.pk %}">Del</a> <a href="{%url 'dashboard:offer_range_update' object.pk %}">update</a></td>
+      <button class="btn update">
+      Update
+      </button>
 
-			</tr>
+      <button class="btn delete"
+      onclick="openDelete(${r.id},'${r.name}')">
+      Delete
+      </button>
 
-			{%endfor%}
+      </td>
 
-        </tbody>
-      </table>
-    </div>
+    </tr>
+    {%endfor%}
+  </tbody>
+
+  </table>
+
   </div>
+
+</main>
+{%endblock%}
+{%block extra%}
+<!-- DELETE MODAL -->
+
+<div class="modal" id="deleteModal">
+
+  <div class="modal-box">
+
+  <h3>Delete Offer Range</h3>
+
+  <p id="deleteText"></p>
+
+  <div class="modal-actions">
+
+  <button class="cancel" onclick="closeModal()">Cancel</button>
+
+  <button class="confirm" id="confirmDelete">
+  Delete
+  </button>
+
+  </div>
+
+  </div>
+
 </div>
+{%endblock%}
+
+{%block script%}
+<script>
+
+
+
+/* DELETE */
+
+function openDelete(id,name){
+
+  deleteId=id
+
+  document.getElementById("deleteText").innerText=
+  `Are you sure you want to delete "${name}"?`
+
+  document.getElementById("deleteModal").style.display="flex"
+
+}
+
+function closeModal(){
+  document.getElementById("deleteModal").style.display="none"
+}
+
+document.getElementById("confirmDelete").onclick=function(){
+
+  try{
+
+  const index=ranges.findIndex(r=>r.id===deleteId)
+
+  if(index>-1){
+
+  ranges.splice(index,1)
+
+  showMessage("Offer range deleted successfully","success")
+
+  }else{
+
+  showMessage("Failed to delete range","error")
+
+  }
+
+  }catch(err){
+
+  showMessage("Unexpected error occurred","error")
+
+  }
+
+  closeModal()
+  render()
+
+}
+
+/* MESSAGE */
+
+function showMessage(text,type){
+
+  const box=document.getElementById("messageBox")
+
+  box.innerText=text
+  box.className="message "+type
+  box.style.display="block"
+
+  setTimeout(()=>{
+  box.style.display="none"
+  },10000)
+
+}
+
+
+</script>
 {%endblock%}
