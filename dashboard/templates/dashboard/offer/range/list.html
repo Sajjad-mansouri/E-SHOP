@@ -17,10 +17,10 @@
 
   <div></div>
 
-  <button class="create-btn"
-  onclick="window.location.href='create-offer-range.html'">
+  <a class="create-btn"
+  href="{%url 'dashboard:offer_range_create'%}">
   Create Offer Range
-  </button>
+  </a>
 
   </div>
 
@@ -51,9 +51,9 @@
 
       <td>
 
-      <button class="btn update">
+      <a class="btn update" href="{%url 'dashboard:offer_range_update' object.id %}">
       Update
-      </button>
+      </a>
 
       <button class="btn delete"
       onclick="openDelete(${r.id},'${r.name}')">

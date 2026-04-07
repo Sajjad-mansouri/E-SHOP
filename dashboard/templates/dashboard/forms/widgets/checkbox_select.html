@@ -36,10 +36,16 @@
                 <!-- Product rows will be dynamically inserted here -->
 
     {% for group, options, index in widget.optgroups %}
+    ///
+    {{options}}
+    ///
     {% for widget in options %}
     <div class="product-row">
-      
+        widget
+      {{widget.value}}
+      widget
       {%with instance=widget.value.instance%}
+
       <div class="product-col product-checkbox">
         <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
 

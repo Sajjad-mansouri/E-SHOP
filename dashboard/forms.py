@@ -2,11 +2,12 @@ from django.forms.models import inlineformset_factory
 from django import forms
 from django.forms.models import BaseInlineFormSet
 from django.utils import timezone
+from django.db.models import Q
 from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
 from offer.models import OfferRange, Offer, OfferType
-from .widgets import CustomCheckboxSelectMultiple
+from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple
 from coupon.models import Coupon
 
 class ProductClassForm(forms.ModelForm):
@@ -209,9 +210,10 @@ class CategoryForm(CategoryFormFactory):
 class OfferRangeForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.fields["included_products"].queryset = Product.objects.filter(stockrecords__is_public=True)
-		self.fields["excluded_products"].queryset = Product.objects.filter(stockrecords__is_public=True)
-		
+
+		self.fields["included_products"].queryset = StockRecord.objects.filter(is_public=True)
+		self.fields["excluded_products"].queryset = StockRecord.objects.filter(is_public=True)
+
 	class Meta:
 		model = OfferRange
 		fields = [
@@ -223,11 +225,11 @@ class OfferRangeForm(forms.ModelForm):
 				]
 
 		widgets = {
-				"included_products":CustomCheckboxSelectMultiple(),
-				"excluded_products":CustomCheckboxSelectMultiple(),
-				"classes":forms.CheckboxSelectMultiple(),
-				"included_categories":forms.CheckboxSelectMultiple(),
-				"excluded_categories":forms.CheckboxSelectMultiple(),
+				"included_products":TableCheckboxSelectMultiple(),
+				"excluded_products":TableCheckboxSelectMultiple(),
+				"classes":NameCheckboxSelectMultiple(),
+				"included_categories":NameCheckboxSelectMultiple(),
+				"excluded_categories":NameCheckboxSelectMultiple(),
 
 
 		}

@@ -1,0 +1,21 @@
+	<table>
+	<thead>
+	<tr>
+	<th></th>
+	<th>Name</th>
+	</tr>
+	</thead>
+
+	<tbody id="categoryTable">
+			{% for group, options, index in widget.optgroups %}
+				{% for widget in options %}
+					{%with instance=widget.value.instance%}
+						<tr>
+						<td><input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}></td>
+						<td>{{instance.name}}</td>
+						</tr>
+					{%endwith%}
+				{%endfor%}
+			{%endfor%}
+	</tbody>
+	</table>

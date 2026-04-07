@@ -1,18 +1,235 @@
-{%extends 'base.html'%}
+{%extends 'dashboard/_dashboard_base.html'%}
 {%load static%}
 
 {%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/product_list.css'%}">
-
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_offer_range.css'%}">
 {%endblock%}
 
 {%block content%}
+<main class="main">
 
-<form method="POST">
-	{%csrf_token%}
-	{{form}}
-	<input type="submit" value="create">
-	
-</form>
-{{form.media}}
+	<div class="page-title">Create Offer Range</div>
+
+	<form method="POST">
+		{%csrf_token%}
+
+	<div class="card">
+
+	<div class="form-group">
+	<label>Name</label>
+	{{form.name}}
+	</div>
+
+	<div class="form-group">
+	<label>Description</label>
+	{{form.description}}
+	</div>
+
+	<div class="form-group checkbox">
+	{{form.is_public}}
+	<label>Is Public</label>
+	</div>
+
+	<div class="form-group checkbox">
+	{{form.includes_all_products}}
+	<label>Include All Products</label>
+	</div>
+
+	<div class="form-group">
+	<label>Include Products</label>
+	<div class="multi-select" onclick="openIncludeProductModal('include')">Click to select products</div>
+	<div id="includeProducts" class="selected-products"></div>
+	</div>
+
+	<div class="form-group">
+	<label>Exclude Products</label>
+	<div class="multi-select" onclick="openExcludeProductModal('exclude')">Click to select products</div>
+	<div id="excludeProducts" class="selected-products"></div>
+	</div>
+
+	<div class="form-group">
+	<label>Include Categories</label>
+	<div class="multi-select" onclick="openIncludeCategoryModal('include')">Click to select categories</div>
+	<div id="includeCategories" class="selected-products"></div>
+	</div>
+
+	<div class="form-group">
+	<label>Exclude Categories</label>
+	<div class="multi-select" onclick="openExcludeCategoryModal('exclude')">Click to select categories</div>
+	<div id="excludeCategories" class="selected-products"></div>
+	</div>
+
+
+	<div class="form-group">
+	<label>Product Types</label>
+	<div class="multi-select" onclick="openProductTypeModal('exclude')">Click to select Product Types</div>
+	<div id="productTypes" class="selected-products"></div>
+	</div>
+
+	<div class="actions">
+	<button  class="save-btn" type="submit">Create Offer Range</button>
+	</div>
+
+	</div>
+<div class="modal" id="includeProductModal">
+	<div class="modal-box">
+
+
+	<table>
+		
+	{{form.included_products}}
+	</table>
+
+	<div class="modal-actions">
+	<button class="btn cancel" onclick="closeModal()">Cancel</button>
+	<button class="btn confirm" onclick="confirmProducts()">Add Selected</button>
+	</div>
+
+	</div>
+</div>
+<div class="modal" id="excludeProductModal">
+	<div class="modal-box">
+
+
+	<table>
+	{{form.excluded_products}}
+	</table>
+	<div class="modal-actions">
+	<button class="btn cancel" onclick="closeModal()">Cancel</button>
+	<button class="btn confirm" onclick="confirmProducts()">Add Selected</button>
+	</div>
+
+	</div>
+</div>
+<!-- CATEGORY MODAL -->
+
+<div class="modal" id="includeCategoryModal">
+	<div class="modal-box">
+
+	<h3 style="margin-bottom:10px;">Select Categories</h3>
+
+	{{form.included_categories}}
+
+	<div class="modal-actions">
+	<button class="btn cancel" onclick="closeCategoryModal()">Cancel</button>
+	<button class="btn confirm" onclick="confirmCategories()">Add Selected</button>
+	</div>
+
+	</div>
+</div>
+<div class="modal" id="excludeCategoryModal">
+	<div class="modal-box">
+
+	<h3 style="margin-bottom:10px;">Select Categories</h3>
+
+	{{form.excluded_categories}}
+
+	<div class="modal-actions">
+	<button class="btn cancel" onclick="closeCategoryModal()">Cancel</button>
+	<button class="btn confirm" onclick="confirmCategories()">Add Selected</button>
+	</div>
+
+	</div>
+</div>
+
+<div class="modal" id="productType">
+	<div class="modal-box">
+
+	<h3 style="margin-bottom:10px;">Select Categories</h3>
+
+	{{form.classes}}
+
+	<div class="modal-actions">
+	<button class="btn cancel" onclick="closeProductTypeModal()">Cancel</button>
+	<button class="btn confirm" onclick="confirmProductType()">Add Selected</button>
+	</div>
+
+	</div>
+</div>
+	</form>
+
+</main>
+
+{%endblock%}
+{%block extra%}
+<!-- PRODUCT MODAL -->
+
+
+{%endblock%}
+
+{%block script%}
+<script>
+
+
+/* PRODUCT MODAL */
+
+function openIncludeProductModal(target){
+
+	currentTarget=target
+	document.getElementById("includeProductModal").style.display="flex"
+}
+
+function openExcludeProductModal(target){
+	currentTarget=target
+	document.getElementById("excludeProductModal").style.display="flex"
+}
+
+function closeModal(){
+	event.preventDefault()
+	document.getElementById("includeProductModal").style.display="none"
+	document.getElementById("excludeProductModal").style.display="none"
+
+}
+
+
+
+function confirmProducts(){
+
+	event.preventDefault()
+	closeModal()
+}
+
+/* CATEGORY MODAL */
+
+function openIncludeCategoryModal(target){
+	currentTarget=target
+	document.getElementById("includeCategoryModal").style.display="flex"
+}
+function openExcludeCategoryModal(target){
+	currentTarget=target
+	document.getElementById("excludeCategoryModal").style.display="flex"
+}
+
+function closeCategoryModal(){
+	event.preventDefault()
+	document.getElementById("includeCategoryModal").style.display="none"
+	document.getElementById("excludeCategoryModal").style.display="none"
+
+}
+
+function confirmCategories(){
+	event.preventDefault()
+	closeCategoryModal()
+
+}
+
+
+function openProductTypeModal(target){
+	currentTarget=target
+	document.getElementById("productType").style.display="flex"
+}
+
+function closeProductTypeModal(){
+	event.preventDefault()
+	document.getElementById("productType").style.display="none"
+
+}
+
+function confirmProductType(){
+	event.preventDefault()
+	closeProductTypeModal()
+
+}
+
+</script>
 {%endblock%}

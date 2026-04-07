@@ -1,0 +1,28 @@
+
+<thead>
+	<tr>
+	<th></th>
+	<th>Image</th>
+	<th>Name</th>
+	<th>Price</th>
+	<th>Stock</th>
+	<th>UPC</th>
+	</tr>
+</thead>
+
+<tbody id="productTable">
+	{% for group, options, index in widget.optgroups %}
+		{% for widget in options %}
+			{%with instance=widget.value.instance%}
+			<tr>
+			<td><input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}></td>
+			<td><img src="{{instance.get_product_image}}"></td>
+			<td>{{instance.product.title}}</td>
+			<td>{{instance.price}}</td>
+			<td>{{instance.num_in_stock}}</td>
+			<td>{{instance.product.upc}}</td>
+			</tr>
+			{%endwith%}
+		{%endfor%}
+	{%endfor%}
+</tbody>

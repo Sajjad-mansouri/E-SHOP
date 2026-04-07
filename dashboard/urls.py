@@ -1,9 +1,6 @@
 from django.urls import path
 from . import views
 from .views import (  
-					OfferRangeListView,
-					OfferRangeCreateView,
-					OfferRangeUpdateView,
 					OfferRangeDeleteView,
 
 					OfferListView,
@@ -41,9 +38,9 @@ urlpatterns = [
 	path("category/update/<int:pk>/", views.CategoryUpdateView.as_view(), name="category_update"),
 	path("category/delete/<int:pk>/", views.CategoryDeleteView.as_view(), name="category_delete"),
 
-	path("offer/range/", OfferRangeListView.as_view(), name="offer_range"),
-	path("offer/range/create/", OfferRangeCreateView.as_view(), name="offer_range_create"),
-	path("offer/range/update/<int:pk>/", OfferRangeUpdateView.as_view(), name="offer_range_update"),
+	path("offer/range/", views.OfferRangeListView.as_view(), name="offer_range"),
+	path("offer/range/create/", views.OfferRangeCreateView.as_view(), name="offer_range_create"),
+	path("offer/range/update/<int:pk>/", views.OfferRangeUpdateView.as_view(), name="offer_range_update"),
 	path("offer/range/delete/<int:pk>/", OfferRangeDeleteView.as_view(), name="offer_range_delete"),
 
 	path("offer/", OfferListView.as_view(), name="offer_list"),

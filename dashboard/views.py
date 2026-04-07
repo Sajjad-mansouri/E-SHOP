@@ -34,6 +34,7 @@ from catalog.models import Product, ProductClass, ProductAttribute, ProductAttri
 from offer.models import OfferRange, Offer
 from coupon.models import Coupon
 from order.models import Order
+from .mixins import SearchFieldMixin
 
 UserModel = get_user_model()
 
@@ -337,13 +338,15 @@ class OfferRangeCreateView(CreateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
 	form_class = OfferRangeForm
-	success_url = reverse_lazy("offer_range")
+	success_url = reverse_lazy("dashboard:offer_range")
 
 class OfferRangeUpdateView(UpdateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
 	form_class = OfferRangeForm
-	success_url = reverse_lazy("offer_range")
+	success_url = reverse_lazy("dashboard:offer_range")
+	search_template_name = "dashboard/offer/range/test.html"
+
 
 class OfferRangeDeleteView(DeleteView):
 	model = OfferRange

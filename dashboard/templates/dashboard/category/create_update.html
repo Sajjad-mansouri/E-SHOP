@@ -122,5 +122,131 @@ function showMessage(text,type){
 
 }
 
+
+// continue
+
+const datasets={
+
+products:[
+{id:1,name:"iPhone 14"},
+{id:2,name:"MacBook Pro"},
+{id:3,name:"Running Shoes"}
+],
+
+productTypes:[
+{id:1,name:"Phone"},
+{id:2,name:"Laptop"},
+{id:3,name:"Shoes"}
+],
+
+categories:[
+{id:1,name:"Electronics"},
+{id:2,name:"Fashion"},
+{id:3,name:"Accessories"}
+]
+
+}
+
+let currentField=null
+let currentData=[]
+
+/* open modal */
+
+function openSelector(field){
+
+    currentField=field
+
+    if(field==="includeProducts" || field==="excludeProducts"){
+    currentData=datasets.products
+    }
+
+    else if(field==="productTypes"){
+    currentData=datasets.productTypes
+    }
+
+    else{
+    currentData=datasets.categories
+    }
+
+    renderSelector(currentData)
+
+    document.getElementById("selectorModal").style.display="flex"
+
+}
+
+/* render rows */
+
+function renderSelector(data){
+
+    const table=document.getElementById("selectorTable")
+
+    table.innerHTML=""
+
+    data.forEach(item=>{
+
+    table.innerHTML+=`
+
+    <tr>
+
+    <td>
+    <input type="checkbox" value="${item.id}">
+    </td>
+
+    <td>${item.name}</td>
+
+    </tr>
+
+    `
+
+})
+
+}
+
+/* filter */
+
+function filterSelector(q){
+
+q=q.toLowerCase()
+
+const filtered=currentData.filter(x=>x.name.toLowerCase().includes(q))
+
+renderSelector(filtered)
+
+}
+
+/* close */
+
+function closeSelector(){
+
+    document.getElementById("selectorModal").style.display="none"
+
+}
+
+/* confirm */
+
+function confirmSelection(){
+
+    const selected=[...document.querySelectorAll("#selectorTable input:checked")]
+
+    const container=document.getElementById(currentField+"Selected")
+
+    selected.forEach(s=>{
+
+    const item=currentData.find(x=>x.id==s.value)
+
+    const chip=document.createElement("div")
+
+    chip.className="chip"
+
+    chip.innerText=item.name
+
+    container.appendChild(chip)
+
+})
+
+closeSelector()
+
+}
+
 </script>
 {%endblock%}

@@ -101,6 +101,12 @@ class Product(models.Model):
 		if not self.slug:
 			self.slug = slugify(self.title)
 		super().save(*args, **kwargs)
+
+	@property
+	def get_first_image_url(self):
+		if self.images.all():
+			return self.images.all()[0].image.url
+		return ""
 		
 	class Meta:
 		ordering = ["-created"]
