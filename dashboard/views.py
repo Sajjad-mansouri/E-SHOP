@@ -428,3 +428,10 @@ class CouponDeleteView(DeleteView):
 	model = Coupon
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/delete.html"
+
+	def form_valid(self, form):
+		self.object.delete()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})

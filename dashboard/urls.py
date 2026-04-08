@@ -1,11 +1,5 @@
 from django.urls import path
 from . import views
-from .views import (  
-					CouponListView,
-					CouponCreateView,
-					CouponUpdateView,
-					CouponDeleteView
-					)
 
 
 app_name = "dashboard"
@@ -47,10 +41,10 @@ urlpatterns = [
 	path("offer/delete/<int:pk>/", views.DeleteOfferView.as_view(), name="delete_offer"),
 
 
-	path("offer/coupon/", CouponListView.as_view(), name="coupon_list"),
-	path("offer/coupon/create/", CouponCreateView.as_view(), name="coupon_create"),
-	path("offer/coupon/update/<int:pk>/", CouponUpdateView.as_view(), name="coupon_update"),
-	path("offer/coupon/delete/<int:pk>/", CouponDeleteView.as_view(), name="coupon_delete"),
+	path("offer/coupon/", views.CouponListView.as_view(), name="coupon_list"),
+	path("offer/coupon/create/", views.CouponCreateView.as_view(), name="coupon_create"),
+	path("offer/coupon/update/<int:pk>/", views.CouponUpdateView.as_view(), name="coupon_update"),
+	path("offer/coupon/delete/<int:pk>/", views.CouponDeleteView.as_view(), name="coupon_delete"),
 
 
 

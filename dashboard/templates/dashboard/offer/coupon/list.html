@@ -49,7 +49,7 @@
               </a>
 
               <button class="btn delete"
-              onclick="openDelete('{{coupon.id}}','{{coupon.name}}')">
+              onclick="openDelete('{{coupon.id}}','{{coupon.code}}')">
               Delete
               </button>
             </td>
@@ -109,7 +109,7 @@ document.getElementById("deleteModal").style.display="none"
 
 
 
-const BaseDeleteUrl = "{%url 'dashboard:delete_offer' 0 %}"
+const BaseDeleteUrl = "{%url 'dashboard:coupon_delete' 0 %}"
 document.getElementById("confirmDelete").onclick = async()=>await deleteObject(BaseDeleteUrl);
 
 
