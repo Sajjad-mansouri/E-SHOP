@@ -94,7 +94,7 @@
 {%endblock%}
 
 <script type="text/javascript">
-async function deleteObject(url){
+async function fetchDeleteObject(url){
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const formData = new FormData()
@@ -106,10 +106,40 @@ async function deleteObject(url){
         body:formData
 
     })
+
     const data = await response.json()
 
     return data
 }
+
+async function deleteObject(baseUrl) {
+
+    try {
+        const id = document.getElementById("confirmDelete").getAttribute("data-id")
+        const url = baseUrl.replace("0", id)
+        console.log(url)
+        const data = await fetchDeleteObject(url)
+        if (data.status){
+            console.log(`tr[data-id="${id}"]`)
+            const tr = document.querySelector(`tr[data-id="${id}"]`)
+            tr.remove()
+            showMessage("Product type deleted successfully", "success");
+
+        }else{
+            showMessage("An error occurred while deleting", "error");
+        }
+
+    } catch (error) {
+        console.log(error)
+        showMessage("An error occurred while deleting", "error");
+
+
+    }
+
+    closeModal();
+
+};
+
 </script>
 {%block script%}
 {%endblock%}

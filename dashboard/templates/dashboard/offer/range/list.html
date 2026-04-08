@@ -40,8 +40,9 @@
   </thead>
 
   <tbody id="tableBody">
+    
     {%for object in object_list%}
-    <tr>
+    <tr data-id="{{object.id}}">
 
       <td>{{object.name}}</td>
       <td>{{object.slug}}</td>
@@ -56,7 +57,7 @@
       </a>
 
       <button class="btn delete"
-      onclick="openDelete(${r.id},'${r.name}')">
+      onclick="openDelete('{{object.id}}','{{object.name}}')">
       Delete
       </button>
 
@@ -76,7 +77,7 @@
 <!-- DELETE MODAL -->
 
 <div class="modal" id="deleteModal">
-
+{%csrf_token%}
   <div class="modal-box">
 
   <h3>Delete Offer Range</h3>
@@ -107,12 +108,13 @@
 
 function openDelete(id,name){
 
-  deleteId=id
+
 
   document.getElementById("deleteText").innerText=
   `Are you sure you want to delete "${name}"?`
 
   document.getElementById("deleteModal").style.display="flex"
+  document.getElementById("confirmDelete").setAttribute("data-id", id)
 
 }
 
@@ -120,34 +122,8 @@ function closeModal(){
   document.getElementById("deleteModal").style.display="none"
 }
 
-document.getElementById("confirmDelete").onclick=function(){
-
-  try{
-
-  const index=ranges.findIndex(r=>r.id===deleteId)
-
-  if(index>-1){
-
-  ranges.splice(index,1)
-
-  showMessage("Offer range deleted successfully","success")
-
-  }else{
-
-  showMessage("Failed to delete range","error")
-
-  }
-
-  }catch(err){
-
-  showMessage("Unexpected error occurred","error")
-
-  }
-
-  closeModal()
-  render()
-
-}
+const BaseDeleteUrl = "{%url 'dashboard:offer_range_delete' 0 %}"
+document.getElementById("confirmDelete").onclick = async()=>await deleteObject(BaseDeleteUrl);
 
 /* MESSAGE */
 

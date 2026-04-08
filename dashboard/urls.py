@@ -41,7 +41,7 @@ urlpatterns = [
 	path("offer/range/", views.OfferRangeListView.as_view(), name="offer_range"),
 	path("offer/range/create/", views.OfferRangeCreateView.as_view(), name="offer_range_create"),
 	path("offer/range/update/<int:pk>/", views.OfferRangeUpdateView.as_view(), name="offer_range_update"),
-	path("offer/range/delete/<int:pk>/", OfferRangeDeleteView.as_view(), name="offer_range_delete"),
+	path("offer/range/delete/<int:pk>/", views.OfferRangeDeleteView.as_view(), name="offer_range_delete"),
 
 	path("offer/", OfferListView.as_view(), name="offer_list"),
 

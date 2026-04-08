@@ -34,7 +34,7 @@ from catalog.models import Product, ProductClass, ProductAttribute, ProductAttri
 from offer.models import OfferRange, Offer
 from coupon.models import Coupon
 from order.models import Order
-from .mixins import SearchFieldMixin
+
 
 UserModel = get_user_model()
 
@@ -353,6 +353,12 @@ class OfferRangeDeleteView(DeleteView):
 	template_name = "dashboard/offer/range/delete.html"
 	success_url = reverse_lazy("offer_range")
 
+	def form_valid(self, form):
+		self.object.delete()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
 
 class OfferListView(ListView):
 	model = Offer
