@@ -1,30 +1,77 @@
-{%extends 'base.html'%}
+{%extends 'dashboard/_dashboard_base.html'%}
 {%load static%}
 {%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/create_update_offer.css'%}">
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_coupon.css'%}">
 {%endblock%}
 
 {%block content%}
 
-<div class="breadcrumb-bar">
-  <div class="breadcrumb">
-    <a href="#">Dashboard</a> <i class="fa-solid fa-chevron-right"></i>
-    <a href="#">Offers</a> <i class="fa-solid fa-chevron-right"></i>
-    <span class="current">{%if object%}Update{%else%}Create{%endif%} Coupon</span>
-  </div>
-</div>
+<main class="main">
 
-<main class="offer-container">
-  <div class="offer-card">
-    <h1><i class="fa-regular fa-tag"></i> Create new offer</h1>
+  <a class="back-link" href="{%url 'dashboard:coupon_list'%}">← Back to Coupons</a>
 
-    <form method="POST">
-      {%csrf_token%}
-      {{form}}
-      <input type="submit" value="create">
-    </form>
-        
-  </div>
+  <div id="errorBox" class="error-box"></div>
+
+  <form id="couponForm" method="POST">
+    {%csrf_token%}
+
+    <!-- COUPON INFO -->
+
+    <div class="card">
+
+    <div class="section-title">Coupon Details</div>
+
+    <div class="form-group">
+    <label>Code</label>
+    {{form.code}}
+    </div>
+
+    <div class="form-group">
+    <label>Description</label>
+    {{form.description}}
+    </div>
+
+    <div class="grid">
+
+    <div class="form-group">
+    <label>Valid From</label>
+    {{form.valid_from}}
+    </div>
+
+    <div class="form-group">
+    <label>Valid To</label>
+    {{form.valid_to}}
+    </div>
+
+    </div>
+
+    <div class="grid">
+
+    <div class="form-group">
+    <label>Discount</label>
+    {{form.discount}}
+    </div>
+
+    <div class="form-group">
+    <label>Usage</label>
+    {{form.usage}}
+    </div>
+
+    </div>
+
+    <div class="checkbox">
+    {{form.active}}
+    <label>Active</label>
+    </div>
+
+    </div>
+
+    <div class="actions">
+    <button class="save-btn" type="submit">Create Coupon</button>
+    <a class="cancel-btn"  href="{%url 'dashboard:coupon_list'%}">Cancel</a>
+    </div>
+
+  </form>
+
 </main>
-
 {%endblock%}
