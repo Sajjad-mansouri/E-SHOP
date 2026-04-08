@@ -362,7 +362,7 @@ class OfferRangeDeleteView(DeleteView):
 
 class OfferListView(ListView):
 	model = Offer
-	template_name = "dashboard/offer/offer/list.html"
+	template_name = "dashboard/offer/offer/_list.html"
 
 
 class CreateOfferView(OfferWizardStepView):
