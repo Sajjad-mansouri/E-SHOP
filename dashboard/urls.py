@@ -1,9 +1,6 @@
 from django.urls import path
 from . import views
 from .views import (  
-					DeleteOfferView,
-
-
 					CouponListView,
 					CouponCreateView,
 					CouponUpdateView,
@@ -47,7 +44,7 @@ urlpatterns = [
 	path("offer/update/<int:offer_pk>/<int:offer_step>/", views.UpdateOfferView.as_view(), name="offer_step_update"),
 	path("offer/<int:offer_pk>/<int:offer_step>/", views.OfferStepView.as_view(), name="update_offer_form"),
 
-	path("offer/delete/<int:pk>/", DeleteOfferView.as_view(), name="delete_offer"),
+	path("offer/delete/<int:pk>/", views.DeleteOfferView.as_view(), name="delete_offer"),
 
 
 	path("offer/coupon/", CouponListView.as_view(), name="coupon_list"),

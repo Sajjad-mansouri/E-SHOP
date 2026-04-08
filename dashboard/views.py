@@ -402,7 +402,10 @@ class DeleteOfferView(DeleteView):
 	def form_valid(self, form):
 		success_url = self.get_success_url()
 		self.object.offer_type.delete()
-		return HttpResponseRedirect(success_url)
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
 
 
 class CouponListView(ListView):

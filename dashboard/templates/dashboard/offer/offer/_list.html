@@ -38,7 +38,7 @@
 
   <tbody id="tableBody">
     {%for offer in object_list%}
-    <tr data-id="{{object.id}}">
+    <tr data-id="{{offer.id}}">
             <td><strong>{{offer.name}}</strong></td>
             <td><span class="offer-type">{{offer.offer_type.type}}</span></td>
             <td>{{offer.start_datetime}}</td>
@@ -113,7 +113,7 @@ document.getElementById("deleteModal").style.display="none"
 
 
 
-const BaseDeleteUrl = "{%url 'dashboard:product_type_delete' 0 %}"
+const BaseDeleteUrl = "{%url 'dashboard:delete_offer' 0 %}"
 document.getElementById("confirmDelete").onclick = async()=>await deleteObject(BaseDeleteUrl);
 
 
