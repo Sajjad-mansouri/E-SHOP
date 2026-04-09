@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -83,7 +84,7 @@ class StockRecord(models.Model):
 	@admin.display(description="discount(%)")
 	def get_discount(self):
 		product_discounts = self.get_product_discounts
-		return product_discounts[0][0]
+		return Decimal(product_discounts[0][0])
 
 	@property
 	def has_dicounted(self):

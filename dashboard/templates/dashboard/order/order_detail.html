@@ -1,0 +1,167 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+
+{%block title%}Order Detail{%endblock%}
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/order_detail.css'%}">
+
+{%endblock%}
+  {%block content%}
+
+  <!-- content -->
+
+<main class="main">
+<div class="account-content">
+<div id="status-message" class="status-message" style="display:none;"></div>
+<h2>Order #{{order.order_number}}</h2>
+<p class="sub-text">Placed on {{order.created_at}}</p>
+
+<!-- INFO BOXES -->
+<div class="order-info">
+	<div class="info-box">
+	<strong>Customer</strong>
+	{{order.shipping_address.full_name}}
+	</div>
+
+	<div class="info-box">
+		<strong>Email</strong>
+		{{request.user.email}}
+	</div>
+
+	<div class="info-box">
+		<strong>Phone</strong>
+		-
+	</div>
+
+	<div class="info-box">
+		<strong>Payment Method</strong>
+		{{order.payment.payment_method}}
+	</div>
+
+	<div class="info-box">
+		<strong>Shipping Address</strong>
+		{{order.shipping_address.line1}}<br>
+		{{order.shipping_address.province}}, {{order.shipping_address.postcode}}
+	</div>
+</div>
+<!-- PRODUCT TABLE -->
+<div class="table-container">
+	<table>
+		<thead>
+			<tr>
+				<th>Product</th>
+				<th>Price</th>
+				<th>Qty</th>
+				<th>Total</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{%for item in order.cart.items.all%}
+			<tr>
+			<td>
+			<div class="product">
+			<img src="{{item.stock.product.images.all.0.image.url}}" alt="{{item.stock.product.title}}">
+			<span>{{item.stock.product.title}}</span>
+			</div>
+			</td>
+			<td>
+					<span class="old-price">${{item.stock.price}}</span>
+					<span class="new-price">${{item.stock.get_final_price}}</span>
+			</td>
+			<td>{{item.quantity}}</td>
+			<td>${{item.get_item_price}}</td>
+			</tr>
+
+			{%endfor%}
+
+		</tbody>
+	</table>
+</div>
+
+<!-- TOTALS -->
+<div class="totals">
+	<div class="total-row"><span>Subtotal</span> <span>${{order.calc_items_price}}</span></div>
+	<div class="total-row"><span>Coupon Discount</span> <span>- ${{order.calc_discount}}</span></div>
+	<div class="total-row">
+		<span>Shipping</span>
+		<span>${{order.calc_shipping_cost}}</span>
+	</div>
+	<div class="total-row">
+		<span>Tax</span>
+		<span>${{order.calc_tax}}</span>
+	</div>
+	<div class="total-row final">
+		<span>Total</span>
+		<span>${{order.calc_total_cost}}</span>
+	</div>
+			{%if order.get_coupon%}
+				<span class="coupon-badge">Coupon {{order.get_coupon}} applied</span>
+			{%endif%}
+</div>
+
+<!-- BACK & STATUS SIDE BY SIDE -->
+<div class="bottom-actions">
+
+<a href="{%url 'dashboard:order_list'%}" class="btn-back">← Back to Orders</a>
+
+<div class="status-group">
+	{%csrf_token%}
+		{{form}}
+	
+
+
+	<button class="update-btn" onclick="updateStatus()">Update Status</button>
+</div>
+
+</div>
+
+</div>
+</main>
+{%endblock%}
+
+{%block script%}
+<script>
+async function updateStatus(){
+		const status = document.getElementById("id_status").value;
+		const messageBox = document.getElementById("status-message");
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const formData = new FormData()
+    formData.append("status", status)
+    try{
+
+	    const response = await fetch("{%url 'dashboard:order_detail' object.id%}", {
+	        method:"POST",
+	        headers:{
+	            "X-CSRFToken":csrfToken,   
+	        },
+	        body:formData
+
+	    })
+
+			const data = await response.json()
+			if (data.status){
+				messageBox.className = "status-message";
+				messageBox.innerHTML = "✅ Order status updated to: <strong>" + status + "</strong>";
+
+			}else{
+				messageBox.className = "status-message error";
+				messageBox.innerHTML = "❌ Failed to update order status. Please try again.";
+			}
+    }catch(error){
+    	messageBox.className = "status-message error";
+    	messageBox.innerHTML = "❌ Failed to update order status. Please try again.";
+    }
+
+
+		messageBox.style.display = "block";
+		window.scrollTo({
+		top:0,
+		behavior:"smooth"
+		});
+
+}
+</script>
+
+{%endblock%}

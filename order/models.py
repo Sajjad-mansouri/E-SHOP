@@ -75,7 +75,10 @@ class Order(models.Model):
     @property
     def get_percent_coupon_discount(self):
         coupon_application = self.get_user_coupon_application
-        discount_prc = coupon_application.coupon.discount
+        if coupon_application:
+            discount_prc = coupon_application.coupon.discount
+        else:
+            discount_prc = 0.0
         return Decimal(discount_prc)
 
 
@@ -85,7 +88,7 @@ class Order(models.Model):
             if self.cart.get_items_price > self.shipping_method.free_shipping_threshold:
                 return Decimal("0.0")
             else:
-                return shipping_method.price
+                return self.shipping_method.price
 
     @property
     def calc_discount(self):

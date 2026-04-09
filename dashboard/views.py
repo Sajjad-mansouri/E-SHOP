@@ -28,6 +28,7 @@ from .forms import (
 					OfferRestrictionForm,
 
 					CouponForm,
+					OrderStatusForm,
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
@@ -431,6 +432,26 @@ class CouponDeleteView(DeleteView):
 
 	def form_valid(self, form):
 		self.object.delete()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
+
+
+
+class OderListView(ListView):
+	model = Order
+	template_name = "dashboard/order/orders.html"
+
+class OderDetailView(UpdateView):
+	model = Order
+	form_class = OrderStatusForm
+	template_name = "dashboard/order/order_detail.html"
+
+
+	def form_valid(self, form):
+		form.save()
+
 		return JsonResponse({"status":True})
 
 	def form_invalid(self, form):

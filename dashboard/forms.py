@@ -9,6 +9,7 @@ from treebeard.forms import movenodeform_factory
 from offer.models import OfferRange, Offer, OfferType
 from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple
 from coupon.models import Coupon
+from order.models import Order
 
 class ProductClassForm(forms.ModelForm):
 	class Meta:
@@ -285,5 +286,15 @@ class CouponForm(forms.ModelForm):
 		widgets = {
 				"valid_from":forms.DateTimeInput(attrs={"type":"datetime-local"}),
 				"valid_to":forms.DateTimeInput(attrs={"type":"datetime-local"}),
+
+		}
+
+
+class OrderStatusForm(forms.ModelForm):
+	class Meta:
+		model = Order
+		fields = ["status"]
+		widgets = {
+			"status":forms.Select(attrs={"class":"status-select"})
 
 		}
