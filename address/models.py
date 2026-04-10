@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from .fields import PhoneNumberField
 
 UserModel = get_user_model()
 # Create your models here.
@@ -25,13 +26,15 @@ class Address(models.Model):
 		("CA", "Canada"),
 		("UK", "United Kingdom"),
 		("AU", "Australia"),
+		("GER", "Germany"),
+
 	]
 	full_name = models.CharField(_("Full name"), max_length=255)
+	country = models.CharField(_("country"),choices=COUNTRIES)
+	phone_number = PhoneNumberField(_("Phone Number"), max_length=20)
 	address_type = models.CharField(_("Address Type"), choices=ADDRESS_TYPE, max_length=20, blank=True)
-	phone_number = models.CharField(_("Phone Number"), max_length=15)
 	city = models.CharField(_("City"), max_length=255)
 	province = models.CharField(_("Province/State"), max_length=255)
-	country = models.CharField(_("country"),choices=COUNTRIES)
 	postcode = models.CharField(_("Post/Zip-code"), max_length=64)
 	line1 = models.CharField(_("First line of address"), max_length=255, help_text=_("Street address, P.O. box, company name"))
 	line2 = models.CharField(_("Second line of address"), max_length=255, blank=True, help_text=_("Apartment, suite, unit, building, floor, etc."))

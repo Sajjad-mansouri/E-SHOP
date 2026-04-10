@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
+
 class User(AbstractUser):
 	USER_TYPES = [
 		("seller", "Seller"),
@@ -24,6 +25,7 @@ class Profile(models.Model):
 	profile_image = models.ImageField(_("Profile Image"), upload_to="users")
 	birth_day = models.DateTimeField(_("Birth Day"), null=True, blank=True)
 	status = models.CharField(_("status"), choices=STATUS, max_length=6, default="normal")
+	
 
 	def __str__(self):
 		return f'"{self.user.get_full_name()}" profile'
