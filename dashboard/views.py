@@ -1,3 +1,5 @@
+import zoneinfo
+from datetime import timedelta, datetime
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.db.models import Q
@@ -10,6 +12,7 @@ from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
+from django.utils import timezone
 from .wizard_views import OfferWizardStepView
 from .forms import (
 					image_formset, 
@@ -456,3 +459,97 @@ class OderDetailView(UpdateView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
+
+
+class FulfilmentStatistic(TemplateView):
+	template_name = "dashboard/fulfilment/statistics.html"
+
+
+	def get(self, request, *args, **kwargs):
+		self.is_filter = self.request.GET.get("filter")
+		if self.is_filter=="true":
+			orders = self.get_filtered_objects()
+			total, processing, shipped, delivered, cancelled = self.get_count_by_status(orders)
+			return JsonResponse({
+								"total":total, 
+								"processing":processing, 
+								"shipped":shipped, 
+								"delivered":delivered, 
+								"cancelled":cancelled})
+			
+		else:
+
+			context = self.get_context_data(**kwargs)
+			return self.render_to_response(context)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		orders = self.get_filtered_objects()
+		total, processing, shipped, delivered, cancelled = self.get_count_by_status(orders)
+		context["total"] = total
+		context["processing"] = processing
+		context["shipped"] = shipped
+		context["delivered"] = delivered
+		context["cancelled"] = cancelled
+		context["order"] = orders
+		return context
+
+	def get_filtered_objects(self):
+		period = self.request.GET.get("period")
+		is_range = self.request.GET.get("is_range")
+		is_range = self.request.GET.get("is_range")
+		range_start = self.request.GET.get("range_start")
+		range_end = self.request.GET.get("range_end")
+		if self.is_filter=="true" and period !="total":
+			filter_q = self.get_filter_by_period(period, is_range, range_start, range_end)
+			orders = Order.objects.filter(filter_q)
+		else:
+			orders = Order.objects.all()
+
+		return orders
+
+	def get_filter_by_period(self, period=None, is_range=None, range_start=None, range_end=None):
+		now = timezone.now()
+		if period == "today":
+			start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+			end = start + timedelta(days=1)
+
+		elif period == "week":
+			start_of_week = now - timedelta(days=now.weekday())
+			start = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+			end = start + timedelta(days=7)
+
+		elif period == "month":
+			start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+			if start.month == 12:
+				end = start.replace(year=start.year + 1, month=1)
+			else:
+				end = start.replace(month=start.month + 1)
+		
+		elif period == "year":
+			start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+			end = start.replace(year=start.year + 1)
+
+		elif is_range:
+			
+			timezone_str = self.request.GET.get("timezone")
+			tz = zoneinfo.ZoneInfo(timezone_str)
+			start_naive = date_obj = datetime.strptime(range_start, "%Y-%m-%d") 
+			end_naive = datetime.strptime(range_end, "%Y-%m-%d") 
+
+			start = timezone.make_aware(start_naive, tz)
+			end = timezone.make_aware(end_naive, tz)
+
+
+		
+		return Q(created_at__gte=start) & Q(created_at__lte=end)
+
+			
+
+	def get_count_by_status(self, orders):
+			total = orders.count()
+			processing = orders.filter(status="processing").count()
+			shipped = orders.filter(status="shipped").count()
+			delivered = orders.filter(status="delivered").count()
+			cancelled = orders.filter(status="cancelled").count()
+			return total, processing, shipped, delivered, cancelled

@@ -46,8 +46,11 @@ urlpatterns = [
 	path("offer/coupon/update/<int:pk>/", views.CouponUpdateView.as_view(), name="coupon_update"),
 	path("offer/coupon/delete/<int:pk>/", views.CouponDeleteView.as_view(), name="coupon_delete"),
 
-	path("orders/", views.OderListView.as_view(), name="order_list"),
-	path("order/<int:pk>/", views.OderDetailView.as_view(), name="order_detail"),
+	path("fulfilment/orders/", views.OderListView.as_view(), name="order_list"),
+	path("fulfilment/order/<int:pk>/", views.OderDetailView.as_view(), name="order_detail"),
+
+	path("fulfilment/statistics/", views.FulfilmentStatistic.as_view(), name="statistics"),
+
 
 
 

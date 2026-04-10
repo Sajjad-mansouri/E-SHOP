@@ -1,0 +1,98 @@
+/* MAIN */
+.main{
+max-width:1350px;margin:auto;padding:40px 24px;
+}
+
+/* PAGE TITLE */
+.page-title{font-size:1.8rem;font-weight:800;margin-bottom:28px;}
+
+/* FILTER BAR – SEGMENT CONTROLS */
+.filters{
+display:flex;flex-wrap:wrap;gap:14px;margin-bottom:34px;align-items:center;
+}
+
+.segmented{
+display:flex;background:#fff;border-radius:12px;overflow:hidden;
+box-shadow:var(--shadow);
+}
+.segmented button{
+padding:10px 18px;border:none;background:none;font-weight:600;
+cursor:pointer;color:#666;font-size:0.9rem;
+transition:0.2s;
+}
+.segmented button.active{
+background:var(--primary);color:white;
+}
+
+.filters select, .filters input{
+padding:10px 14px;border-radius:12px;border:1px solid #ddd;
+font-size:0.92rem;background:white;
+}
+
+/* STAT CARDS */
+.stats-grid{
+display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:26px;margin-bottom:40px;
+}
+
+.stat-card{
+background:white;padding:28px;border-radius:var(--radius);
+box-shadow:var(--shadow);position:relative;overflow:hidden;
+transition:transform 0.2s;
+}
+.stat-card:hover{transform:translateY(-3px);}
+.stat-title{
+font-size:0.92rem;color:var(--text-soft);margin-bottom:10px;
+}
+.stat-value{
+font-size:2.2rem;font-weight:800;margin-bottom:6px;
+}
+
+
+
+
+
+/* TABLE CARDS */
+.table-card{
+background:white;padding:30px;border-radius:var(--radius);
+box-shadow:var(--shadow);margin-top:25px;
+}
+.table-title{
+font-weight:700;margin-bottom:18px;font-size:1.15rem;
+}
+
+table{
+width:100%;border-collapse:collapse;
+}
+th,td{
+padding:14px 10px;border-bottom:1px solid #eee;font-size:0.9rem;
+}
+th{color:var(--text-muted);font-weight:600;}
+
+/* STATUS TAGS */
+.status{
+padding:6px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;
+}
+.delivered{background:#e8f7ef;color:var(--success);}
+.processing{background:#fff5e6;color:var(--warning);}
+.cancelled{background:#fdecec;color:var(--cancel);}
+.shipped{background:#e6f2ff;color:var(--info);}
+
+
+.message{
+padding:12px 16px;
+border-radius:10px;
+margin-bottom:18px;
+font-size:0.9rem;
+display:none;
+}
+
+.message.success{
+background:#e9f7ef;
+color:#1a7f47;
+}
+
+.message.error{
+background:#fdecec;
+color:#c93737;
+}

@@ -1,0 +1,152 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/fulfilment/statistics.css'%}">
+{%endblock%}
+
+{%block content%}
+<main class="main">
+
+	<div class="page-title">Fulfilment Statistics</div>
+	<div id="messageBox" class="message"></div>
+
+	<!-- FILTERS -->
+	<div class="filters">
+
+	<div class="segmented">
+	<button class="filter-btn filter" data-period="today">Today</button>
+	<button class="filter-btn filter" data-period="week">This Week</button>
+	<button class="filter-btn filter" data-period="month">This Month</button>
+	<button class="filter-btn filter" data-period="year">This Year</button>
+	<button class="filter-btn filter active" data-period="total">Total</button>
+
+	</div>
+
+	<input type="date" class="start-range">
+	<input type="date" class="end-range">
+	<div class="segmented">
+	<button id="apply-range"class="filter">Apply Range</button>
+</div>
+
+	</div>
+
+
+	<!-- STAT CARDS -->
+	<div class="stats-grid">
+
+	<div class="stat-card" id="total">
+		<div class="stat-title">Total Orders</div>
+		<div class="stat-value">{{total}}</div>
+
+	</div>
+
+	<div class="stat-card" id="delivered">
+		<div class="stat-title">Delivered</div>
+		<div class="stat-value">{{delivered}}</div>
+
+	</div>
+
+	<div class="stat-card" id="processing">
+		<div class="stat-title">Processing</div>
+		<div class="stat-value">{{processing}}</div>
+
+	</div>
+
+	<div class="stat-card" id="shipped">
+		<div class="stat-title">Shipped</div>
+		<div class="stat-value">{{shipped}}</div>
+
+	</div>
+
+	<div class="stat-card" id="cancelled">
+		<div class="stat-title">Cancelled</div>
+		<div class="stat-value">{{cancelled}}</div>
+
+	</div>
+
+	</div>
+
+</main>
+
+{%endblock%}
+
+{%block extra%}
+
+{%endblock%}
+
+{%block script%}
+<script>
+const totalOrderVal = document.querySelector("#total .stat-value");
+const deliveredOrderVal = document.querySelector("#delivered .stat-value");
+const processingOrderVal = document.querySelector("#processing .stat-value");
+const shippedOrderVal = document.querySelector("#shipped .stat-value");
+const cancelledOrderVal = document.querySelector("#cancelled .stat-value");
+const applyRangeBtn = document.getElementById("apply-range");
+
+ const filterBtns = document.querySelectorAll(".filter-btn")
+ filterBtns.forEach(btn=>{
+ 	btn.addEventListener("click",async ()=>{
+ 		const activeBtn = document.querySelector(".filter.active")
+	 	activeBtn.classList.remove("active");
+ 		const period = btn.dataset.period
+ 		btn.classList.add("active");
+	 	const url = "{%url 'dashboard:statistics'%}" + `?filter=true&period=${period}`
+ 		const data = await filterByPeriood(url)
+ 		updateTemplate(data)
+ 	})
+ })
+
+
+ async function filterByPeriood(url){
+ 	const response = await fetch(url, {
+ 		method:"GET"
+ 	})
+ 	const data = await response.json()
+ 	return data
+ }
+
+ function updateTemplate(data){
+	totalOrderVal.innerText = data.total;
+	deliveredOrderVal.innerText = data.delivered;
+	processingOrderVal.innerText = data.processing;
+	shippedOrderVal.innerText = data.shipped;
+	cancelledOrderVal.innerText = data.cancelled;
+ }
+
+ applyRangeBtn.addEventListener("click", async ()=>{
+ 	const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	const activeBtn = document.querySelector(".filter.active")
+ 	activeBtn.classList.remove("active");
+ 	applyRangeBtn.classList.add("active");
+	const startRange = document.querySelector(".start-range").value;
+	const endRange = document.querySelector(".end-range").value;
+	if(startRange==""){
+
+		showMessage("Please select start and end of range!", "error")
+	}
+	else{
+		const url = "{%url 'dashboard:statistics'%}" + `?filter=true&is_range=true&range_start=${startRange}&range_end=${endRange}&timezone=${timezone}`
+		const data = await filterByPeriood(url)
+		updateTemplate(data)
+		showMessage(`results from:${startRange} to:${endRange}`, "success")
+	}
+
+
+ })
+
+function showMessage(text,type){
+
+	const box=document.getElementById("messageBox")
+
+	box.innerText=text
+	box.className="message "+type
+	box.style.display="block"
+
+	setTimeout(()=>{
+	box.style.display="none"
+	},10000)
+
+}
+</script>
+{%endblock%}
