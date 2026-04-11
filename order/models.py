@@ -48,6 +48,7 @@ class Order(models.Model):
     tax_rate = models.DecimalField(_("Tax Rate"), max_digits=10, decimal_places=2, default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    total_cost = models.DecimalField(_("Total cost"), max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f"Order {self.order_number}"
@@ -123,5 +124,9 @@ class Order(models.Model):
         final_cost = pure_price + tax + shipping_cost
 
         return final_cost
+
+    def save(self, *args, **kwargs):
+        self.total_cost = self.calc_total_cost
+        super().save(*args, **kwargs)
 
 

@@ -51,6 +51,9 @@ urlpatterns = [
 
 	path("fulfilment/statistics/", views.FulfilmentStatistic.as_view(), name="statistics"),
 
+	path("customers/", views.CustomerListView.as_view(), name="customers"),
+
+
 
 
 

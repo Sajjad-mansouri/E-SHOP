@@ -1,0 +1,106 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/customer/customers.css'%}">
+{%endblock%}
+
+{%block content%}
+<main class="main">
+  <div class="page-title">Customers</div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input id="q" class="input" type="search" placeholder="Search by name, email, phone…" />
+    <select id="status" class="select">
+      <option value="">All Statuses</option>
+      <option value="normal">Normal</option>
+      <option value="vip">VIP</option>
+    </select>
+    <select id="sort" class="select">
+      <option value="date_joined">Oldest users</option>
+      <option value="-date_joined">Newest users</option>
+
+      <option value="-order_count">Most Orders</option>
+      <option value="order_count">Fewest Orders</option>
+
+      <option value="-total_spent">Highest spending</option>
+      <option value="total_spent">Lowest spending</option>
+
+      <option value="first_name">Name(A->Z)</option>
+      <option value="-first_name">Name(Z->A)</option>
+
+    </select>
+
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-wrap">
+      <table id="customers-table" aria-label="Customer list">
+        <thead>
+          <tr>
+            <th style="width:32px;"></th>
+            <th>Customer</th>
+            <th>date joined</th>
+
+            <th>Orders</th>
+            <th>Total Spent</th>
+            <th>Last Order</th>
+            <th>Status</th>
+            <th style="width:120px;"></th>
+          </tr>
+        </thead>
+        <tbody id="customers-body">
+        	{%include "dashboard/customer/_customers.html"%}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+{%endblock%}
+
+{%block extra%}
+
+{%endblock%}
+
+{%block script%}
+<script>
+	const search = document.getElementById("q")
+	const customersBody = document.getElementById("customers-body")
+	const status = document.getElementById("status")
+	const sort = document.getElementById("sort")
+
+	search.addEventListener("input", async()=>{
+		const value = event.target.value;
+		update_customers("search", value)
+	})
+
+	status.addEventListener("change", async()=>{
+		const value = event.target.value;
+		console.log(value)
+		update_customers("status", value)
+	})
+	sort.addEventListener("change", async()=>{
+		const value = event.target.value;
+		console.log(value)
+		update_customers("ordering", value)
+	})
+	async function update_customers(type, value){
+		const data = await search_customers(type, value)
+		customersBody.innerHTML = data	
+	}
+
+	async function search_customers(type, value){
+		const response = await fetch("{%url 'dashboard:customers'%}"+`?${type}=${value}`, {
+			method:"GET",
+			headers:{
+				"AJAX":true
+			}
+		})
+		const data = response.text()
+		return data
+	}
+</script>
+{%endblock%}

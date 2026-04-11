@@ -1,0 +1,27 @@
+        	{%for object in object_list%}
+
+          <tr data-id="1">
+            <td>
+              <div class="avatar">
+                <img src="{%if object.profile.profile_image%}{{object.profile.profile_image.url}}{%endif%}" alt="{{object.get_full_name}}">
+              </div>
+            </td>
+            <td>
+              <div class="flex" style="gap:6px">
+                <div>
+                  <strong>{{object.get_full_name}}</strong>
+                  <span class="sub">{{object.email}}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{object.date_joined|date}}</td>
+
+            <td>{{object.orders.count}}</td>
+            <td>{%if object.total_spent%}${{object.total_spent}}{%else%}$0.00{%endif%}</td>
+            <td>{%if object.last_order%}{{object.last_order|date}}{%else%}-{%endif%}</td>
+            <td><span class="badge vip">{{object.profile.get_status_display}}</span></td>
+            <td class="actions">
+              <button class="btn" data-view>View</button>
+            </td>
+          </tr>
+          {%endfor%}

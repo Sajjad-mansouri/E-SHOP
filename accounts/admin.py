@@ -4,7 +4,7 @@ from .models import User, Profile
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
-	pass
+	ordering = ("-date_joined", )
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):

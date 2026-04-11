@@ -15,6 +15,9 @@ class User(AbstractUser):
 	USERNAME_FIELD = "email"
 	REQUIRED_FIELDS = ["username"]
 
+	class Meta(AbstractUser.Meta):
+		ordering = ["-date_joined"]
+
 
 class Profile(models.Model):
 	STATUS=[

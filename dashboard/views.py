@@ -2,7 +2,7 @@ import zoneinfo
 from datetime import timedelta, datetime
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic.list import ListView
@@ -11,7 +11,7 @@ from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
 from django.contrib.auth import get_user_model
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.utils import timezone
 from .wizard_views import OfferWizardStepView
 from .forms import (
@@ -553,3 +553,64 @@ class FulfilmentStatistic(TemplateView):
 			delivered = orders.filter(status="delivered").count()
 			cancelled = orders.filter(status="cancelled").count()
 			return total, processing, shipped, delivered, cancelled
+
+
+class CustomerListView(ListView):
+	template_name = "dashboard/customer/customers.html"
+	queryset = UserModel.objects.filter(user_type="customer")
+
+	def dispatch(self, request, *args, **kwargs):
+		self.is_ajax = request.headers.get("AJAX")
+		return super().dispatch(request, *args, **kwargs)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		users = self.queryset.filter(~Q(orders__status="cancelled")).annotate(
+			last_order=Max("orders__created_at"), 
+			order_count=Count("orders"),
+			total_spent=Sum("orders__total_cost")
+			).prefetch_related("orders")
+		if self.is_ajax:
+			users = self.filter_search(users)
+			users = self.filter_status(users)
+			users = self.sort_users(users)
+		context["object_list"] = users
+
+		return context
+
+	def filter_search(self, users):
+		search = self.request.GET.get("search")
+		if search:
+			return users.filter(Q(first_name__icontains=search)|Q(email__icontains=search))
+		return users
+
+
+	def filter_status(self, users):
+		status = self.request.GET.get("status")
+		if status:
+			return users.filter(Q(profile__status=status))
+		return users
+
+	def sort_users(self, users):
+		ordering = self.request.GET.get("ordering")
+		ordering_options = [
+		"date_joined",
+		"-date_joined",
+		"first_name",
+		"-first_name",
+		"total_spent",
+		"-total_spent",
+		"order_count",
+		"-order_count"
+
+		]
+		if ordering and ordering in ordering_options:
+			print(ordering)
+			return users.order_by(ordering)
+		return users
+
+	def render_to_response(self, context, **response_kwargs):
+		is_ajax = self.request.headers.get("AJAX")
+		if is_ajax == 'true':
+			self.template_name = "dashboard/customer/_customers.html"
+		return super().render_to_response(context, **response_kwargs)
