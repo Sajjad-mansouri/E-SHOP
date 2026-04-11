@@ -21,7 +21,7 @@
             <td>{%if object.last_order%}{{object.last_order|date}}{%else%}-{%endif%}</td>
             <td><span class="badge vip">{{object.profile.get_status_display}}</span></td>
             <td class="actions">
-              <button class="btn" data-view>View</button>
+              <a class="btn" href="{%url 'dashboard:customer' object.id %}">View</a>
             </td>
           </tr>
           {%endfor%}

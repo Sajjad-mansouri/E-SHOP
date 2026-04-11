@@ -1,0 +1,130 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/customer/customer.css'%}">
+{%endblock%}
+
+{%block content%}
+<main class="main">
+
+  <div class="page-title">Customer Details</div>
+
+  <!-- STATS -->
+
+  <div class="stats-grid">
+
+  <div class="stat-card">
+  <div class="stat-title">Total Orders</div>
+  <div class="stat-value">{{object.orders.count}}</div>
+  </div>
+
+  <div class="stat-card">
+  <div class="stat-title">Total Spent</div>
+  <div class="stat-value">${%if total_spent %}{{total_spent}}{%else%}0.00{%endif%}</div>
+  </div>
+
+  <div class="stat-card">
+  <div class="stat-title">Last Order</div>
+  <div class="stat-value">{%if last_order %}{{last_order}}{%else%}-{%endif%}</div>
+  </div>
+
+  </div>
+
+  <!-- CUSTOMER INFO -->
+
+  <div class="card">
+
+  <div class="card-title">Customer Information</div>
+
+  <div class="customer-info">
+
+  <div class="info-item">
+  <div class="info-label">Name</div>
+  {{object.get_full_name}}
+  </div>
+
+  <div class="info-item">
+  <div class="info-label">Email</div>
+  {{object.email}}
+  </div>
+
+
+  <div class="info-item">
+  <div class="info-label">Customer Since</div>
+  {{object.date_joined}}
+  </div>
+
+  </div>
+
+  </div>
+
+  <!-- DEFAULT ADDRESS -->
+
+
+  <div class="card">
+
+      <div class="card-title">Default Address</div>
+      {%for address in default_addresses%}
+      <div class="address-card">
+
+        <span class="default-badge">Default</span>
+
+      <strong>{{address.full_name}}</strong>
+
+      <p>
+      {{ address.line1 }}<br>
+      {% if address.line2 %}{{ address.line2 }}<br>{% endif %}
+      {{ address.city }}, {{ address.province }} {{ address.postcode }}<br>
+      {{address.get_country_display}}<br>
+      Phone: {{ address.phone_number }}
+      </p>
+
+      </div>
+
+      <button class="btn-view">View All Addresses</button>
+      {%empty%}
+      <span>Empty addresses!</span>
+      {%endfor%}
+  </div>
+
+  <!-- CUSTOMER ORDERS -->
+
+  <div class="table-card">
+
+  <div class="table-title">Customer Orders</div>
+
+  <table>
+
+  <thead>
+  <tr>
+  <th>Order ID</th>
+  <th>Total</th>
+  <th>Status</th>
+  <th>Date</th>
+  <th>action</th>
+
+  </tr>
+  </thead>
+
+  <tbody>
+    {%for order in orders%}
+  <tr>
+    <td>#{{order.order_number}}</td>
+    <td>${{order.total_cost}}</td>
+    <td><span class="status delivered">{{order.status}}</span></td>
+    <td>{{order.created_at}}</td>
+    <td class="action"><a class="btn" href="{%url 'dashboard:customer' object.id %}">View</a></td>
+
+  </tr>
+  {%endfor%}
+
+
+  </tbody>
+
+  </table>
+
+  </div>
+
+</main>
+{%endblock%}

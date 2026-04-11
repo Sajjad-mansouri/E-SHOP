@@ -614,3 +614,20 @@ class CustomerListView(ListView):
 		if is_ajax == 'true':
 			self.template_name = "dashboard/customer/_customers.html"
 		return super().render_to_response(context, **response_kwargs)
+
+class CustomerDetailView(DetailView):
+	template_name = "dashboard/customer/customer.html"
+	queryset = UserModel.objects.filter(user_type="customer")
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		aggregate = self.object.orders.aggregate(
+			total_spent=Sum("total_cost"),
+			last_order=Max("created_at"), 
+			)
+		context["total_spent"] = aggregate["total_spent"]
+		context["last_order"] = aggregate["last_order"]
+		context["default_addresses"] = self.object.addresses.filter(is_default_address=True)
+		context["orders"] = self.object.orders.all()
+
+		return context
