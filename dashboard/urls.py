@@ -55,6 +55,9 @@ urlpatterns = [
 	path("customer/<int:pk>/", views.CustomerDetailView.as_view(), name="customer"),
 	path("customer/<int:pk>/addresses", views.AddressListView.as_view(), name="addresses"),
 
+	path("report/sales/", views.SalesReport.as_view(), name="sales_report"),
+
+
 
 
 

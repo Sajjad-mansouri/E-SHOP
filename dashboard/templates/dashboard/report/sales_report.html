@@ -1,0 +1,139 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/report/sales_report.css'%}">
+{%endblock%}
+
+{%block content%}
+<main class="main">
+
+	<div class="page-header">
+	<div class="page-title">Sales Report</div>
+
+	<div class="filter">
+	<input type="date">
+	<input type="date">
+	<button>Filter</button>
+	</div>
+
+	</div>
+
+	<!-- SALES STATS -->
+
+	<div class="stats-grid">
+
+	<div class="stat-card">
+	<div class="stat-title">Total Revenue</div>
+	<div class="stat-value">${{total_revenue|floatformat:2}}</div>
+	</div>
+
+	<div class="stat-card">
+	<div class="stat-title">Total Orders</div>
+	<div class="stat-value">{{total_orders}}</div>
+	</div>
+
+	<div class="stat-card">
+	<div class="stat-title">Average Order</div>
+	<div class="stat-value">${{average_order|floatformat:2}}</div>
+	</div>
+
+	<div class="stat-card">
+	<div class="stat-title">Products Sold</div>
+	<div class="stat-value">{{product_sold}}</div>
+	</div>
+
+	</div>
+
+	<!-- SALES CHART -->
+
+	<div class="card">
+
+	<div class="card-title">Revenue Overview</div>
+
+	<div class="chart-placeholder">
+	Sales chart will appear here
+	</div>
+
+	</div>
+
+	<!-- TOP PRODUCTS -->
+
+	<div class="card">
+
+	<div class="card-title">Top Selling Products</div>
+
+	<table>
+
+	<thead>
+	<tr>
+	<th>Product</th>
+	<th>Units Sold</th>
+	<th>Revenue</th>
+	</tr>
+	</thead>
+
+	<tbody>
+		{%for stock in top_selling%}
+	<tr>
+		<td>{{stock.product.title}}</td>
+		<td>{{stock.sell_count}}</td>
+		<td>${{stock.revenue}}</td>
+	</tr>
+		{%endfor%}
+
+
+	</tbody>
+
+	</table>
+
+	</div>
+
+	<!-- RECENT ORDERS -->
+
+	<div class="card">
+
+	<div class="card-title">Recent Orders</div>
+
+	<table>
+
+	<thead>
+	<tr>
+	<th>Order ID</th>
+	<th>Customer</th>
+	<th>Total</th>
+	<th>Status</th>
+	<th>Date</th>
+	</tr>
+	</thead>
+
+	<tbody>
+		{%for order in recent_orders%}
+		<tr>
+		<td>#{{order.order_number}}</td>
+		<td>{{order.user.get_full_name}}</td>
+		<td>${{order.total_cost}}</td>
+		<td><span class="status delivered">{{order.status}}</span></td>
+		<td>{{order.created_at|date}}</td>
+		</tr>
+
+		{%endfor%}
+
+	</tbody>
+
+	</table>
+
+	</div>
+
+</main>
+{%endblock%}
+
+{%block extra%}
+
+{%endblock%}
+
+{%block script%}
+<script>
+
+</script>
+{%endblock%}

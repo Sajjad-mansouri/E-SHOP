@@ -12,7 +12,7 @@ UserModel = get_user_model()
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ("paid", "Paid"),
+        ("pending", "pending"),
         ("processing", "Processing"),
         ("shipped", "Shipped"),
         ("delivered", "Delivered"),

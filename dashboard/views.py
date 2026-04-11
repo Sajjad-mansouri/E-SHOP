@@ -11,7 +11,7 @@ from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
 from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Avg
 from django.utils import timezone
 from .wizard_views import OfferWizardStepView
 from .forms import (
@@ -640,3 +640,43 @@ class AddressListView(DetailView):
 		context = super().get_context_data(**kwargs)
 		context["addresses"] = self.object.addresses.all()
 		return context
+
+
+class SalesReport(ListView):
+		template_name = "dashboard/report/sales_report.html"
+		model = Order
+
+
+		def get_context_data(self, **kwargs):
+			context = super().get_context_data(**kwargs)
+			recent_orders = self.object_list[:10]
+			top_selling , product_sold= self.get_top_selling_products()
+			total_revenue, total_orders, average_order = self.get_total_order_stat()
+			context["recent_orders"] = recent_orders
+			context["top_selling"] = top_selling
+			context["total_revenue"] = total_revenue
+			context["total_orders"] = total_orders
+			context["average_order"] = average_order
+			context["product_sold"] = product_sold
+			
+
+
+
+
+
+			return context
+
+		def get_top_selling_products(self):
+			q = Q(stock_carts__cart__order__status__in=["pending", "processing", "shipped","delivered"])
+			top_selling = StockRecord.objects.annotate(sell_count = Sum("stock_carts__quantity", filter=q), revenue=Sum("stock_carts__final_item_price", filter=q))	
+			top_selling = top_selling.order_by("-sell_count")
+			top_selling_agg = top_selling.aggregate(product_sold=Sum("sell_count"))
+			return top_selling, top_selling_agg["product_sold"]
+
+		def get_total_order_stat(self):
+			q = Q(status__in=["pending", "processing", "shipped","delivered"])
+			total_agg = Order.objects.aggregate(total_revenue = Sum("total_cost", filter=q))
+			avg_agg = Order.objects.aggregate(average_order = Avg("total_cost", filter=q))
+
+			total_orders = Order.objects.filter(q).count()
+			return total_agg["total_revenue"], total_orders, avg_agg["average_order"]

@@ -45,6 +45,7 @@ class CartItem(models.Model):
 
 	created = models.DateTimeField(_("Date Created"), auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(_("Date Updated"), auto_now=True, db_index=True)
+	final_item_price = models.DecimalField(_("Item Price"), max_digits=10, decimal_places=2, default=0.0)
 
 	def __str__(self):
 		return f"{self.quantity} X {self.stock}"
@@ -58,4 +59,8 @@ class CartItem(models.Model):
 	def get_item_price(self):
 		stock_final_price = self.stock.get_final_price
 		return stock_final_price * self.quantity
+
+	def save(self, *args, **kwargs):
+		self.final_item_price = self.get_item_price
+		super().save(*args, **kwargs)
 
