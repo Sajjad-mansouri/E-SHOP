@@ -32,12 +32,14 @@ from .forms import (
 
 					CouponForm,
 					OrderStatusForm,
+					CommentStatusForm
 					)
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
 from offer.models import OfferRange, Offer
 from coupon.models import Coupon
 from order.models import Order
+from comment.models import Comment
 
 
 UserModel = get_user_model()
@@ -725,3 +727,20 @@ class SalesReport(ListView):
 			if is_ajax == 'true':
 				self.template_name = "dashboard/report/_report.html"
 			return super().render_to_response(context, **response_kwargs)
+
+
+class ReviewListView(ListView):
+	model = Comment
+	template_name = "dashboard/review/reviews.html"
+	context_object_name = "reviews"
+
+class ReviewStatusUpdateView(UpdateView):
+	model = Comment
+	form_class = CommentStatusForm
+	def form_valid(self, form):
+		form.save()
+		status = form.cleaned_data["status"]
+		return JsonResponse({"status":True, "action":status})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})

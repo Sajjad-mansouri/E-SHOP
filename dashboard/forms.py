@@ -10,6 +10,7 @@ from offer.models import OfferRange, Offer, OfferType
 from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple
 from coupon.models import Coupon
 from order.models import Order
+from comment.models import Comment
 
 class ProductClassForm(forms.ModelForm):
 	class Meta:
@@ -298,3 +299,8 @@ class OrderStatusForm(forms.ModelForm):
 			"status":forms.Select(attrs={"class":"status-select"})
 
 		}
+
+class CommentStatusForm(forms.ModelForm):
+	class Meta:
+		model = Comment
+		fields = ["status"]

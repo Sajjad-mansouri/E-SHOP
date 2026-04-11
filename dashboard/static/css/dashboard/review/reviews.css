@@ -1,0 +1,118 @@
+/* MAIN */
+
+.main{
+max-width:1200px;
+margin:auto;
+padding:30px 20px;
+}
+
+.page-title{
+font-size:1.6rem;
+font-weight:700;
+margin-bottom:20px;
+}
+
+/* FILTER BAR */
+
+.filter-bar{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:20px;
+}
+
+.filter-bar input,
+.filter-bar select{
+padding:8px 10px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:0.9rem;
+}
+
+/* TABLE CARD */
+
+.table-card{
+background:white;
+padding:25px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+text-align:left;
+padding:12px;
+border-bottom:1px solid #eee;
+font-size:0.9rem;
+}
+
+th{
+color:#777;
+font-weight:600;
+}
+
+/* STATUS */
+
+.status{
+padding:4px 10px;
+border-radius:8px;
+font-size:0.8rem;
+font-weight:600;
+}
+
+.status.visible{
+background:#e8f7ef;
+color:#1a7f47;
+}
+
+.status.hidden{
+background:#fdecec;
+color:#c93737;
+}
+
+/* BUTTONS */
+
+.btn{
+padding:6px 12px;
+border:none;
+border-radius:8px;
+font-size:0.85rem;
+cursor:pointer;
+}
+
+.btn-view{background:#eef2ff;color:#3730a3;}
+.btn-hide{background:#fff5e6;color:#c77700;}
+.btn-show{background:#e8f7ef;color:#1a7f47;}
+.btn-delete{background:#fdecec;color:#c93737;}
+
+/* MODAL */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+align-items:center;
+justify-content:center;
+}
+
+.modal-box{
+background:white;
+padding:25px;
+border-radius:var(--radius);
+width:420px;
+box-shadow:var(--shadow);
+}
+
+.modal-close{
+float:right;
+cursor:pointer;
+font-weight:700;
+}

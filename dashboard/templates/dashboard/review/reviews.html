@@ -1,0 +1,196 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/review/reviews.css'%}">
+{%endblock%}
+
+{%block content%}
+
+<main class="main">
+
+<div class="page-title">Product Reviews</div>
+
+<div class="filter-bar">
+
+<input type="text" id="searchInput" placeholder="Search product or customer">
+
+<select id="statusFilter">
+<option value="">All Status</option>
+<option value="visible">Visible</option>
+<option value="hidden">Hidden</option>
+</select>
+
+<select id="ratingFilter">
+<option value="">All Ratings</option>
+<option value="5">5 Stars</option>
+<option value="4">4 Stars</option>
+<option value="3">3 Stars</option>
+<option value="2">2 Stars</option>
+<option value="1">1 Star</option>
+</select>
+
+<input type="date" id="startDate">
+<input type="date" id="endDate">
+
+</div>
+
+
+<div class="table-card">
+
+<table id="reviewsTable">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Product</th>
+<th>Customer</th>
+<th>Rating</th>
+<th>Status</th>
+<th>Date</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{%for review in reviews%}
+<tr data-product="Running Shoes"  data-id="{{review.id}}" data-customer="John Doe" data-rating="5" data-status="{{review.status}}" data-date="2026-03-10">
+<td>#101</td>
+<td><a href="{%url 'catalog:product_detail' review.content_object.product.slug review.content_object.id %}">{{review.content_object.product.title}}</a></td>
+<td>{{review.user.username}}</td>
+<td>{{review.get_rating_display}}</td>
+<td><span class="status visible">{%if review.status == 'visible'%}Visible{%else%}Hidden{%endif%}</span></td>
+<td>{{review.created|date}}</td>
+<td class="content" id="{{review.id}}" style="display:none">{{review.content|linebreaks}}</td>
+<td>
+	{%csrf_token%}
+<button class="btn btn-view" onclick="openModal({{review.id}})">View</button>
+<button class="btn btn-hide" onclick="toggleStatus(this)">Hide</button>
+<button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+</td>
+</tr>
+{%endfor%}
+
+
+</tbody>
+
+</table>
+
+</div>
+
+</main>
+
+
+<div class="modal" id="reviewModal">
+
+<div class="modal-box">
+
+<span class="modal-close" onclick="closeModal()">✕</span>
+
+<h3 style="margin-bottom:10px;">Review</h3>
+
+<p id="reviewText"></p>
+
+</div>
+
+</div>
+
+{%endblock%}
+
+{%block script%}
+<script>
+
+const filters = document.querySelectorAll("#searchInput,#statusFilter,#ratingFilter,#startDate,#endDate")
+filters.forEach(f => f.addEventListener("input", filterReviews))
+
+function filterReviews(){
+
+let search=document.getElementById("searchInput").value.toLowerCase()
+let status=document.getElementById("statusFilter").value
+let rating=document.getElementById("ratingFilter").value
+let start=document.getElementById("startDate").value
+let end=document.getElementById("endDate").value
+
+document.querySelectorAll("#reviewsTable tbody tr").forEach(row=>{
+
+let product=row.dataset.product.toLowerCase()
+let customer=row.dataset.customer.toLowerCase()
+let rowStatus=row.dataset.status
+let rowRating=row.dataset.rating
+let rowDate=row.dataset.date
+
+let matchSearch=product.includes(search)||customer.includes(search)
+let matchStatus=!status||rowStatus===status
+let matchRating=!rating||rowRating===rating
+let matchStart=!start||rowDate>=start
+let matchEnd=!end||rowDate<=end
+
+row.style.display=(matchSearch&&matchStatus&&matchRating&&matchStart&&matchEnd)?"":"none"
+
+})
+
+}
+
+function openModal(id){
+	console.log(id)
+	const content = document.getElementById(id).innerText
+
+document.getElementById("reviewText").innerText=content
+document.getElementById("reviewModal").style.display="flex"
+}
+
+function closeModal(){
+document.getElementById("reviewModal").style.display="none"
+}
+
+async function updateStatus(url, newStatus){
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const formData = new FormData()
+    formData.append("status", newStatus)
+    const response = await fetch(url, {
+        method:"POST",
+        headers:{
+            "X-CSRFToken":csrfToken,   
+        },
+        body:formData
+
+    })
+    const data = await response.json()
+    return data
+}
+async function toggleStatus(btn){
+
+	let row=btn.closest("tr")
+	let badge=row.querySelector(".status")
+	const status = row.dataset.status
+	const id = row.dataset.id
+	const baseUrl  = "{%url 'dashboard:review_update' 0 %}"
+	const url = baseUrl.replace("0", id)
+	let newStatus
+	if(status=="visible"){
+		newStatus = "hidden"
+	}else{
+		newStatus = "visible"
+	}
+	const data = await updateStatus(url, newStatus)
+
+	if(data.status){
+		row.dataset.status=newStatus
+		badge.className=`status ${newStatus}`
+		badge.innerText= newStatus=="hidden" ?"Hidden":"Visible"
+		btn.innerText= newStatus=="hidden" ?"Show":"Hide"
+		}
+	else{
+
+	}
+
+}
+
+function deleteRow(btn){
+btn.closest("tr").remove()
+}
+
+</script>
+
+{%endblock%}
