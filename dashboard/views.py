@@ -650,15 +650,16 @@ class SalesReport(ListView):
 		def get_context_data(self, **kwargs):
 			context = super().get_context_data(**kwargs)
 			recent_orders = self.object_list[:10]
-			top_selling , product_sold= self.get_top_selling_products()
-			total_revenue, total_orders, average_order = self.get_total_order_stat()
+			product_selling_q, total_q = self.get_filtered_objects()
+			top_selling , product_sold= self.get_top_selling_products(product_selling_q)
+			total_revenue, total_orders, average_order = self.get_total_order_stat(total_q)
 			context["recent_orders"] = recent_orders
 			context["top_selling"] = top_selling
 			context["total_revenue"] = total_revenue
 			context["total_orders"] = total_orders
 			context["average_order"] = average_order
 			context["product_sold"] = product_sold
-			
+
 
 
 
@@ -666,17 +667,61 @@ class SalesReport(ListView):
 
 			return context
 
-		def get_top_selling_products(self):
-			q = Q(stock_carts__cart__order__status__in=["pending", "processing", "shipped","delivered"])
+		def get_top_selling_products(self, product_selling_q):
+			q = Q(stock_carts__cart__order__status__in=["pending", "processing", "shipped","delivered"]) & product_selling_q
 			top_selling = StockRecord.objects.annotate(sell_count = Sum("stock_carts__quantity", filter=q), revenue=Sum("stock_carts__final_item_price", filter=q))	
 			top_selling = top_selling.order_by("-sell_count")
 			top_selling_agg = top_selling.aggregate(product_sold=Sum("sell_count"))
 			return top_selling, top_selling_agg["product_sold"]
 
-		def get_total_order_stat(self):
-			q = Q(status__in=["pending", "processing", "shipped","delivered"])
+		def get_total_order_stat(self, total_q):
+			q = Q(status__in=["pending", "processing", "shipped","delivered"]) & total_q
 			total_agg = Order.objects.aggregate(total_revenue = Sum("total_cost", filter=q))
 			avg_agg = Order.objects.aggregate(average_order = Avg("total_cost", filter=q))
 
 			total_orders = Order.objects.filter(q).count()
 			return total_agg["total_revenue"], total_orders, avg_agg["average_order"]
+
+		def get_filtered_objects(self):
+			period = self.request.GET.get("period")
+			is_filter = self.request.GET.get("filter")
+			is_range = self.request.GET.get("is_range")
+			range_start = self.request.GET.get("range_start")
+			range_end = self.request.GET.get("range_end")
+			product_selling_q, total_q = Q(), Q()
+			print(period, is_filter, is_range, range_start, range_end)
+			if is_filter=="true" and period !="total":
+				product_selling_q, total_q = self.get_filter_by_period(period, is_range, range_start, range_end)
+
+			
+				
+
+			return product_selling_q, total_q
+
+		def get_filter_by_period(self, period=None, is_range=None, range_start=None, range_end=None):
+			now = timezone.now()
+
+			if is_range:
+				
+				timezone_str = self.request.GET.get("timezone")
+				tz = zoneinfo.ZoneInfo(timezone_str)
+				start_naive = date_obj = datetime.strptime(range_start, "%Y-%m-%d") 
+				end_naive = datetime.strptime(range_end, "%Y-%m-%d") 
+
+				start = timezone.make_aware(start_naive, tz)
+				end = timezone.make_aware(end_naive, tz)
+
+			print(start, end)
+			product_selling_q = (Q(stock_carts__cart__order__created_at__gte=start)&
+								Q(stock_carts__cart__order__created_at__lte=end)
+				)
+			
+			total_q = (Q(created_at__gte=start) & Q(created_at__lte=end))
+
+			return product_selling_q, total_q
+
+		def render_to_response(self, context, **response_kwargs):
+			is_ajax = self.request.headers.get("AJAX")
+			if is_ajax == 'true':
+				self.template_name = "dashboard/report/_report.html"
+			return super().render_to_response(context, **response_kwargs)

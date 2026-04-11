@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from stock.models import StockRecord
+from django.utils import timezone
 from cart.models import Cart
 from address.models import Address
 from shipping.models import Shipping
@@ -46,7 +47,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     tax_rate = models.DecimalField(_("Tax Rate"), max_digits=10, decimal_places=2, default=0.0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     total_cost = models.DecimalField(_("Total cost"), max_digits=10, decimal_places=2, null=True, blank=True)
 

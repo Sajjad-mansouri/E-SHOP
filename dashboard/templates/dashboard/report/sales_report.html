@@ -6,124 +6,27 @@
 {%endblock%}
 
 {%block content%}
+	<div id="messageBox" class="message"></div>
 <main class="main">
 
 	<div class="page-header">
 	<div class="page-title">Sales Report</div>
 
 	<div class="filter">
-	<input type="date">
-	<input type="date">
-	<button>Filter</button>
+	<input type="date" class="start-range">
+	<input type="date" class="end-range">
+	<button id="apply-range">Filter</button>
 	</div>
 
 	</div>
 
 	<!-- SALES STATS -->
+<div id="content">
 
-	<div class="stats-grid">
-
-	<div class="stat-card">
-	<div class="stat-title">Total Revenue</div>
-	<div class="stat-value">${{total_revenue|floatformat:2}}</div>
-	</div>
-
-	<div class="stat-card">
-	<div class="stat-title">Total Orders</div>
-	<div class="stat-value">{{total_orders}}</div>
-	</div>
-
-	<div class="stat-card">
-	<div class="stat-title">Average Order</div>
-	<div class="stat-value">${{average_order|floatformat:2}}</div>
-	</div>
-
-	<div class="stat-card">
-	<div class="stat-title">Products Sold</div>
-	<div class="stat-value">{{product_sold}}</div>
-	</div>
-
-	</div>
-
-	<!-- SALES CHART -->
-
-	<div class="card">
-
-	<div class="card-title">Revenue Overview</div>
-
-	<div class="chart-placeholder">
-	Sales chart will appear here
-	</div>
-
-	</div>
-
-	<!-- TOP PRODUCTS -->
-
-	<div class="card">
-
-	<div class="card-title">Top Selling Products</div>
-
-	<table>
-
-	<thead>
-	<tr>
-	<th>Product</th>
-	<th>Units Sold</th>
-	<th>Revenue</th>
-	</tr>
-	</thead>
-
-	<tbody>
-		{%for stock in top_selling%}
-	<tr>
-		<td>{{stock.product.title}}</td>
-		<td>{{stock.sell_count}}</td>
-		<td>${{stock.revenue}}</td>
-	</tr>
-		{%endfor%}
+	{%include 'dashboard/report/_report.html'%}		
+</div>
 
 
-	</tbody>
-
-	</table>
-
-	</div>
-
-	<!-- RECENT ORDERS -->
-
-	<div class="card">
-
-	<div class="card-title">Recent Orders</div>
-
-	<table>
-
-	<thead>
-	<tr>
-	<th>Order ID</th>
-	<th>Customer</th>
-	<th>Total</th>
-	<th>Status</th>
-	<th>Date</th>
-	</tr>
-	</thead>
-
-	<tbody>
-		{%for order in recent_orders%}
-		<tr>
-		<td>#{{order.order_number}}</td>
-		<td>{{order.user.get_full_name}}</td>
-		<td>${{order.total_cost}}</td>
-		<td><span class="status delivered">{{order.status}}</span></td>
-		<td>{{order.created_at|date}}</td>
-		</tr>
-
-		{%endfor%}
-
-	</tbody>
-
-	</table>
-
-	</div>
 
 </main>
 {%endblock%}
@@ -134,6 +37,53 @@
 
 {%block script%}
 <script>
+const applyRangeBtn = document.getElementById("apply-range");
+const content = document.getElementById("content")
+ applyRangeBtn.addEventListener("click", async ()=>{
+ 	const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+	const startRange = document.querySelector(".start-range").value;
+	const endRange = document.querySelector(".end-range").value;
+	if(startRange==""){
+
+		showMessage("Please select start and end of range!", "error")
+	}
+	else{
+		const url = "{%url 'dashboard:sales_report'%}" + `?filter=true&is_range=true&range_start=${startRange}&range_end=${endRange}&timezone=${timezone}`
+		const data = await filterByPeriood(url)
+		updateTemplate(data)
+		showMessage(`results from:${startRange} to:${endRange}`, "success")
+	}
+
+
+ })
+function showMessage(text,type){
+
+	const box=document.getElementById("messageBox")
+
+	box.innerText=text
+	box.className="message "+type
+	box.style.display="block"
+
+	setTimeout(()=>{
+	box.style.display="none"
+	},10000)
+
+}
+
+ async function filterByPeriood(url){
+ 	const response = await fetch(url, {
+ 		method:"GET",
+ 		headers:{
+ 			"AJAX":true
+ 		}
+ 	})
+ 	const data = await response.text()
+ 	return data
+ }
+
+  function updateTemplate(data){
+		content.innerHTML = data;
+	 }
 </script>
 {%endblock%}

@@ -130,3 +130,22 @@ color:#1a7f47;
 background:#fff5e6;
 color:#c77700;
 }
+
+
+.message{
+padding:12px 16px;
+border-radius:10px;
+margin-bottom:18px;
+font-size:0.9rem;
+display:none;
+}
+
+.message.success{
+background:#e9f7ef;
+color:#1a7f47;
+}
+
+.message.error{
+background:#fdecec;
+color:#c93737;
+}
