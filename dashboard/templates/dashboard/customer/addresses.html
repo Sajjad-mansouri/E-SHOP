@@ -1,0 +1,43 @@
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/customer/addresses.css'%}">
+{%endblock%}
+
+{%block content%}
+<main class="main">
+
+	<div class="page-header">
+	<div class="page-title">Customer Addresses</div>
+
+	</div>
+
+	<div class="address-grid">
+
+	<!-- DEFAULT ADDRESS -->
+	{%for address in addresses%}
+	<div class="address-card">
+
+		{%if address.is_default_address%}<span class="default-badge">Default</span>{%endif%}
+
+      <strong>{{address.full_name}}</strong>
+
+      <p>
+      {{ address.line1 }}<br>
+      {% if address.line2 %}{{ address.line2 }}<br>{% endif %}
+      {{ address.city }}, {{ address.province }} {{ address.postcode }}<br>
+      {{address.get_country_display}}<br>
+      Phone: {{ address.phone_number }}
+      </p>
+
+
+
+	</div>
+
+	{%endfor%}
+
+	</div>
+
+</main>
+{%endblock%}

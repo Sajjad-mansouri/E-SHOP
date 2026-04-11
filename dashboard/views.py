@@ -631,3 +631,12 @@ class CustomerDetailView(DetailView):
 		context["orders"] = self.object.orders.all()
 
 		return context
+
+class AddressListView(DetailView):
+	template_name = "dashboard/customer/addresses.html"
+	queryset = UserModel.objects.filter(user_type="customer")
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["addresses"] = self.object.addresses.all()
+		return context

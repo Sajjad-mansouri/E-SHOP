@@ -82,7 +82,7 @@
 
       </div>
 
-      <button class="btn-view">View All Addresses</button>
+      <button class="btn-view" onclick="openAddresses()">View All Addresses</button>
       {%empty%}
       <span>Empty addresses!</span>
       {%endfor%}
@@ -114,7 +114,7 @@
     <td>${{order.total_cost}}</td>
     <td><span class="status delivered">{{order.status}}</span></td>
     <td>{{order.created_at}}</td>
-    <td class="action"><a class="btn" href="{%url 'dashboard:customer' object.id %}">View</a></td>
+    <td class="action"><a class="btn" href="{%url 'dashboard:order_detail' order.id %}">View</a></td>
 
   </tr>
   {%endfor%}
@@ -127,4 +127,11 @@
   </div>
 
 </main>
+{%endblock%}
+{%block script%}
+<script type="text/javascript">
+  function openAddresses(){
+    window.location.href = "{%url 'dashboard:addresses' object.id%}"
+  }
+</script>
 {%endblock%}
