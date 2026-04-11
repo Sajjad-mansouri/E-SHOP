@@ -59,6 +59,8 @@ urlpatterns = [
 
 	path("reviews/", views.ReviewListView.as_view(), name="reviews"),
 	path("review/update/<int:pk>/", views.ReviewStatusUpdateView.as_view(), name="review_update"),
+	path("review/delete/<int:pk>/", views.ReviewDeletView.as_view(), name="review_delete"),
+
 
 
 

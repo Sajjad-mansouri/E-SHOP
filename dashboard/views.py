@@ -744,3 +744,13 @@ class ReviewStatusUpdateView(UpdateView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
+
+class ReviewDeletView(DeleteView):
+	model = Comment
+
+	def form_valid(self, form):
+		self.object.delete()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})
