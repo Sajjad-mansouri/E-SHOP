@@ -1,0 +1,17 @@
+{%for review in reviews%}
+<tr data-product="Running Shoes"  data-id="{{review.id}}" data-customer="John Doe" data-rating="5" data-status="{{review.status}}" data-date="2026-03-10">
+<td>#101</td>
+<td><a href="{%url 'catalog:product_detail' review.content_object.product.slug review.content_object.id %}">{{review.content_object.product.title}}</a></td>
+<td>{{review.user.username}}</td>
+<td>{{review.get_rating_display}}</td>
+<td><span class="status visible">{%if review.status == 'visible'%}Visible{%else%}Hidden{%endif%}</span></td>
+<td>{{review.created|date}}</td>
+<td class="content" id="{{review.id}}" style="display:none">{{review.content|linebreaks}}</td>
+<td>
+	{%csrf_token%}
+<button class="btn btn-view" onclick="openModal({{review.id}})">View</button>
+<button class="btn btn-hide" onclick="toggleStatus(this)">Hide</button>
+<button class="btn btn-delete" onclick="confirmDelete(this)">Delete</button>
+</td>
+</tr>
+{%endfor%}

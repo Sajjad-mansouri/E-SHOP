@@ -55,23 +55,7 @@
 
 <tbody>
 
-{%for review in reviews%}
-<tr data-product="Running Shoes"  data-id="{{review.id}}" data-customer="John Doe" data-rating="5" data-status="{{review.status}}" data-date="2026-03-10">
-<td>#101</td>
-<td><a href="{%url 'catalog:product_detail' review.content_object.product.slug review.content_object.id %}">{{review.content_object.product.title}}</a></td>
-<td>{{review.user.username}}</td>
-<td>{{review.get_rating_display}}</td>
-<td><span class="status visible">{%if review.status == 'visible'%}Visible{%else%}Hidden{%endif%}</span></td>
-<td>{{review.created|date}}</td>
-<td class="content" id="{{review.id}}" style="display:none">{{review.content|linebreaks}}</td>
-<td>
-	{%csrf_token%}
-<button class="btn btn-view" onclick="openModal({{review.id}})">View</button>
-<button class="btn btn-hide" onclick="toggleStatus(this)">Hide</button>
-<button class="btn btn-delete" onclick="confirmDelete(this)">Delete</button>
-</td>
-</tr>
-{%endfor%}
+{%include 'dashboard/review/_reviews.html'%}
 
 
 </tbody>
@@ -122,37 +106,10 @@
 
 {%block script%}
 <script>
+const searchInput = document.getElementById("searchInput")
+const reviewsTable = document.getElementById("reviewsTable")
+const tbody = reviewsTable.querySelector("tbody")
 
-const filters = document.querySelectorAll("#searchInput,#statusFilter,#ratingFilter,#startDate,#endDate")
-filters.forEach(f => f.addEventListener("input", filterReviews))
-
-function filterReviews(){
-
-let search=document.getElementById("searchInput").value.toLowerCase()
-let status=document.getElementById("statusFilter").value
-let rating=document.getElementById("ratingFilter").value
-let start=document.getElementById("startDate").value
-let end=document.getElementById("endDate").value
-
-document.querySelectorAll("#reviewsTable tbody tr").forEach(row=>{
-
-let product=row.dataset.product.toLowerCase()
-let customer=row.dataset.customer.toLowerCase()
-let rowStatus=row.dataset.status
-let rowRating=row.dataset.rating
-let rowDate=row.dataset.date
-
-let matchSearch=product.includes(search)||customer.includes(search)
-let matchStatus=!status||rowStatus===status
-let matchRating=!rating||rowRating===rating
-let matchStart=!start||rowDate>=start
-let matchEnd=!end||rowDate<=end
-
-row.style.display=(matchSearch&&matchStatus&&matchRating&&matchStart&&matchEnd)?"":"none"
-
-})
-
-}
 
 function openModal(id){
 	console.log(id)
@@ -282,6 +239,27 @@ async function deleteConfirmed(){
 
 }
 
+async function filterReview(url){
+    const response = await fetch(url, {
+        method:"GET",
+        headers:{
+            "AJAX":true,   
+        },
+
+    })
+    const data = await response.text()
+    return data
+}
+
+function updateTable(data){
+	tbody.innerHTML = data
+}
+searchInput.addEventListener("input", async()=>{
+	const value = event.target.value;
+	const url = "{%url 'dashboard:reviews'%}" + `?search=${value}`
+	const data = await filterReview(url)
+	updateTable(data)
+})
 </script>
 
 {%endblock%}

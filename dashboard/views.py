@@ -13,6 +13,7 @@ from django.forms.models import inlineformset_factory
 from django.contrib.auth import get_user_model
 from django.db.models import Sum, Count, Avg
 from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
 from .wizard_views import OfferWizardStepView
 from .forms import (
 					image_formset, 
@@ -733,6 +734,34 @@ class ReviewListView(ListView):
 	model = Comment
 	template_name = "dashboard/review/reviews.html"
 	context_object_name = "reviews"
+
+	def dispatch(self, request, *args, **kwargs):
+		self.is_ajax = self.request.headers.get("AJAX")
+		return super().dispatch(request, *args, **kwargs)
+
+	def render_to_response(self, context, **response_kwargs):
+		if self.is_ajax == 'true':
+			self.template_name = "dashboard/review/_reviews.html"
+		return super().render_to_response(context, **response_kwargs)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		if self.is_ajax:
+			reviews = self.search_reviews()
+			context["reviews"] = reviews
+
+		return context
+
+	def search_reviews(self):
+		search = self.request.GET.get("search")
+		if search:
+			stock_ct = ContentType.objects.get_for_model(StockRecord)
+			q1 = Q(content_type=stock_ct)
+			q2 = Q(object_id__in=StockRecord.objects.filter(product__title__icontains=search).values_list("id", flat=True))
+			q3 = Q(user__username__icontains=search)
+			return Comment.objects.filter((q1&q2)|q3)
+		else:
+			return Comment.objects.all()
 
 class ReviewStatusUpdateView(UpdateView):
 	model = Comment
