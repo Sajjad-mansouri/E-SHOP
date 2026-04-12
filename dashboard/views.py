@@ -756,9 +756,13 @@ class ReviewListView(ListView):
 		search = self.request.GET.get("search")
 		status = self.request.GET.get("status")
 		rating = self.request.GET.get("rating")
+		start_date = self.request.GET.get("start_date")
+		end_date = self.request.GET.get("end_date")
+
+
 
 		comments = self.object_list
-		if not (search or status or rating):
+		if not (search or status or rating or start_date or end_date):
 			return comments
 		if search:
 			stock_ct = ContentType.objects.get_for_model(StockRecord)
@@ -773,9 +777,21 @@ class ReviewListView(ListView):
 		if rating and rating!="all":
 			comments = comments.filter(rating=rating)
 
+		if start_date:
+			start = self.make_date_aware(start_date)
+			comments = comments.filter(created__gte=start)
+		if end_date:
+			end = self.make_date_aware(end_date)
+			comments = comments.filter(created__lte=end)
+
 
 		return comments
-
+	def make_date_aware(self, date):
+			timezone_str = self.request.GET.get("timezone")
+			tz = zoneinfo.ZoneInfo(timezone_str)
+			naive_date = datetime.strptime(date, "%Y-%m-%d") 
+			date = timezone.make_aware(naive_date, tz)
+			return date
 
 class ReviewStatusUpdateView(UpdateView):
 	model = Comment

@@ -5,7 +5,7 @@
 <td>{{review.user.username}}</td>
 <td>{{review.get_rating_display}}</td>
 <td><span class="status {{review.status}}">{%if review.status == 'visible'%}Visible{%else%}Hidden{%endif%}</span></td>
-<td>{{review.created|date}}</td>
+<td>{{review.created}}</td>
 <td class="content" id="{{review.id}}" style="display:none">{{review.content|linebreaks}}</td>
 <td>
 	{%csrf_token%}
