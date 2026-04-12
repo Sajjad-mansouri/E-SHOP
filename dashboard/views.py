@@ -755,8 +755,10 @@ class ReviewListView(ListView):
 	def search_reviews(self):
 		search = self.request.GET.get("search")
 		status = self.request.GET.get("status")
+		rating = self.request.GET.get("rating")
+
 		comments = self.object_list
-		if not search and not status:
+		if not (search or status or rating):
 			return comments
 		if search:
 			stock_ct = ContentType.objects.get_for_model(StockRecord)
@@ -765,8 +767,11 @@ class ReviewListView(ListView):
 			q3 = Q(user__username__icontains=search)
 			comments =  comments.filter((q1&q2)|q3)
 
-		if status!="all":
+		if status and status!="all":
 			comments = comments.filter(status=status)
+
+		if rating and rating!="all":
+			comments = comments.filter(rating=rating)
 
 
 		return comments

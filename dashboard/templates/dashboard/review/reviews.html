@@ -23,7 +23,7 @@
 </select>
 
 <select id="ratingFilter">
-<option value="">All Ratings</option>
+<option value="all">All Ratings</option>
 <option value="5">5 Stars</option>
 <option value="4">4 Stars</option>
 <option value="3">3 Stars</option>
@@ -110,6 +110,7 @@ const searchInput = document.getElementById("searchInput")
 const reviewsTable = document.getElementById("reviewsTable")
 const tbody = reviewsTable.querySelector("tbody")
 const statusFilter = document.getElementById("statusFilter")
+const ratingFilter = document.getElementById("ratingFilter")
 
 function openModal(id){
 	console.log(id)
@@ -268,6 +269,12 @@ statusFilter.addEventListener("change", async()=>{
 	updateTable(data)
 })
 
+ratingFilter.addEventListener("change", async()=>{
+	const value = event.target.value;
+	const url = "{%url 'dashboard:reviews'%}" + `?rating=${value}`
+	const data = await filterReview(url)
+	updateTable(data)
+})
 </script>
 
 {%endblock%}
