@@ -1,4 +1,4 @@
-{%load static%}
+{%load static dashboard_tags%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,10 +25,10 @@
 
 <nav class="nav-bar">
 
-<a class="nav-item active" href="{%url 'dashboard:overview'%}">Overview</a>
+<a class="nav-item {% is_active_link 'overview' %}" href="{%url 'dashboard:overview'%}">Overview</a>
 
 <div class="nav-group">
-<a class="nav-item" href="catalog-products.html">Catalog</a>
+<a class="nav-item {% is_active_link 'catalog' %}" >Catalog</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:products'%}">Products</a>
 <a href="{%url 'dashboard:product_type_list'%}">Product Types</a>
@@ -37,7 +37,7 @@
 </div>
 
 <div class="nav-group">
-<a class="nav-item" href="orders.html">Fulfilment</a>
+<a class="nav-item {% is_active_link 'fulfilment' %}" >Fulfilment</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:order_list'%}">Orders</a>
 <a href="{%url 'dashboard:statistics'%}">Statistics</a>
@@ -46,14 +46,14 @@
 </div>
 
 <div class="nav-group">
-<a class="nav-item" href="customers.html">Customers</a>
+<a class="nav-item {% is_active_link 'customer' %}" >Customers</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:customers'%}">Customer List</a>
 </div>
 </div>
 
 <div class="nav-group">
-<a class="nav-item" href="offers.html">Offers</a>
+<a class="nav-item {% is_active_link 'offer' %}" >Offers</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:offer_list'%}">Offers</a>
 <a href="{%url 'dashboard:offer_range'%}">Offer Range</a>
@@ -62,14 +62,14 @@
 </div>
 
 <div class="nav-group">
-<a class="nav-item" href="email-templates.html">Content</a>
+<a class="nav-item {% is_active_link 'content' %}" >Content</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:reviews'%}">Reviews</a>
 </div>
 </div>
 
 <div class="nav-group">
-<a class="nav-item" href="sales-report.html">Reports</a>
+<a class="nav-item {% is_active_link 'report' %}" >Reports</a>
 <div class="sub-nav">
 <a href="{%url 'dashboard:sales_report'%}">Sales Report</a>
 

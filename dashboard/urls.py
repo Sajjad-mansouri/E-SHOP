@@ -5,23 +5,23 @@ from . import views
 app_name = "dashboard"
 urlpatterns = [
 	path("overview/", views.DashboardOverView.as_view(), name="overview"),
-	path("products/", views.ProductListView.as_view(), name="products"),
-	path("product/create/", views.CreateUpdateProductView.as_view(), name="create_product"),
-	path("product/update/<int:pk>/", views.CreateUpdateProductView.as_view(), name="update_product"),
-	path("product/delete/<int:pk>/", views.DeleteProductView.as_view(), name="delete_product"),
-	path("product/search", views.SearchProduct.as_view(), name="search_product"),
+	path("catalog/products/", views.ProductListView.as_view(), name="products"),
+	path("catalog/product/create/", views.CreateUpdateProductView.as_view(), name="create_product"),
+	path("catalog/product/update/<int:pk>/", views.CreateUpdateProductView.as_view(), name="update_product"),
+	path("catalog/product/delete/<int:pk>/", views.DeleteProductView.as_view(), name="delete_product"),
+	path("catalog/product/search", views.SearchProduct.as_view(), name="search_product"),
 
-	path("product-type/", views.ProductTypeView.as_view(), name="product_type_list"),
-	path("product-type/create/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
-	path("product-type/update/<int:pk>/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
-	path("product-type/delete/<int:pk>/", views.ProductTypeDeleteView.as_view(), name="product_type_delete"),
+	path("catalog/product-type/", views.ProductTypeView.as_view(), name="product_type_list"),
+	path("catalog/product-type/create/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
+	path("catalog/product-type/update/<int:pk>/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
+	path("catalog/product-type/delete/<int:pk>/", views.ProductTypeDeleteView.as_view(), name="product_type_delete"),
 
 
-	path("categories/", views.CategoryListView.as_view(), name="categories"),
-	path("category/<int:pk>/", views.SubCategoryView.as_view(), name="sub_category"),
-	path("category/create/", views.CategoryCreateView.as_view(), name="category_create"),
-	path("category/update/<int:pk>/", views.CategoryUpdateView.as_view(), name="category_update"),
-	path("category/delete/<int:pk>/", views.CategoryDeleteView.as_view(), name="category_delete"),
+	path("catalog/categories/", views.CategoryListView.as_view(), name="categories"),
+	path("catalog/category/<int:pk>/", views.SubCategoryView.as_view(), name="sub_category"),
+	path("catalog/category/create/", views.CategoryCreateView.as_view(), name="category_create"),
+	path("catalog/category/update/<int:pk>/", views.CategoryUpdateView.as_view(), name="category_update"),
+	path("catalog/category/delete/<int:pk>/", views.CategoryDeleteView.as_view(), name="category_delete"),
 
 	path("offer/range/", views.OfferRangeListView.as_view(), name="offer_range"),
 	path("offer/range/create/", views.OfferRangeCreateView.as_view(), name="offer_range_create"),
@@ -57,9 +57,9 @@ urlpatterns = [
 
 	path("report/sales/", views.SalesReport.as_view(), name="sales_report"),
 
-	path("reviews/", views.ReviewListView.as_view(), name="reviews"),
-	path("review/update/<int:pk>/", views.ReviewStatusUpdateView.as_view(), name="review_update"),
-	path("review/delete/<int:pk>/", views.ReviewDeletView.as_view(), name="review_delete"),
+	path("content/reviews/", views.ReviewListView.as_view(), name="reviews"),
+	path("content/review/update/<int:pk>/", views.ReviewStatusUpdateView.as_view(), name="review_update"),
+	path("content/review/delete/<int:pk>/", views.ReviewDeletView.as_view(), name="review_delete"),
 
 
 
