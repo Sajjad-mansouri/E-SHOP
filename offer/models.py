@@ -1,8 +1,11 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.utils.text import slugify
+from django.core.validators import MinValueValidator, MaxValueValidator
 from catalog.models import Product, ProductClass, Category
+from stock.models import StockRecord
 
 
 class OfferRange(models.Model):
@@ -11,14 +14,14 @@ class OfferRange(models.Model):
 	description = models.TextField(_("Description"), blank=True)
 	is_public = models.BooleanField(_("Is public?"),default=True)
 	includes_all_products = models.BooleanField(_("Includes all products?"), default=False)
-	included_products = models.ManyToManyField(Product, 
+	included_products = models.ManyToManyField(StockRecord, 
 												related_name="product_ranges",
 												blank=True,
 												verbose_name=_("Included Products"),
 												)
 
 	excluded_products = models.ManyToManyField(
-												Product,
+												StockRecord,
 												related_name="exclude_product_ranges",
 												blank=True,
 												verbose_name=_("Excluded Products"),
@@ -65,6 +68,7 @@ class OfferRange(models.Model):
 
 	@property
 	def get_products(self):
+
 		# included_products
 		# excluded_products
 		# classes
@@ -72,10 +76,10 @@ class OfferRange(models.Model):
 		# excluded_categories
 		included_products_filter = Q(id__in=self.included_products.values("id"))
 		excluded_products_filter = ~Q(id__in=self.excluded_products.values("id"))
-		included_categories_filter = Q(categories__in=self.included_categories.values("id"))
-		excluded_categories_filter = ~Q(categories__in=self.excluded_categories.values("id"))
-		classes_filter = Q(product_class__in=self.classes.values("id"))
-		public_filter = Q(stockrecords__is_public=True) 
+		included_categories_filter = Q(product__categories__in=self.included_categories.values("id"))
+		excluded_categories_filter = ~Q(product__categories__in=self.excluded_categories.values("id"))
+		classes_filter = Q(product__product_class__in=self.classes.values("id"))
+		public_filter = Q(is_public=True) 
 		if self.includes_all_products:
 			_filter = (
 				excluded_products_filter & excluded_categories_filter & public_filter
@@ -86,7 +90,7 @@ class OfferRange(models.Model):
 				(included_products_filter | included_categories_filter | classes_filter)
 				& excluded_products_filter & excluded_categories_filter & public_filter
 				)
-		offer_products = Product.objects.filter(_filter)
+		offer_products = StockRecord.objects.filter(_filter)
 
 		return offer_products
 
@@ -111,16 +115,14 @@ class OfferType(models.Model):
 		("Shipping fixed price", _("Get shipping for a fixed price"))
 	]
 	type = models.CharField(_("Offer Type"), max_length=100, choices=TYPE_CHOICES, blank=True)
-	value = models.DecimalField(
-		_("Value"), decimal_places=2, max_digits=10, null=True, blank=True
-	)
+	max_discount = models.IntegerField(_("Max Discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 
 	class Meta:
 		verbose_name = _("Offer Type")
 		verbose_name_plural = _("Offer Types")
 
 	def __str__(self):
-		return f"{self.offer_range}-{self.type}:{self.value}"
+		return f"{self.offer_range}-{self.type}:{self.max_discount}"
 
 class Offer(models.Model):
 
@@ -132,11 +134,17 @@ class Offer(models.Model):
 	slug = models.SlugField(
 		_("Slug"), max_length=100, unique=True, blank=True 
 	)
+	desc_header = models.CharField(
+		_("Description Header"),
+		max_length=100,
+		blank=True
+	)
 	description = models.TextField(
 		_("Description"),
 		blank=True,
 	)
 
+	image = models.ImageField(_("Image"), upload_to="offer/", blank=True, null=True)
 	OFFER_STATUS = [
 		("open", "open"),
 		("Suspended", "Suspended"),
@@ -206,3 +214,17 @@ class Offer(models.Model):
 		if not self.slug:
 			self.slug = slugify(self.name)
 		super().save(*args, **kwargs)
+
+	@property
+	def is_valid(self):
+		now = timezone.now()
+		return self.start_datetime<=now<=self.end_datetime
+
+	@property
+	def get_expire(self):
+		now = timezone.now()
+		return self.end_datetime - now
+
+	@property
+	def get_offer_products(self):
+		return self.offer_type.offer_range.get_products

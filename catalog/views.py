@@ -1,14 +1,18 @@
+from datetime import timedelta
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django.db.models import Avg
+from django.utils import timezone
 
 from catalog.models import Category, Product, UserRating
 from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
+from offer.models import Offer
 
 class HomePageView(TemplateResponseMixin, View):
 	template_name = "catalog/list/home.html"
@@ -21,14 +25,24 @@ class HomePageView(TemplateResponseMixin, View):
 				category.get_children()
 
 		stock_records = self.get_trending_products()
-		context = {"categories":root_categories, "stock_records":stock_records}
+		offers = Offer.objects.filter(status="open")
+		context = {
+					"categories":root_categories, 
+					"stock_records":stock_records,
+					"offers":offers,
+					"now":timezone.now()
+					}
 		return self.render_to_response(context)
 
-	def get_trending_products(self, product_count=5):
-		return StockRecord.objects.filter(num_in_stock__gt=0)
+	def get_trending_products(self, product_count=5, period=30):
 
-
-
+		start = timezone.now() - timedelta(days=period)
+		product_selling_q = (Q(stock_carts__cart__order__created_at__gte=start)
+			)
+		q = Q(stock_carts__cart__order__status__in=["pending", "processing", "shipped","delivered"]) & product_selling_q
+		top_selling = StockRecord.objects.annotate(sell_count = Sum("stock_carts__quantity", filter=q))	
+		top_selling = top_selling.order_by("-sell_count")
+		return top_selling
 
 class ProductDetailView(DetailView):
 	model = Product
@@ -110,3 +124,12 @@ class ApplyRating(View):
 		except UserRating.DoesNotExist:
 			UserRating.objects.create(user=request.user, product=product, rating=rating)
 		return JsonResponse({"status":True})
+
+class OfferProductListView(DetailView):
+	model = Offer
+	template_name = "catalog/offer/products.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["offer_stocks"] = self.object.get_offer_products
+		return context

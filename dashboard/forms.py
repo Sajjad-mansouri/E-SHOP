@@ -251,12 +251,12 @@ class OfferDetailForm(forms.ModelForm):
 class OfferTypeForm(forms.ModelForm):
 	class Meta:
 		model = OfferType
-		fields = ["offer_range", "type", "value"]
+		fields = ["offer_range", "type", "max_discount"]
 		widgets = {
 			"offer_range":forms.Select(attrs={"class":"form-select"}),
 			"type":forms.Select(attrs={"class":"form-select"}),
 
-			"value":forms.NumberInput(attrs={"class":"form-control"})
+			"max_discount":forms.NumberInput(attrs={"class":"form-control"})
 		}
 
 class OfferRestrictionForm(forms.ModelForm):

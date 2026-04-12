@@ -73,6 +73,7 @@ class Product(models.Model):
 
 	title = models.CharField(max_length=200, verbose_name=_("title"))
 	slug = models.SlugField(max_length=200, blank=True, verbose_name=_("slug"))
+	short_description = models.TextField(blank=True, verbose_name=_("Short Description"))
 	description = models.TextField(blank=True, verbose_name=_("Description"))
 	upc = models.CharField(verbose_name=_("UPC"), help_text=_("Universal Product Code"))
 	product_class = models.ForeignKey(ProductClass,
@@ -85,7 +86,7 @@ class Product(models.Model):
 									 )
 	categories = models.ManyToManyField(Category, through='ProductCategory', verbose_name=_("categories"))
 	attributes = models.ManyToManyField("ProductAttribute", through="ProductAttributeValue", verbose_name=_("attributes"))
-
+	brand = models.CharField(_("Brand"), max_length=200, null=True)
 	created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
 	updated = models.DateTimeField(auto_now=True, verbose_name=_("updated"))
 

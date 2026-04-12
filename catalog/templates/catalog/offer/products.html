@@ -1,0 +1,127 @@
+{%extends 'base.html'%}
+{% load static catalog_tags%}
+
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/offer/products.css'%}">
+
+  {%endblock%}
+
+{%block content%}
+
+<!-- OFFER HERO SECTION -->
+<section class="offer-hero">
+  <div class="offer-hero-content">
+    <div class="offer-badge">LIMITED TIME OFFER</div>
+    <h1>Up to {{object.offer_type.max_discount}}% OFF</h1>
+    <p>{{offer.description}}</p>
+    
+    <div class="offer-timer">
+      <div class="timer-unit">
+        <span class="timer-value" id="days">02</span>
+        <span class="timer-label">Days</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-value" id="hours">14</span>
+        <span class="timer-label">Hours</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-value" id="minutes">38</span>
+        <span class="timer-label">Minutes</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-value" id="seconds">12</span>
+        <span class="timer-label">Seconds</span>
+      </div>
+    </div>
+    
+
+  </div>
+</section>
+
+
+<!-- OFFER GRID -->
+<div class="offer-grid">
+  {%for stock in offer_stocks%}
+
+  <div class="offer-card flash">
+    <div class="offer-card-header">
+      <span class="offer-brand">{{stock.product.brand}}</span>
+      <span class="offer-discount">-{{stock.get_discount}}%</span>
+    </div>
+    <a href="{%url 'catalog:product_detail' stock.product.slug stock.id %}">
+     <img src="{{stock.get_product_image}}" alt="{{stock.product.title}}" class="offer-card-img">
+    <div class="offer-card-content">
+      <h3>{{stock.product.title}}</h3>
+      <p class="offer-description">{{stock.product.short_description}}</p>
+      <div class="offer-price">
+        <span class="current-price">${{stock.get_final_price|floatformat:2}}</span>
+        <span class="original-price">${{stock.price|floatformat:2}}</span>
+      </div>
+      <div class="offer-stats">
+        <span><i class="fa-regular fa-clock"></i> Ends in {{object.get_expire|humanize_timedelta}} </span>
+
+      </div>
+
+    </div>     
+    </a>
+
+  </div>
+  {%endfor%}
+
+
+</div>
+
+
+
+
+
+{%endblock%}
+
+{%block script%}
+<script>
+  // Countdown timer functionality
+  function updateCountdown() {
+    const now = new Date();
+    const target = new Date({{object.end_datetime|date:'U'}}*1000);
+
+    const diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent = '00';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      return;
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('days').textContent = days.toString().padStart(2, '0');
+    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+  }
+  
+  // Update countdown every second
+  setInterval(updateCountdown, 1000);
+  updateCountdown(); // Initial call
+  
+  // Filter button functionality
+  document.querySelectorAll('.filter-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // In a real implementation, this would filter the offers
+      // For now, we'll just show a simple alert
+      const filterText = this.textContent;
+      console.log(`Filtering by: ${filterText}`);
+    });
+  });
+  
+
+</script>
+{%endblock%}

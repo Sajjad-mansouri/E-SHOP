@@ -1,25 +1,36 @@
 {%extends "base.html"%}
-{% load static %}
+{% load static catalog_tags%}
   {%block style%}
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css'%}">
+  <style type="text/css">
+.hero-banner {
+  /* This creates a semi-transparent black layer over your image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  padding: 50px 20px; /* Added a bit more padding */
+  text-align: center;
+  color: white;
+}
+
+/* Make sure the text elements are legible against the new background */
+.hero-banner h1 { color: #fff; }
+.hero-banner p { color: #eee; }
+.offer-label { background: var(--primary); color: #fff; }
+
+  </style>
 
   {%endblock%}
 {%block content%}
 
 
-<!-- HERO with refined copy -->
-<section class="hero-banner">
-  <div class="hero-content">
-    <h1>Premium picks · smart prices</h1>
-    <p>Why browse anywhere else? Thousands of curated products, ready to ship.</p>
-    <a href="#" class="btn">Explore summer deals <i class="fa-regular fa-arrow-right"></i></a>
-  </div>
-</section>
+{%get_offer_banner offers 0%}
 
 <!-- featured product grid (new) to extend page -->
 <div class="section-title">
   <i class="fa-regular fa-fire-flame-curved"></i> 
-  <span>Trending now · just for you</span>
+  <span>Trending products from last month</span>
 </div>
 
 <div class="product-grid">
@@ -38,13 +49,5 @@
 
 </div>
 
-<!-- brand strip (fresh) -->
-<div class="brands-row">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Nike" alt="nike">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Apple" alt="apple">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Samsung" alt="samsung">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Adidas" alt="adidas">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Sony" alt="sony">
-  <img src="https://via.placeholder.com/120x40/eaeaea/333?text=Panasonic" alt="panasonic">
-</div>
+{%get_offer_banner offers 1%}
 {%endblock%}

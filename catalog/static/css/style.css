@@ -1,19 +1,21 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-:root {
-  --primary: #ef4056;
-  --primary-dark: #d32f2f;
-  --dark: #1a1a1a;
-  --gray: #444;
-  --light: #f8f9fa;
-  --border: #e0e0e0;
-  --card-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.05);
-  --hover-shadow: 0 12px 24px -8px rgba(239,64,86,0.15);
-}
+    :root {
+      --primary: #ef4056;
+      --primary-dark: #d32f2f;
+      --dark: #1a1a1a;
+      --gray: #444;
+      --light: #f8f9fa;
+      --border: #e0e0e0;
+      --card-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.05);
+      --hover-shadow: 0 12px 24px -8px rgba(239,64,86,0.15);
+      --offer-gradient: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+      --flash-gradient: linear-gradient(135deg, #ff3366 0%, #ff9966 100%);
+    }
 
 body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -21,7 +23,9 @@ body {
   color: var(--dark);
   line-height: 1.5;
 }
-
+a {
+  text-decoration: none;
+}
 /* top bar */
 .top-bar {
   background: #111;
@@ -232,7 +236,7 @@ header {
 
 /* HERO */
 .hero-banner {
-  background: linear-gradient(145deg, #ffeaed 0%, #fff3f5 80%);
+  background: var(--offer-gradient);
   padding: 70px 20px;
   text-align: center;
   margin-bottom: 10px;
@@ -262,6 +266,7 @@ header {
   font-weight: 600;
   transition: 0.25s;
   border: 1px solid transparent;
+  margin: 20px;
 }
 
 .btn:hover {
@@ -289,6 +294,7 @@ header {
   padding: 0 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  justify-content: center;  
   gap: 28px;
 }
 
@@ -301,6 +307,8 @@ header {
   text-align: center;
   position: relative;
   border: 1px solid rgba(0,0,0,0.02);
+  max-width: 320px;               /* prevents huge cards */
+  margin: 0 auto;                 /* keeps layout clean */
 }
 
 .product-card:hover {

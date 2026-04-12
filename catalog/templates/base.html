@@ -5,19 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>E‑SHOP · modern commerce UI</title>
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/> -->
-  <link rel="stylesheet" type="text/css" href="{%static 'css/font-awesome/all.min.css'%}">
-
-
+  <link rel="stylesheet" type="text/css" href="{%static 'css/style.css'%}">
   {%block style%}{%endblock%}
  
 </head>
 <body>
 
-<!-- top bar with extra info -->
-<div class="top-bar">
-  <i class="fa-regular fa-clock"></i> Flash sale ends in 8 hours • Free shipping $99+ • 30‑day returns
-</div>
 
 <!-- HEADER with refined admin/logout block -->
 <header>
@@ -33,14 +26,15 @@
 
       <!-- grouped admin/dashboard/logout with better spacing -->
       <div style="display:flex; gap:18px; align-items:center;">
-        <a href="#" class="header-icon">
+        <a href="{%url 'account:profile'%}" class="header-icon">
           <i class="fa-solid fa-user-shield"></i>
-          <span>Admin</span>
+          <span>Account</span>
         </a>
-        <a href="#" class="header-icon">
+        <a href="{%url 'dashboard:overview'%}" class="header-icon">
           <i class="fa-solid fa-chart-pie"></i>
           <span>Dashboard</span>
         </a>
+
         <a href="#" class="header-icon">
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>Logout</span>
@@ -97,15 +91,7 @@
 
 {%endblock%}
 
-<!-- NEWSLETTER + extended footer -->
-<section class="newsletter">
-  <h3>never miss a drop</h3>
-  <p>new arrivals, exclusive sales — directly to your inbox.</p>
-  <div class="newsletter-form">
-    <input type="email" placeholder="your.email@example.com">
-    <button>Subscribe</button>
-  </div>
-</section>
+
 
 <!-- FOOTER (detailed) -->
 <footer>
@@ -122,16 +108,13 @@
     </div>
     <div class="footer-col">
       <h5>Support</h5>
-      <ul><li><a href="#">Help center</a></li><li><a href="#">Returns & refunds</a></li><li><a href="#">Track order</a></li><li><a href="#">Contact us</a></li></ul>
+      <ul><li><a href="#">Contact us</a></li></ul>
     </div>
     <div class="footer-col">
-      <h5>Company</h5>
-      <ul><li><a href="#">About us</a></li><li><a href="#">Careers</a></li><li><a href="#">Affiliate</a></li><li><a href="#">Press</a></li></ul>
+      <h5>Ecom</h5>
+      <ul><li><a href="#">About us</a></li></ul>
     </div>
-    <div class="footer-col">
-      <h5>Legal</h5>
-      <ul><li><a href="#">Privacy policy</a></li><li><a href="#">Terms of use</a></li><li><a href="#">Cookie settings</a></li></ul>
-    </div>
+
   </div>
   <div class="copyright">
     <span>© 2025 E‑SHOP – prototype extended. All rights reserved.</span>

@@ -9,7 +9,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib import admin
 
 from comment.models import Comment
-from offer.models import OfferRange, OfferType, Offer
+
 
 User = get_user_model()
 
@@ -45,6 +45,7 @@ class StockRecord(models.Model):
 		blank=True, null=True, verbose_name=_("Low Stock Threshold")
 	)
 	discount = models.IntegerField(_("discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
+	offer_discount = models.IntegerField(_("Offer Discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 
 
 	# Date information
@@ -63,12 +64,12 @@ class StockRecord(models.Model):
 
 	@property
 	def get_product_discounts(self):
-
+		from offer.models import  Offer
 		offers = Offer.objects.filter(Q(status="open"))
 		product_discounts = []
 		for offer in offers:
 			product = offer.offer_type.offer_range.get_products.filter(id=self.product.id).exists()
-			product_discounts.append((offer.offer_type.value, offer.priority, offer.name))
+			product_discounts.append((self.offer_discount, offer.priority, offer.name))
 
 
 		if not product_discounts:

@@ -714,7 +714,7 @@ class SalesReport(ListView):
 				start = timezone.make_aware(start_naive, tz)
 				end = timezone.make_aware(end_naive, tz)
 
-			print(start, end)
+
 			product_selling_q = (Q(stock_carts__cart__order__created_at__gte=start)&
 								Q(stock_carts__cart__order__created_at__lte=end)
 				)
