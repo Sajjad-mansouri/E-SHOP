@@ -754,14 +754,23 @@ class ReviewListView(ListView):
 
 	def search_reviews(self):
 		search = self.request.GET.get("search")
+		status = self.request.GET.get("status")
+		comments = self.object_list
+		if not search and not status:
+			return comments
 		if search:
 			stock_ct = ContentType.objects.get_for_model(StockRecord)
 			q1 = Q(content_type=stock_ct)
 			q2 = Q(object_id__in=StockRecord.objects.filter(product__title__icontains=search).values_list("id", flat=True))
 			q3 = Q(user__username__icontains=search)
-			return Comment.objects.filter((q1&q2)|q3)
-		else:
-			return Comment.objects.all()
+			comments =  comments.filter((q1&q2)|q3)
+
+		if status!="all":
+			comments = comments.filter(status=status)
+
+
+		return comments
+
 
 class ReviewStatusUpdateView(UpdateView):
 	model = Comment
