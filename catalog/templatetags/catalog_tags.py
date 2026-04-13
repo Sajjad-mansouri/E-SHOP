@@ -100,3 +100,20 @@ def render_comment_star(comment):
 		rating = 0
 	return {"ratings":range(rating)}
 
+
+@register.simple_tag()
+def count_review_rection(review, action):
+	if action=="like":
+		return review.review_reactions.filter(like=True).count()
+	elif action=="unlike":
+		return review.review_reactions.filter(unlike=True).count()
+
+@register.simple_tag(takes_context=True)
+def has_reaction(context, review, action):
+	user = context["user"]
+	if action=="like":
+		if review.review_reactions.filter(user=user, like=True).exists():
+			return "selected"
+	elif action=="unlike":
+		if review.review_reactions.filter(user=user, unlike=True).exists():
+			return "selected"

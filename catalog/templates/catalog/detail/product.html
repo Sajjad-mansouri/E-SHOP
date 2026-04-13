@@ -514,6 +514,48 @@
     },10000)
 
   }
+
+  async function reactionReview(review_id, reaction){
+    const formData = new FormData()
+    formData.append("reaction", reaction)
+    formData.append("review_id", review_id)
+    const url = "{%url 'comment:review_reaction'%}"
+    const data = await postFetch(url, formData, "json")
+    const likeBtn = document.querySelector(`.like[data-id='${review_id}']`)
+    const likeCount =  likeBtn.nextElementSibling;
+    const unLikeBtn = document.querySelector(`.unlike[data-id='${review_id}']`)
+    const unLikeCount =  unLikeBtn.nextElementSibling;
+
+
+    if (data.status){
+      if (reaction=="like"){
+
+        if(!likeBtn.classList.contains("selected")){
+          likeBtn.classList.add("selected")
+          likeCount.innerText = Number(likeCount.innerText) + 1
+
+        }
+        if(unLikeBtn.classList.contains("selected")){
+          unLikeBtn.classList.remove("selected")
+          unLikeCount.innerText = Number(unLikeCount.innerText) - 1
+
+        }
+
+      }else if(reaction=="unlike"){
+        if(likeBtn.classList.contains("selected")){
+          likeBtn.classList.remove("selected")
+          likeCount.innerText = Number(likeCount.innerText) - 1
+
+        }
+        if(!unLikeBtn.classList.contains("selected")){
+          unLikeBtn.classList.add("selected")
+          unLikeCount.innerText = Number(unLikeCount.innerText) + 1
+
+        }
+
+      }
+    }
+  }
   // Close modals when clicking outside
   document.addEventListener('click', function(event) {
     const reviewModal = document.getElementById('reviewModal');

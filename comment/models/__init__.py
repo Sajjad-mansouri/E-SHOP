@@ -1,1 +1,1 @@
-from .comments import Comment, ReviewLike
+from .comments import Comment, ReviewReaction

@@ -2,10 +2,11 @@ import json
 from django.shortcuts import render,get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.views.generic.base import View
 from django.views.generic.edit import UpdateView
 from django.db.models import Avg
 from .forms import CommentForm
-from .models import Comment
+from .models import Comment, ReviewReaction
 
 
 
@@ -58,3 +59,30 @@ def remove_review(request):
 		return JsonResponse({'status':'failed'})
 
 
+
+
+class ReviewReactionView(View):
+	def post(self, request, *args, **kwargs):
+		reaction = request.POST.get("reaction")
+		review_id = request.POST.get("review_id")
+		if request.user.is_authenticated:
+			review = Comment.objects.get(id=int(review_id))
+			try:
+				review_reaction = ReviewReaction.objects.get(user=request.user, review=review)
+
+			except ReviewReaction.DoesNotExist:
+				review_reaction = ReviewReaction.objects.create(user=request.user, review=review)
+
+			if reaction == "like":
+				review_reaction.like=True
+				review_reaction.unlike=False
+
+			elif reaction == "unlike":
+				review_reaction.unlike=True
+				review_reaction.like=False
+			review_reaction.save()
+			return JsonResponse({"status":True})
+
+
+		else:
+			return JsonResponse({"status":False})
