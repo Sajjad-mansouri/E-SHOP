@@ -28,7 +28,7 @@ class StockRecord(models.Model):
 		related_name="stockrecords",
 	)
 	is_public = models.BooleanField(default=True)
-	comments = GenericRelation(Comment)
+	comments = GenericRelation(Comment, related_query_name="stockrecord")
 	sku = models.CharField(max_length=128, verbose_name=_("SKU"))
 	price_currency = models.CharField(
 	   max_length=12, default=settings.DEFAULT_CURRENCY, verbose_name=_("Currency")

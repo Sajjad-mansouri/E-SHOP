@@ -10,7 +10,7 @@ def is_bookmarked(context, stock_record):
 	user = context["user"]
 	# stock_record = context["stock_record"]
 	try:
-		cart = Cart.objects.get(user=user)
+		cart = Cart.objects.get(user=user, submited=False)
 	except Cart.DoesNotExist:
 		return False
 	return cart.items.filter(stock=stock_record).exists()
@@ -90,3 +90,13 @@ def humanize_timedelta(value):
 def get_offer_banner(context, offers, priority):
 
 	return {"offers":offers, "priority":priority}
+
+
+@register.inclusion_tag("catalog/detail/_comment_star.html")
+def render_comment_star(comment):
+	try:
+		rating = int(comment.rating)
+	except ValueError:
+		rating = 0
+	return {"ratings":range(rating)}
+

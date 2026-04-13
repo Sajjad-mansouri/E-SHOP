@@ -1,0 +1,33 @@
+
+<div class="reviews-section">
+  <div class="review-grid">
+    <!-- left: write review button -->
+    <div class="write-comment">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+        Write a review
+      </h3>
+      <p>Share your experience with this product to help other customers.</p>
+      <button class="submit-review" id="writeReviewBtn">Write Your Review</button>
+    </div>
+
+    <!-- right: see comments -->
+    <div class="comments-list">
+      <div id="messageBox" class="message"></div>
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+        </svg>
+        Customer reviews (<span class="comment-count">{{stock_record.comments.count}}</span>)
+      </h3>
+      {%for comment in stock_record.comments.all%}
+        {%include 'comment/comment_item.html'%}
+      {%endfor%}
+
+
+
+    </div>
+  </div>
+</div>

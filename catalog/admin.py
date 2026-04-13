@@ -5,7 +5,7 @@ from .models import (
 					ProductClass, Category, Product, 
 					ProductCategory, ProductAttribute, 
 					ProductAttributeValue, ProductImage,
-					UserRating
+					UserRating,ShortDescriptions
 
 					)
 
@@ -25,6 +25,7 @@ class CategoryAdmin(TreeAdmin):
 class ProductAdmin(admin.ModelAdmin):
 	list_display = ['pk','title', 'slug', 'created', 'updated']
 
+admin.site.register(ShortDescriptions)
 admin.site.register(ProductCategory)
 admin.site.register(ProductAttribute)
 admin.site.register(ProductAttributeValue)

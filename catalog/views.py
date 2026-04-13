@@ -13,6 +13,7 @@ from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
 from offer.models import Offer
+from comment.models import Comment
 
 class HomePageView(TemplateResponseMixin, View):
 	template_name = "catalog/list/home.html"
@@ -46,7 +47,7 @@ class HomePageView(TemplateResponseMixin, View):
 
 class ProductDetailView(DetailView):
 	model = Product
-	template_name = "catalog/detail/product_detail.html"
+	template_name = "catalog/detail/product.html"
 
 	def get_context_data(self,**kwargs):
 
@@ -60,8 +61,8 @@ class ProductDetailView(DetailView):
 		except UserRating.DoesNotExist:
 			user_product_rating = []
 
-		product_ratings = UserRating.objects.filter(product=self.object).aggregate(rating_mean=Avg("rating", default=0))
-		product_ratings_count = UserRating.objects.filter(product=self.object).distinct().count()
+		product_ratings = Comment.objects.filter(stockrecord=stock_record).aggregate(rating_mean=Avg("rating", default=0))
+		product_ratings_count = Comment.objects.filter(stockrecord=stock_record).distinct().count()
 
 
 		context["stock_record"] = stock_record
@@ -80,7 +81,7 @@ class ProductDetailView(DetailView):
 		for attribute in self.object.product_attributes.all():
 			attribute_type = attribute.attribute.type
 			if attribute_type == 'text':
-				attributes_values.append((f"{attribute}", attribute.value_text))
+				attributes_values.append((f"{attribute.attribute}", attribute.value_text))
 
 
 		return attributes_values

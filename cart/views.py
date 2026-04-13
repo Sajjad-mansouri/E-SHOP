@@ -12,9 +12,11 @@ class AddToCartView(View):
 		if request.user.is_authenticated:
 			cart_item_form = CartItemForm(request.POST)
 			if cart_item_form.is_valid():
-				try:
+				is_exist = Cart.objects.filter(submited=False).exists()
+				if is_exist:
 					cart = Cart.objects.get(submited=False)
-				except Cart.DoesNotExist:
+				else:
+
 					cart = Cart.objects.create(user=request.user)
 				cart_item = cart_item_form.save(commit=False)
 				cart_item.cart = cart

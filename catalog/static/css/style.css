@@ -26,6 +26,31 @@ body {
 a {
   text-decoration: none;
 }
+    /* SVG Icon Styles */
+    .icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+      vertical-align: middle;
+    }
+
+    .icon-sm {
+      width: 0.875em;
+      height: 0.875em;
+    }
+
+    .icon-lg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+
+    .icon-xl {
+      width: 2em;
+      height: 2em;
+    }
 /* top bar */
 .top-bar {
   background: #111;
@@ -97,49 +122,45 @@ header {
   font-size: 1.1rem;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 26px;
-}
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+    }
 
-.header-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--gray);
-  text-decoration: none;
-  font-size: 0.75rem;
-  transition: color 0.2s;
-  line-height: 1.2;
-}
+    .header-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
 
-.header-icon i {
-  font-size: 1.5rem;
-  margin-bottom: 4px;
-}
+    .header-icon .icon { 
+      margin-bottom: 4px; 
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    .header-icon:hover { color: var(--primary); }
 
-.header-icon:hover { color: var(--primary); }
-
-.cart-wrapper {
-  position: relative;
-}
-
-.cart-count {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background: var(--primary);
-  color: white;
-  font-size: 0.68rem;
-  font-weight: 700;
-  width: 19px;
-  height: 19px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .cart-wrapper { position: relative; }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.68rem;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
 /* NAV + MEGA MENU */
 .nav-bar {
@@ -223,7 +244,9 @@ header {
   border-bottom: 1px dashed #eee;
   padding-bottom: 6px;
 }
-
+.sub-col h4 a{
+  color: var(--primary);
+}
 .sub-col ul { list-style: none; }
 .sub-col li { margin: 8px 0; }
 .sub-col a {

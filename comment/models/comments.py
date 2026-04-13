@@ -8,7 +8,7 @@ UserModel = get_user_model()
 
 class Comment(models.Model):
 	RATINGS = [
-		("", ""),
+		("0", ""),
 		("1", "*"),
 		("2", "**"),
 		("3", "***"),
