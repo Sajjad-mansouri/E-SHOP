@@ -1,25 +1,64 @@
-{%for stock in object_list%}
-<div class="product-card">
-      <div class="product-badge ${badgeClass}">best sell</div>
-      <div class="product-image">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
+    <div class="products-header">
+      <div class="products-count" id="productCount">{{paginator.count}} products exists</div>
+      <div class="sort-container">
+        <span class="sort-label">Sort by:</span>
+        <select class="sort-select" id="sortSelect">
+          <option value="featured">Featured</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="rating">Customer Rating</option>
+          <option value="newest">Newest Arrivals</option>
+          <option value="best-selling">Best Selling</option>
+        </select>
       </div>
-      <div class="product-info">
-        <div class="product-category">Headphones</div>
-        <h3 class="product-title"><a href="#">{{stock.product.title}}</a></h3>
-        <p class="product-description">{{stock.product.short_description}} </p>
-        <div class="product-rating">
-          <div class="stars"><svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-          <span class="rating-count">4.7 (100)</span>
-        </div>
-        <div class="product-price">
-          <span class="current-price">${{stock.get_final_price}}</span>
-          {%if stock.get_discount > 0%}
-          <span class="original-price">${{stock.price}}</span>
-          <span class="discount">-{{stock.get_discount}}%</span>
-          {%endif%}
-        </div>
+    </div>
+   <div class="products-grid" id="productsContainer">
+    {%for stock in object_list%}
+    <div class="product-card">
+          
+          <div class="product-rating">
+            <div class="stars"><svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+            <span class="rating-count">4.7 (100)</span>
+          </div>
+          <div class="product-image">
+            <img src="{{stock.get_product_image}}" alt="${product.name}" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-badge ${badgeClass}">best sell</div>
 
-      </div>
-</div>
-{%endfor%}
+            <h3 class="product-title"><a href="#">{{stock.product.title}}</a></h3>
+            <p class="product-description">{{stock.product.short_description}} </p>
+
+            <div class="product-price">
+              <span class="current-price">${{stock.get_final_price}}</span>
+              {%if stock.get_discount > 0%}
+              <span class="original-price">${{stock.price}}</span>
+              <span class="discount">-{{stock.get_discount}}%</span>
+              {%endif%}
+            </div>
+
+          </div>
+    </div>
+    {%endfor%}
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <button class="page-btn arrow disabled" id="prevPage">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn">4</button>
+    <button class="page-btn">5</button>
+    <button class="page-btn arrow" id="nextPage">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </svg>
+    </button>
+  </div> 
+

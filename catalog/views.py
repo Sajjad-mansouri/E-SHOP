@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
@@ -8,7 +9,7 @@ from django.http import JsonResponse
 from django.db.models import Avg
 from django.utils import timezone
 
-from catalog.models import Category, Product, UserRating, ProductAttributeValue
+from catalog.models import Category, Product, UserRating, ProductAttributeValue, ProductAttribute, ProductClass
 from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
@@ -90,7 +91,7 @@ class ProductDetailView(DetailView):
 class CategoryProducts(ListView):
 	model = Category
 	template_name = "catalog/category/products.html"
-	paginate_by = 1
+	paginate_by = 2
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
@@ -123,13 +124,78 @@ class CategoryProducts(ListView):
 		attributes =  (self.category.product_class.attributes.all()
 						.prefetch_related(Prefetch("attribute_values", to_attr="values"))
 			)
-
-		for attr in attributes:
-			for val in attr.values:
-				print(attr, val)
 		return attributes
 
 
+class CategoryFilter(ListView):
+	model = StockRecord
+	template_name = "catalog/category/_products.html"
+	paginate_by = 2
+
+	def get_queryset(self):
+		stocks = super().get_queryset()
+		stocks = StockRecord.objects.all()
+		product_class_id = self.kwargs.get("product_class")
+		q_total=Q()
+		for key, value in self.request.GET.items():
+
+			if key  in ["price_min", "price_max", "availability", "rating"]:
+				q= self.get_stock_q(key, value)
+			else:
+				try:
+					product_class = ProductClass.objects.get(id=product_class_id)
+					product_attribute = ProductAttribute.objects.get(name=key, product_class=product_class)
+					value_type = product_attribute.type
+					q = self.get_q(value_type, value)
+
+
+				except (ProductAttribute.DoesNotExist, ProductClass.DoesNotExist) as e:
+					pass
+
+			q_total = q_total & q
+
+
+		stocks = stocks.filter(q_total)
+		return stocks
+
+
+	def get_q(self, value_type, value):
+
+		QUERY = {
+			"text":Q(product__product_attributes__value_text=value),
+			"decimal":Q(product__product_attributes__value_decimal=value),
+			"integer":Q(product__product_attributes__value_integer=value),
+			"boolean":Q(product__product_attributes__value_boolean=value),
+			"float":Q(product__product_attributes__value_float=value),
+			"richtext":Q(product__product_attributes__value_richtext=value),
+			"date":Q(product__product_attributes__value_date=value),
+			"datetime":Q(product__product_attributes__value_datetime=value),
+			"file":Q(product__product_attributes__value_file=value),
+			"image":Q(product__product_attributes__value_image=value),
+
+		}
+		return QUERY[value_type]
+
+	def get_stock_q(self, key, value):
+		if isinstance(value, Decimal):
+			value = Decimal(value)
+
+		if key == "price_min":
+			q = Q(price__gte=value)
+
+		elif key == "price_max":
+
+			q = Q(price__lte=value)
+
+		elif key == "availability":
+			
+			q = Q(num_in_stock__gt=0)
+		elif key == "rating":
+			value = float(value)
+			q = Q(rating__gte=value)
+
+
+		return q
 class ApplyRating(View):
 	def post(self, request, *args, **kwargs):
 

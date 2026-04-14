@@ -15,44 +15,13 @@
   
   <!-- PRODUCTS SECTION -->
   <main class="products-section">
-    <div class="products-header">
-      <div class="products-count" id="productCount">Showing 1-12 of 68 products</div>
-      <div class="sort-container">
-        <span class="sort-label">Sort by:</span>
-        <select class="sort-select" id="sortSelect">
-          <option value="featured">Featured</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="rating">Customer Rating</option>
-          <option value="newest">Newest Arrivals</option>
-          <option value="best-selling">Best Selling</option>
-        </select>
-      </div>
-    </div>
+
     
-    <div class="products-grid" id="productsContainer">
-      <!-- Products will be loaded here by JavaScript -->
+
       {%include 'catalog/category/_products.html'%}
-    </div>
+
     
-    <!-- PAGINATION -->
-    <div class="pagination">
-      <button class="page-btn arrow disabled" id="prevPage">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-        </svg>
-      </button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
-      <button class="page-btn">4</button>
-      <button class="page-btn">5</button>
-      <button class="page-btn arrow" id="nextPage">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-        </svg>
-      </button>
-    </div>
+
   </main>
 </div>
 
@@ -62,215 +31,24 @@
 {%block script%}
 <script>
   // Complete product data
-  const products = [
-    {
-      id: 1,
-      name: "Sony WH-1000XM5 Wireless Headphones",
-      category: "Headphones",
-      description: "Industry-leading noise cancellation with 30-hour battery life and premium sound quality.",
-      price: 349.99,
-      originalPrice: 399.99,
-      rating: 4.8,
-      reviewCount: 1245,
-      brand: "sony",
-      type: ["over-ear", "wireless", "noise-cancelling"],
-      inStock: true,
-      badge: "Best Seller",
-      discount: 13,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Apple AirPods Max",
-      category: "Headphones",
-      description: "Over-ear headphones with Active Noise Cancellation and spatial audio.",
-      price: 549.99,
-      originalPrice: 549.99,
-      rating: 4.7,
-      reviewCount: 892,
-      brand: "apple",
-      type: ["over-ear", "wireless", "noise-cancelling"],
-      inStock: true,
-      badge: "New",
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=300&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Bose QuietComfort 45",
-      category: "Headphones",
-      description: "World-class noise cancellation with comfortable fit and clear audio.",
-      price: 329.99,
-      originalPrice: 329.99,
-      rating: 4.6,
-      reviewCount: 756,
-      brand: "bose",
-      type: ["over-ear", "wireless", "noise-cancelling"],
-      inStock: true,
-      badge: null,
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=300&fit=crop"
-    },
-    {
-      id: 4,
-      name: "Samsung Galaxy Buds2 Pro",
-      category: "Headphones",
-      description: "True wireless earbuds with intelligent ANC and Hi-Fi sound.",
-      price: 229.99,
-      originalPrice: 229.99,
-      rating: 4.5,
-      reviewCount: 543,
-      brand: "samsung",
-      type: ["in-ear", "wireless"],
-      inStock: true,
-      badge: "Sale",
-      discount: 15,
-      image: "https://images.unsplash.com/photo-1590658165737-15a047b8b5e9?w=400&h=300&fit=crop"
-    },
-    {
-      id: 5,
-      name: "JBL Tune 760NC",
-      category: "Headphones",
-      description: "Wireless over-ear headphones with adaptive noise cancellation.",
-      price: 129.99,
-      originalPrice: 149.99,
-      rating: 4.3,
-      reviewCount: 432,
-      brand: "jbl",
-      type: ["over-ear", "wireless"],
-      inStock: true,
-      badge: "Hot",
-      discount: 13,
-      image: "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=400&h=300&fit=crop"
-    },
-    {
-      id: 6,
-      name: "Apple AirPods Pro (2nd Gen)",
-      category: "Headphones",
-      description: "Active noise cancellation with personalized spatial audio.",
-      price: 249.99,
-      originalPrice: 249.99,
-      rating: 4.9,
-      reviewCount: 1567,
-      brand: "apple",
-      type: ["in-ear", "wireless", "noise-cancelling"],
-      inStock: false,
-      badge: "New",
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&h=300&fit=crop"
-    },
-    {
-      id: 7,
-      name: "Sony WF-1000XM4 Earbuds",
-      category: "Headphones",
-      description: "True wireless earbuds with industry-leading noise cancellation.",
-      price: 279.99,
-      originalPrice: 279.99,
-      rating: 4.7,
-      reviewCount: 987,
-      brand: "sony",
-      type: ["in-ear", "wireless", "noise-cancelling"],
-      inStock: true,
-      badge: "Best Seller",
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=300&fit=crop"
-    },
-    {
-      id: 8,
-      name: "Beats Studio Pro",
-      category: "Headphones",
-      description: "Premium over-ear headphones with spatial audio and ANC.",
-      price: 349.99,
-      originalPrice: 349.99,
-      rating: 4.4,
-      reviewCount: 654,
-      brand: "apple",
-      type: ["over-ear", "wireless"],
-      inStock: true,
-      badge: null,
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
-    },
-    {
-      id: 9,
-      name: "Sennheiser Momentum 4",
-      category: "Headphones",
-      description: "Wireless headphones with 60-hour battery and premium sound.",
-      price: 399.99,
-      originalPrice: 399.99,
-      rating: 4.6,
-      reviewCount: 432,
-      brand: "sennheiser",
-      type: ["over-ear", "wireless"],
-      inStock: true,
-      badge: "New",
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=400&h=300&fit=crop"
-    },
-    {
-      id: 10,
-      name: "JBL Live 660NC",
-      category: "Headphones",
-      description: "Wireless over-ear headphones with noise cancellation.",
-      price: 199.99,
-      originalPrice: 249.99,
-      rating: 4.2,
-      reviewCount: 321,
-      brand: "jbl",
-      type: ["over-ear", "wireless"],
-      inStock: true,
-      badge: "Sale",
-      discount: 20,
-      image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=300&fit=crop"
-    },
-    {
-      id: 11,
-      name: "Bose QuietComfort Earbuds II",
-      category: "Headphones",
-      description: "True wireless earbuds with CustomTune technology.",
-      price: 299.99,
-      originalPrice: 299.99,
-      rating: 4.5,
-      reviewCount: 543,
-      brand: "bose",
-      type: ["in-ear", "wireless", "noise-cancelling"],
-      inStock: false,
-      badge: null,
-      discount: 0,
-      image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=300&fit=crop"
-    },
-    {
-      id: 12,
-      name: "Samsung Galaxy Buds Live",
-      category: "Headphones",
-      description: "Open-type wireless earbuds with active noise cancellation.",
-      price: 149.99,
-      originalPrice: 169.99,
-      rating: 4.1,
-      reviewCount: 876,
-      brand: "samsung",
-      type: ["in-ear", "wireless"],
-      inStock: true,
-      badge: "Hot",
-      discount: 12,
-      image: "https://images.unsplash.com/photo-1590658165737-15a047b8b5e9?w=400&h=300&fit=crop"
-    }
-  ];
+
 
   // State management
   let currentPage = 1;
   const productsPerPage = 8;
-  let filteredProducts = [...products];
+
   let sortBy = 'featured';
   const filters = {}
   // Filter state
-document.querySelectorAll('.filter-title').forEach(el => {
-    const key = el.dataset.filter;  // reads data-filter="something"
-    filters[key] = [];               // or some default value
-});
-  filters["price"] = { min: 0, max: 5000 };
-  console.log(filters)
+  document.querySelectorAll('.filter-title').forEach(el => {
+      const key = el.dataset.filter;  // reads data-filter="something"
+      filters[key] = [];               // or some default value
+  });
+  filters["price"] = { min: 0, max: 10000000 };
+
   // DOM Elements
+  const productsSection = document.querySelector(".products-section");
+
   const productsContainer = document.getElementById('productsContainer');
   const productCount = document.getElementById('productCount');
   const sortSelect = document.getElementById('sortSelect');
@@ -295,8 +73,9 @@ document.querySelectorAll('.filter-title').forEach(el => {
     initFilters();
     initPriceSlider();
 
-    updatePagination();
+
   });
+
 
   // Initialize filter toggles
   function initFilters() {
@@ -380,7 +159,7 @@ document.querySelectorAll('.filter-title').forEach(el => {
     });
 
     applyFilterBtn.addEventListener("click", ()=>{
-
+      applyFilters()
     })
   }
 
@@ -391,7 +170,7 @@ document.querySelectorAll('.filter-title').forEach(el => {
     const sliderRect = priceSlider.getBoundingClientRect();
     const sliderWidth = sliderRect.width;
     const minPrice = 0;
-    const maxPrice = 5000;
+    const maxPrice = 10000000;
     
     // Update slider position
     function updateSlider() {
@@ -488,107 +267,59 @@ document.querySelectorAll('.filter-title').forEach(el => {
   }
 
   // Apply all filters and sorting
-  function applyFilters() {
-    fetchFilteredProducts()
-    filteredProducts = products.filter(product => {
-      // Price filter
-      if (product.price < filters.price.min || product.price > filters.price.max) {
-        return false;
+  async function applyFilters() {
+    const data = await getFetch()
+    productsSection.innerHTML = ""
+    productsSection.innerHTML = data
+
+  }
+  function serializeFiltersToURL() {
+    console.log("serializeFiltersToURL")
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if(Array.isArray(value)){
+        value.forEach(v => params.append(key, v));
       }
-      
-      // Brand filter
-      if (filters.brand.length > 0 && !filters.brand.includes(product.brand)) {
-        return false;
-      }
-      
-      // Type filter
-      if (filters.type.length > 0) {
-        const hasType = filters.type.some(type => product.type.includes(type));
-        if (!hasType) return false;
-      }
-      
-      // Rating filter
-      if (filters.rating.length > 0) {
-        const meetsRating = filters.rating.some(rating => {
-          return product.rating >= parseFloat(rating);
+      else if(typeof value === "object" && value !==null){
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          params.append(`${key}_${subKey}`, subValue);
         });
-        if (!meetsRating) return false;
       }
-      
-      // Availability filter
-      if (filters.availability.length > 0) {
-        const availability = product.inStock ? 'in-stock' : 'out-of-stock';
-        if (!filters.availability.includes(availability)) {
-          return false;
-        }
+      else{
+         params.append(key, value);
       }
-      
-      return true;
-    });
-    
-    // Apply sorting
-    sortProducts();
-    
-    // Reset to first page
-    currentPage = 1;
-    
-    // Update UI
-    // renderProducts();
-    updatePagination();
-    updateProductCount();
+
+    }
+    const newURL = `${params.toString()}`;
+    return newURL
+  }
+  async function getFetch(){
+    const url = serializeFiltersToURL()
+    const response = await fetch("{%url 'catalog:category_product_filter' category.product_class.id %}" + `?${url}`,{
+      method:"GET"
+    })
+    const data = await response.text()
+    return data
   }
 
-  function fetchFilteredProducts(){
-    console.log('fetch')
-  }
-  // Sort products based on selected option
-  function sortProducts() {
-    switch(sortBy) {
-      case 'price-low':
-        filteredProducts.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filteredProducts.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        filteredProducts.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        filteredProducts.sort((a, b) => b.id - a.id);
-        break;
-      case 'best-selling':
-        filteredProducts.sort((a, b) => b.reviewCount - a.reviewCount);
-        break;
-      default: // featured
-        filteredProducts.sort((a, b) => {
-          // Featured sorting: badges first, then rating
-          const badgePriority = {
-            'Best Seller': 4,
-            'Hot': 3,
-            'Sale': 2,
-            'New': 1,
-            null: 0
-          };
-          const aPriority = badgePriority[a.badge] || 0;
-          const bPriority = badgePriority[b.badge] || 0;
-          
-          if (bPriority !== aPriority) {
-            return bPriority - aPriority;
-          }
-          return b.rating - a.rating;
-        });
-    }
-  }
+
 
   // Clear all filters
   function clearAllFilters() {
     // Reset filter state
-    filters.price = { min: 0, max: 5000 };
+    Object.entries(filters).forEach(([key, value])=>{
+      if (key=="price"){
+
+        filters.price = { min: 0, max: 10000000 };
+      }else{
+        filters[key]=[]
+      }
+    })
+    
     filters.brand = [];
     filters.type = [];
     filters.rating = [];
-    filters.availability = ['in-stock'];
-    
+
     // Reset UI checkboxes
     document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
       checkbox.classList.remove('checked');
@@ -628,31 +359,7 @@ document.querySelectorAll('.filter-title').forEach(el => {
 
 
 
-  // Update pagination
-  function updatePagination() {
-    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-    
-    // Update page buttons
-    pageBtns.forEach((btn, index) => {
-      const pageNum = index + 1;
-      btn.textContent = pageNum;
-      btn.classList.toggle('active', pageNum === currentPage);
-      btn.style.display = pageNum <= totalPages ? 'flex' : 'none';
-    });
-    
-    // Update prev/next buttons
-    prevPageBtn.classList.toggle('disabled', currentPage === 1);
-    nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
-  }
 
-  // Update product count
-  function updateProductCount() {
-    const totalProducts = filteredProducts.length;
-    const start = (currentPage - 1) * productsPerPage + 1;
-    const end = Math.min(currentPage * productsPerPage, totalProducts);
-    
-    productCount.textContent = `Showing ${start}-${end} of ${totalProducts} products`;
-  }
 </script>
 {%endblock%}
 

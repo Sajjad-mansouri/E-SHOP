@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
@@ -46,7 +46,7 @@ class StockRecord(models.Model):
 	)
 	discount = models.IntegerField(_("discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 	offer_discount = models.IntegerField(_("Offer Discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
-
+	rating = models.FloatField(_("rating"), default=0.0)
 
 	# Date information
 	date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
@@ -115,3 +115,8 @@ class StockRecord(models.Model):
 			return self.product.images.all()[0].image.url
 		else:
 			return ""
+
+	def save(self, *args, **kwargs):
+		agg = self.comments.aggregate(rating_mean=Avg("rating", default=0))
+		self.rating = agg["rating_mean"]
+		super().save(*args, **kwargs)
