@@ -43,6 +43,13 @@ class Category(MP_Node):
 	image = models.ImageField(upload_to=category_image_path, null=True, blank=True, verbose_name=_("image"))
 	description = models.TextField(blank=True, verbose_name=_("Description"))
 	long_description = models.TextField(blank=True, verbose_name=_("Long description"))
+	product_class = models.ForeignKey(ProductClass,
+								 null=True,
+								 blank=True, 
+								 on_delete=models.PROTECT,
+								 related_name="categories",
+								 verbose_name=_("product type"),
+								 )
 
 	class Meta:
 		verbose_name = _("category")
@@ -148,7 +155,7 @@ class ProductAttribute(models.Model):
 	name = models.CharField(max_length=200, verbose_name=_("name"))
 
 	# Attribute types
-	Decimal = "Decimal"
+	Decimal = "decimal"
 	TEXT = "text"
 	INTEGER = "integer"
 	BOOLEAN = "boolean"
@@ -202,6 +209,7 @@ class ProductAttributeValue(models.Model):
 	value_file = models.FileField(null=True, blank=True, upload_to=attribute_file_path)
 	value_image = models.ImageField(null=True, blank=True, upload_to=attribute_image_path)
 
+
 	class Meta:
 		verbose_name = _("Product attribute value")
 		verbose_name_plural = _("Product attribute values")
@@ -215,7 +223,7 @@ class ProductAttributeValue(models.Model):
 	def get_value(self):
 		ATTRIBUTE_TYPE = {
 		"text":self.value_text,
-		"Decimal":self.value_decimal,
+		"decimal":self.value_decimal,
 		"integer":self.value_integer,
 		"boolean":self.value_boolean,
 		"float":self.value_float,

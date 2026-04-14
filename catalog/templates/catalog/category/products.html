@@ -10,150 +10,8 @@
 <!-- MAIN CONTENT -->
 <div class="category-container">
   <!-- FILTER SIDEBAR -->
-  <aside class="filter-sidebar">
-    <div class="filter-header">
-      <h2>Filters</h2>
-      <button class="clear-filters" id="clearFilters">Clear All</button>
-    </div>
-    
-    <div class="filter-section">
-      <div class="filter-title" data-filter="price">
-        <h3>Price Range</h3>
-        <svg class="icon filter-toggle" viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
-      </div>
-      <div class="filter-content" id="priceFilter">
-        <div class="price-inputs">
-          <input type="number" class="price-input" id="priceMin" placeholder="Min" min="0" max="5000" value="0">
-          <input type="number" class="price-input" id="priceMax" placeholder="Max" min="0" max="5000" value="5000">
-        </div>
-        <div class="price-slider" id="priceSlider">
-          <div class="price-slider-track" id="priceTrack"></div>
-          <div class="price-slider-handle" id="priceMinHandle"></div>
-          <div class="price-slider-handle" id="priceMaxHandle"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #666;">
-          <span>$<span id="priceMinValue">0</span></span>
-          <span>$<span id="priceMaxValue">5000</span></span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="filter-section">
-      <div class="filter-title" data-filter="brand">
-        <h3>Brand</h3>
-        <svg class="icon filter-toggle" viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
-      </div>
-      <div class="filter-content" id="brandFilter">
-        <div class="filter-option" data-value="apple">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Apple</span>
-          <span class="filter-count">(24)</span>
-        </div>
-        <div class="filter-option" data-value="samsung">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Samsung</span>
-          <span class="filter-count">(18)</span>
-        </div>
-        <div class="filter-option" data-value="sony">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Sony</span>
-          <span class="filter-count">(12)</span>
-        </div>
-        <div class="filter-option" data-value="bose">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Bose</span>
-          <span class="filter-count">(8)</span>
-        </div>
-        <div class="filter-option" data-value="jbl">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">JBL</span>
-          <span class="filter-count">(6)</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="filter-section">
-      <div class="filter-title" data-filter="type">
-        <h3>Headphone Type</h3>
-        <svg class="icon filter-toggle" viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
-      </div>
-      <div class="filter-content" id="typeFilter">
-        <div class="filter-option" data-value="over-ear">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Over-Ear</span>
-          <span class="filter-count">(32)</span>
-        </div>
-        <div class="filter-option" data-value="in-ear">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">In-Ear</span>
-          <span class="filter-count">(28)</span>
-        </div>
-        <div class="filter-option" data-value="wireless">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Wireless</span>
-          <span class="filter-count">(45)</span>
-        </div>
-        <div class="filter-option" data-value="noise-cancelling">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Noise Cancelling</span>
-          <span class="filter-count">(22)</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="filter-section">
-      <div class="filter-title" data-filter="rating">
-        <h3>Customer Rating</h3>
-        <svg class="icon filter-toggle" viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
-      </div>
-      <div class="filter-content" id="ratingFilter">
-        <div class="filter-option" data-value="4">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">4★ & above</span>
-          <span class="filter-count">(48)</span>
-        </div>
-        <div class="filter-option" data-value="3">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">3★ & above</span>
-          <span class="filter-count">(56)</span>
-        </div>
-        <div class="filter-option" data-value="2">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">2★ & above</span>
-          <span class="filter-count">(62)</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="filter-section">
-      <div class="filter-title" data-filter="availability">
-        <h3>Availability</h3>
-        <svg class="icon filter-toggle" viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
-      </div>
-      <div class="filter-content" id="availabilityFilter">
-        <div class="filter-option" data-value="in-stock">
-          <div class="filter-checkbox checked"></div>
-          <span class="filter-label">In Stock</span>
-          <span class="filter-count">(58)</span>
-        </div>
-        <div class="filter-option" data-value="out-of-stock">
-          <div class="filter-checkbox"></div>
-          <span class="filter-label">Out of Stock</span>
-          <span class="filter-count">(10)</span>
-        </div>
-      </div>
-    </div>
-  </aside>
+  {%include 'catalog/category/_filter.html'%}
+
   
   <!-- PRODUCTS SECTION -->
   <main class="products-section">
@@ -174,6 +32,7 @@
     
     <div class="products-grid" id="productsContainer">
       <!-- Products will be loaded here by JavaScript -->
+      {%include 'catalog/category/_products.html'%}
     </div>
     
     <!-- PAGINATION -->
@@ -403,16 +262,14 @@
   const productsPerPage = 8;
   let filteredProducts = [...products];
   let sortBy = 'featured';
-  
+  const filters = {}
   // Filter state
-  const filters = {
-    price: { min: 0, max: 5000 },
-    brand: [],
-    type: [],
-    rating: [],
-    availability: ['in-stock']
-  };
-
+document.querySelectorAll('.filter-title').forEach(el => {
+    const key = el.dataset.filter;  // reads data-filter="something"
+    filters[key] = [];               // or some default value
+});
+  filters["price"] = { min: 0, max: 5000 };
+  console.log(filters)
   // DOM Elements
   const productsContainer = document.getElementById('productsContainer');
   const productCount = document.getElementById('productCount');
@@ -421,6 +278,7 @@
   const prevPageBtn = document.getElementById('prevPage');
   const nextPageBtn = document.getElementById('nextPage');
   const pageBtns = document.querySelectorAll('.page-btn:not(.arrow)');
+  const applyFilterBtn = document.getElementById("applyFiltersBtn");
 
   // Price slider elements
   const priceMinInput = document.getElementById('priceMin');
@@ -436,7 +294,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     initFilters();
     initPriceSlider();
-    renderProducts();
+
     updatePagination();
   });
 
@@ -467,17 +325,17 @@
           if (!filters[filterType].includes(value)) {
             filters[filterType].push(value);
           }
+
         } else {
           const index = filters[filterType].indexOf(value);
-          console.log(filters)
-          console.log(index)
+
           if (index > -1) {
             filters[filterType].splice(index, 1);
           }
         }
 
         
-        applyFilters();
+
       });
     });
 
@@ -489,7 +347,7 @@
     // Sort select
     sortSelect.addEventListener('change', (e) => {
       sortBy = e.target.value;
-      applyFilters();
+
     });
 
     // Pagination buttons
@@ -520,6 +378,10 @@
         }
       });
     });
+
+    applyFilterBtn.addEventListener("click", ()=>{
+
+    })
   }
 
   // Initialize price slider
@@ -584,7 +446,6 @@
       if (newPrice < filters.price.max - 50) {
         filters.price.min = newPrice;
         updateSlider();
-        applyFilters();
       }
     }
     
@@ -602,7 +463,7 @@
       if (newPrice > filters.price.min + 50) {
         filters.price.max = newPrice;
         updateSlider();
-        applyFilters();
+
       }
     }
     
@@ -613,7 +474,7 @@
       value = Math.max(minPrice, Math.min(value, filters.price.max - 50));
       filters.price.min = value;
       updateSlider();
-      applyFilters();
+
     });
     
     priceMaxInput.addEventListener('change', () => {
@@ -622,12 +483,13 @@
       value = Math.min(maxPrice, Math.max(value, filters.price.min + 50));
       filters.price.max = value;
       updateSlider();
-      applyFilters();
+
     });
   }
 
   // Apply all filters and sorting
   function applyFilters() {
+    fetchFilteredProducts()
     filteredProducts = products.filter(product => {
       // Price filter
       if (product.price < filters.price.min || product.price > filters.price.max) {
@@ -671,11 +533,14 @@
     currentPage = 1;
     
     // Update UI
-    renderProducts();
+    // renderProducts();
     updatePagination();
     updateProductCount();
   }
 
+  function fetchFilteredProducts(){
+    console.log('fetch')
+  }
   // Sort products based on selected option
   function sortProducts() {
     switch(sortBy) {
@@ -742,7 +607,7 @@
     sortBy = 'featured';
     
     // Apply filters
-    applyFilters();
+
   }
 
   // Render products to the grid
@@ -761,75 +626,7 @@
 
   }
 
-  // Create product card HTML
-  function createProductCard(product) {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    
-    // Generate star rating HTML
-    const stars = Math.floor(product.rating);
-    const hasHalfStar = product.rating % 1 >= 0.5;
-    let starsHTML = '';
-    
-    for (let i = 1; i <= 5; i++) {
-      if (i <= stars) {
-        starsHTML += '<svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
-      } else if (i === stars + 1 && hasHalfStar) {
-        starsHTML += '<svg class="icon" viewBox="0 0 24 24"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg>';
-      } else {
-        starsHTML += '<svg class="icon" viewBox="0 0 24 24"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg>';
-      }
-    }
-    
-    // Badge class
-    const badgeClass = product.badge ? product.badge.toLowerCase().replace(' ', '-') : '';
-    
-    // Discount display
-    const discountHTML = product.discount > 0 
-      ? `<span class="discount">-${product.discount}%</span>`
-      : '';
-    
-    // Original price display
-    const originalPriceHTML = product.originalPrice > product.price
-      ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>`
-      : '';
-    
-    card.innerHTML = `
-      ${product.badge ? `<div class="product-badge ${badgeClass}">${product.badge}</div>` : ''}
-      <div class="product-image">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
-      </div>
-      <div class="product-info">
-        <div class="product-category">${product.category}</div>
-        <h3 class="product-title"><a href="#">${product.name}</a></h3>
-        <p class="product-description">${product.description}</p>
-        <div class="product-rating">
-          <div class="stars">${starsHTML}</div>
-          <span class="rating-count">${product.rating.toFixed(1)} (${product.reviewCount})</span>
-        </div>
-        <div class="product-price">
-          <span class="current-price">$${product.price.toFixed(2)}</span>
-          ${originalPriceHTML}
-          ${discountHTML}
-        </div>
-        <div class="product-actions">
-          <button class="add-to-cart-btn" data-product-id="${product.id}">
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
-            </svg>
-            Add to Cart
-          </button>
-          <button class="wishlist-btn" data-product-id="${product.id}">
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    `;
-    
-    return card;
-  }
+
 
   // Update pagination
   function updatePagination() {

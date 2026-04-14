@@ -3,12 +3,12 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Prefetch
 from django.http import JsonResponse
 from django.db.models import Avg
 from django.utils import timezone
 
-from catalog.models import Category, Product, UserRating
+from catalog.models import Category, Product, UserRating, ProductAttributeValue
 from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
@@ -89,15 +89,18 @@ class ProductDetailView(DetailView):
 
 class CategoryProducts(ListView):
 	model = Category
-	template_name = "catalog/list/category_products.html"
+	template_name = "catalog/category/products.html"
 	paginate_by = 1
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 
 		breadcrumb = self.category.get_ancestors()
 		breadcrumb = list(breadcrumb) + [self.category]
+		attributes = self.get_attribute_values()
 		context["breadcrumb"] = breadcrumb
 		context['category'] = self.category
+		context['attributes'] = attributes
+
 		return context
 
 	def get_queryset(self):
@@ -106,6 +109,25 @@ class CategoryProducts(ListView):
 		descendants = self.category.get_descendants(include_self=True)
 		stocks = StockRecord.objects.filter(product__categories__in=descendants).distinct()
 		return stocks
+
+
+
+	def get_attribute_value_field(self, attr_type):
+		ATTR_TYPE= {
+		"text":"value_text"
+		}
+		return ATTR_TYPE[attr_type]
+
+	def get_attribute_values(self):
+
+		attributes =  (self.category.product_class.attributes.all()
+						.prefetch_related(Prefetch("attribute_values", to_attr="values"))
+			)
+
+		for attr in attributes:
+			for val in attr.values:
+				print(attr, val)
+		return attributes
 
 
 class ApplyRating(View):

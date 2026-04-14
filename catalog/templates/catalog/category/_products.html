@@ -1,0 +1,25 @@
+{%for stock in object_list%}
+<div class="product-card">
+      <div class="product-badge ${badgeClass}">best sell</div>
+      <div class="product-image">
+        <img src="${product.image}" alt="${product.name}" loading="lazy">
+      </div>
+      <div class="product-info">
+        <div class="product-category">Headphones</div>
+        <h3 class="product-title"><a href="#">{{stock.product.title}}</a></h3>
+        <p class="product-description">{{stock.product.short_description}} </p>
+        <div class="product-rating">
+          <div class="stars"><svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+          <span class="rating-count">4.7 (100)</span>
+        </div>
+        <div class="product-price">
+          <span class="current-price">${{stock.get_final_price}}</span>
+          {%if stock.get_discount > 0%}
+          <span class="original-price">${{stock.price}}</span>
+          <span class="discount">-{{stock.get_discount}}%</span>
+          {%endif%}
+        </div>
+
+      </div>
+</div>
+{%endfor%}
