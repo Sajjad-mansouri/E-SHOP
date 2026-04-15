@@ -38,7 +38,7 @@
   {% for record in stock_records%}
   <a href="{%url 'catalog:product_detail' record.product.slug record.id%}">
     <div class="product-card">
-      <span class="badge">−30%</span>
+       {%if record.get_type_of_discount%}<span class="badge">-%{{record.get_discount}} {{record.get_type_of_discount}} offer</span>{%endif%}
       <img src="{{record.product.images.first.image.url}}" alt="{{record.product.images.first.caption}}" class="product-img" style="background:#f9f9f9;">
       <h3>{{record.product.title}}</h3>
       <div class="price"><span class="old-price">${{record.price}}</span> ${{record.get_final_price}}</div>

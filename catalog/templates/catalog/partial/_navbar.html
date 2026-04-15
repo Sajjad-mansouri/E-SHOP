@@ -1,0 +1,35 @@
+<!-- NAVIGATION (categories + mega dropdown enhanced) -->
+<nav class="nav-bar">
+  <div class="categories-container">
+    <ul class="main-categories">
+      <li><a href="#" class="active">Home</a></li>
+
+      {%for category in categories%}
+      <li>
+        <a href="{%url 'catalog:category_products' category.slug%}">{{category.name}}</a>
+          {%with childrens=category.get_children %}
+        <div class="dropdown">
+          {%for children in childrens%}
+          <div class="sub-col">
+            <h4><a href="{%url 'catalog:category_products' children.slug%}">{{children.name}}</a></h4>
+            {%with subchildrens=children.get_children%}
+            <ul>
+              {%for subchildren in subchildrens%}
+              <li><a href="{%url 'catalog:category_products' subchildren.slug%}">{{subchildren.name}}</a></li>
+
+              {%endfor%}
+
+            </ul>
+            {%endwith%}
+          </div>
+
+          {%endfor%}
+        </div>
+        {%endwith%}
+      </li>
+
+      {%endfor%}
+
+    </ul>
+  </div>
+</nav>

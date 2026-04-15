@@ -2,7 +2,7 @@ from django import template
 from django.db.models import Avg
 from django.urls import reverse
 from cart.models import Cart
-from catalog.models import UserRating, Product
+from catalog.models import UserRating, Product, Category
 
 register = template.Library()
 
@@ -124,3 +124,14 @@ def is_selected_ordering(context, sort_by):
 	order_by = context["order_by"]
 	if order_by == sort_by:
 		return "selected"
+
+
+
+@register.inclusion_tag("catalog/partial/_navbar.html")
+def get_navbar():
+	categories = Category.objects.all()
+	root_categories = []
+	for category in categories:
+		if category.is_root():
+			root_categories.append(category)
+	return {"categories":root_categories, }

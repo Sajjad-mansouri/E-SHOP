@@ -47,6 +47,7 @@
   </div>
 
   <!-- PAGINATION -->
+  {%if page_obj%}
   <div class="pagination">
     {% if page_obj.has_previous %}
     <a class="page-btn arrow" id="prevPage" data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()">
@@ -70,3 +71,4 @@
     {%endif%}
   </div> 
 
+{%endif%}

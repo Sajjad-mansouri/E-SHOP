@@ -19,17 +19,13 @@ from comment.models import Comment
 class HomePageView(TemplateResponseMixin, View):
 	template_name = "catalog/list/home.html"
 	def get(self, request, *args, **kwargs):
-		categories = Category.objects.all()
-		root_categories = []
-		for category in categories:
-			if category.is_root():
-				root_categories.append(category)
-				category.get_children()
+
+				
 
 		stock_records = self.get_trending_products()
 		offers = Offer.objects.filter(status="open")
 		context = {
-					"categories":root_categories, 
+
 					"stock_records":stock_records,
 					"offers":offers,
 					"now":timezone.now()
@@ -208,10 +204,14 @@ class CategoryProducts(ListView):
 		return ATTR_TYPE[attr_type]
 
 	def get_attribute_values(self):
-
-		attributes =  (self.object.product_class.attributes.all()
-						.prefetch_related(Prefetch("attribute_values", to_attr="values"))
-			)
+		print(self.object)
+		print(self.object.product_class)
+		if self.object.product_class:
+			attributes =  (self.object.product_class.attributes.all()
+							.prefetch_related(Prefetch("attribute_values", to_attr="values"))
+				)
+		else:
+			attributes = ""
 		return attributes
 
 
