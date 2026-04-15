@@ -1,3 +1,4 @@
+{%load catalog_tags%}
     <div class="products-header">
       <div class="products-count" id="productCount">{{paginator.count}} products exists</div>
       <div class="sort-container">
@@ -13,20 +14,20 @@
       </div>
     </div>
    <div class="products-grid" id="productsContainer">
-    {%for stock in object_list%}
+    {%for stock in page_obj%}
     <div class="product-card">
           
           <div class="product-rating">
             <div class="stars"><svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-            <span class="rating-count">4.7 (100)</span>
+            <span class="rating-count">{{stock.rating}} ({{stock.comments.count}})</span>
           </div>
           <div class="product-image">
             <img src="{{stock.get_product_image}}" alt="${product.name}" loading="lazy">
           </div>
           <div class="product-info">
-            <div class="product-badge ${badgeClass}">best sell</div>
+            {%if stock.get_type_of_discount%}<div class="product-badge ${badgeClass}">{{stock.get_type_of_discount}} offer</div>{%endif%}
 
-            <h3 class="product-title"><a href="#">{{stock.product.title}}</a></h3>
+            <h3 class="product-title"><a href="{%url 'catalog:product_detail' stock.product.slug stock.id %}">{{stock.product.title}}</a></h3>
             <p class="product-description">{{stock.product.short_description}} </p>
 
             <div class="product-price">
@@ -44,21 +45,25 @@
 
   <!-- PAGINATION -->
   <div class="pagination">
-    <button class="page-btn arrow disabled" id="prevPage">
+    {% if page_obj.has_previous %}
+    <a class="page-btn arrow" id="prevPage" data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()">
       <svg class="icon" viewBox="0 0 24 24">
         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
       </svg>
-    </button>
+    </a>
+    {%endif%}
 
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <button class="page-btn">4</button>
-    <button class="page-btn">5</button>
-    <button class="page-btn arrow" id="nextPage">
+    {%for page in paginator.page_range%}
+    <button class="page-btn {%if page_obj.number == page %}active{%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
+
+    {%endfor%}
+    {% if page_obj.has_next %}
+
+    <button class="page-btn arrow" id="nextPage" data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()">
       <svg class="icon" viewBox="0 0 24 24">
         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
       </svg>
     </button>
+    {%endif%}
   </div> 
 

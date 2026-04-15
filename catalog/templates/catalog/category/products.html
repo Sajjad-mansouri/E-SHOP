@@ -30,7 +30,8 @@
 
 {%block script%}
 <script>
-  // Complete product data
+  const minPrice = 0;
+  const maxPrice = Math.ceil(Number("{{max_price}}") + Number("{{max_price}}")/100 ) ;
 
 
   // State management
@@ -44,7 +45,7 @@
       const key = el.dataset.filter;  // reads data-filter="something"
       filters[key] = [];               // or some default value
   });
-  filters["price"] = { min: 0, max: 10000000 };
+  filters["price"]={"min":minPrice, "max":maxPrice}
 
   // DOM Elements
   const productsSection = document.querySelector(".products-section");
@@ -53,9 +54,8 @@
   const productCount = document.getElementById('productCount');
   const sortSelect = document.getElementById('sortSelect');
   const clearFiltersBtn = document.getElementById('clearFilters');
-  const prevPageBtn = document.getElementById('prevPage');
-  const nextPageBtn = document.getElementById('nextPage');
-  const pageBtns = document.querySelectorAll('.page-btn:not(.arrow)');
+
+
   const applyFilterBtn = document.getElementById("applyFiltersBtn");
 
   // Price slider elements
@@ -129,37 +129,11 @@
 
     });
 
-    // Pagination buttons
-    prevPageBtn.addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderProducts();
-        updatePagination();
-      }
-    });
 
-    nextPageBtn.addEventListener('click', () => {
-      const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderProducts();
-        updatePagination();
-      }
-    });
-
-    // Page number buttons
-    pageBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (!btn.classList.contains('active')) {
-          currentPage = parseInt(btn.textContent);
-          renderProducts();
-          updatePagination();
-        }
-      });
-    });
 
     applyFilterBtn.addEventListener("click", ()=>{
-      applyFilters()
+      const page = null;
+      applyFilters(page)
     })
   }
 
@@ -169,13 +143,12 @@
     let isDraggingMax = false;
     const sliderRect = priceSlider.getBoundingClientRect();
     const sliderWidth = sliderRect.width;
-    const minPrice = 0;
-    const maxPrice = 10000000;
+
     
     // Update slider position
     function updateSlider() {
-      const minPercent = (filters.price.min - minPrice) / (maxPrice - minPrice) * 100;
-      const maxPercent = (filters.price.max - minPrice) / (maxPrice - minPrice) * 100;
+      const minPercent = (filters.price.min - minPrice) / (maxPrice - minPrice) * 90;
+      const maxPercent = (filters.price.max - minPrice) / (maxPrice - minPrice) * 90;
       
       priceMinHandle.style.left = `${minPercent}%`;
       priceMaxHandle.style.left = `${maxPercent}%`;
@@ -267,14 +240,15 @@
   }
 
   // Apply all filters and sorting
-  async function applyFilters() {
-    const data = await getFetch()
+  async function applyFilters(page) {
+    const url = serializeFiltersToURL(page)
+    const data = await getFetch(url)
     productsSection.innerHTML = ""
     productsSection.innerHTML = data
+    history.pushState({}, "", url)
 
   }
-  function serializeFiltersToURL() {
-    console.log("serializeFiltersToURL")
+  function serializeFiltersToURL(page) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
       if(Array.isArray(value)){
@@ -290,13 +264,31 @@
       }
 
     }
-    const newURL = `${params.toString()}`;
-    return newURL
+    let newURL;
+    if(page){
+      const filterParam = params.toString()
+      if(params.toString()==""){
+        newURL = `?page=${page}`;
+
+      }else{
+        newURL = `?${filterParam}&page=${page}`;
+
+      }
+
+  }else{
+    newURL = `?${params.toString()}`;
+
   }
-  async function getFetch(){
-    const url = serializeFiltersToURL()
-    const response = await fetch("{%url 'catalog:category_product_filter' category.product_class.id %}" + `?${url}`,{
-      method:"GET"
+    return newURL
+  
+  }
+  async function getFetch(url){
+    
+    const response = await fetch("{%url 'catalog:category_products' category.slug  %}" + url,{
+      method:"GET",
+      headers:{
+        "AJAX":true,
+      }
     })
     const data = await response.text()
     return data
@@ -310,7 +302,7 @@
     Object.entries(filters).forEach(([key, value])=>{
       if (key=="price"){
 
-        filters.price = { min: 0, max: 10000000 };
+        filters.price = { min: minPrice, max: maxPrice };
       }else{
         filters[key]=[]
       }
@@ -341,25 +333,16 @@
 
   }
 
-  // Render products to the grid
-  function renderProducts() {
-    const startIndex = (currentPage - 1) * productsPerPage;
-    const endIndex = startIndex + productsPerPage;
-    const productsToShow = filteredProducts.slice(startIndex, endIndex);
-    
-    productsContainer.innerHTML = '';
-    
-    productsToShow.forEach(product => {
-      const productCard = createProductCard(product);
-      productsContainer.appendChild(productCard);
-    });
-    
-
-  }
 
 
 
 
+function applyPagination(){
+  const btn = event.target.closest(".page-btn")
+  const nextPageNumber = btn.dataset.nextNumber
+  applyFilters(nextPageNumber)
+
+}
 </script>
 {%endblock%}
 

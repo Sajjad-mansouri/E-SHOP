@@ -78,7 +78,7 @@ class StockRecord(models.Model):
 			last_offer_priority = product_discounts[-1][1]+1
 
 		product_discounts.sort(key=lambda x:x[1])
-		product_discounts.append((self.discount, last_offer_priority, "personal"))
+		product_discounts.append((self.discount, last_offer_priority, ""))
 		return product_discounts
 
 	@property

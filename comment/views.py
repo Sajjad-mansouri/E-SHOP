@@ -21,6 +21,7 @@ def create_review(request):
 		form.user = request.user
 		form.content_object = stock_record
 		form.save()
+		stock_record.save()
 		return render(request, "comment/comment_item.html", {'comment':form})
 
 	else:
@@ -35,6 +36,8 @@ class CommentUpdateView(UpdateView):
 	def form_valid(self, form):
 		self.obj = form.save()
 		stock_record = self.obj.content_object
+		stock_record.save()
+		
 		product_ratings = Comment.objects.filter(stockrecord=stock_record).aggregate(rating_mean=Avg("rating", default=0))
 		return JsonResponse({"status":True, "total_rating":product_ratings["rating_mean"]})
 

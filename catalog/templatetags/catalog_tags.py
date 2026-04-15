@@ -1,5 +1,6 @@
 from django import template
 from django.db.models import Avg
+from django.urls import reverse
 from cart.models import Cart
 from catalog.models import UserRating, Product
 
@@ -117,3 +118,22 @@ def has_reaction(context, review, action):
 	elif action=="unlike":
 		if review.review_reactions.filter(user=user, unlike=True).exists():
 			return "selected"
+
+@register.simple_tag(takes_context=True)
+def get_pagination_path(context, page):
+
+	request = context["request"]
+	category = context["category"]
+	product_class = context["product_class"]
+
+
+
+
+	if "filter" in request.path:
+		return reverse("catalog:category_product_filter_page", kwargs={"page":page, 
+																		"category":category.slug, 
+																		"product_class":product_class.id})
+	else:
+		return reverse("catalog:category_page", kwargs={"page":page, 
+														"category":category.slug, 
+														})

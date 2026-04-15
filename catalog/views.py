@@ -6,7 +6,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.db.models import Q, Sum, Prefetch
 from django.http import JsonResponse
-from django.db.models import Avg
+from django.db.models import Avg, Max
 from django.utils import timezone
 
 from catalog.models import Category, Product, UserRating, ProductAttributeValue, ProductAttribute, ProductClass
@@ -89,75 +89,76 @@ class ProductDetailView(DetailView):
 
 
 class CategoryProducts(ListView):
-	model = Category
+	model = StockRecord
 	template_name = "catalog/category/products.html"
-	paginate_by = 2
+	paginate_by = 1
+
+	def dispatch(self, request, *args, **kwargs):
+		self.is_ajax = request.headers.get('AJAX')
+		if self.is_ajax:
+			self.template_name = "catalog/category/_products.html"
+
+		return super().dispatch(request, *args, **kwargs)
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-
-		breadcrumb = self.category.get_ancestors()
-		breadcrumb = list(breadcrumb) + [self.category]
+		breadcrumb = self.object.get_ancestors()
+		breadcrumb = list(breadcrumb) + [self.object]
 		attributes = self.get_attribute_values()
+
+		agg =self.object_list.aggregate(max_price=Max("price"))
+		max_price = agg["max_price"]
 		context["breadcrumb"] = breadcrumb
-		context['category'] = self.category
+		context['category'] = self.object
 		context['attributes'] = attributes
+		context['product_class'] = self.object.product_class
+		context['max_price'] = max_price
+
+
+
+
 
 		return context
-
 	def get_queryset(self):
-		slug = self.kwargs.get("category")
-		self.category = get_object_or_404(Category, slug=slug)
-		descendants = self.category.get_descendants(include_self=True)
-		stocks = StockRecord.objects.filter(product__categories__in=descendants).distinct()
+		stock_records = super().get_queryset()
+		category_slug = self.kwargs.get("slug")
+		self.object = Category.objects.get(slug=category_slug)
+		stock_records = self.get_stocks(stock_records)
+		return stock_records
+
+	def get_stocks(self, stock_records):
+		descendants = self.object.get_descendants(include_self=True)
+		stocks = stock_records.filter(product__categories__in=descendants).distinct()
+
+		stocks = self.apply_filter(stocks)
 		return stocks
 
+	def apply_filter(self, stocks):
+		q = self.get_filter()
+		stocks = stocks.filter(q)
+		return stocks
 
-
-	def get_attribute_value_field(self, attr_type):
-		ATTR_TYPE= {
-		"text":"value_text"
-		}
-		return ATTR_TYPE[attr_type]
-
-	def get_attribute_values(self):
-
-		attributes =  (self.category.product_class.attributes.all()
-						.prefetch_related(Prefetch("attribute_values", to_attr="values"))
-			)
-		return attributes
-
-
-class CategoryFilter(ListView):
-	model = StockRecord
-	template_name = "catalog/category/_products.html"
-	paginate_by = 2
-
-	def get_queryset(self):
-		stocks = super().get_queryset()
-		stocks = StockRecord.objects.all()
-		product_class_id = self.kwargs.get("product_class")
+	def get_filter(self):
 		q_total=Q()
 		for key, value in self.request.GET.items():
 
 			if key  in ["price_min", "price_max", "availability", "rating"]:
 				q= self.get_stock_q(key, value)
+				q_total = q_total & q
+
 			else:
 				try:
-					product_class = ProductClass.objects.get(id=product_class_id)
+					product_class = ProductClass.objects.get(id=self.object.product_class.id)
 					product_attribute = ProductAttribute.objects.get(name=key, product_class=product_class)
 					value_type = product_attribute.type
 					q = self.get_q(value_type, value)
+					q_total = q_total & q
 
 
 				except (ProductAttribute.DoesNotExist, ProductClass.DoesNotExist) as e:
 					pass
 
-			q_total = q_total & q
-
-
-		stocks = stocks.filter(q_total)
-		return stocks
-
+		return q_total
 
 	def get_q(self, value_type, value):
 
@@ -196,6 +197,23 @@ class CategoryFilter(ListView):
 
 
 		return q
+
+	def get_attribute_value_field(self, attr_type):
+		ATTR_TYPE= {
+		"text":"value_text"
+		}
+		return ATTR_TYPE[attr_type]
+
+	def get_attribute_values(self):
+
+		attributes =  (self.object.product_class.attributes.all()
+						.prefetch_related(Prefetch("attribute_values", to_attr="values"))
+			)
+		return attributes
+
+
+
+		
 class ApplyRating(View):
 	def post(self, request, *args, **kwargs):
 
