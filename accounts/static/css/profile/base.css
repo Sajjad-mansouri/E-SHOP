@@ -1,0 +1,43 @@
+  .header {
+    background-color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .logo-text {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  .logo-text span { 
+    color: var(--dark); 
+  }
+
+  .home-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: 0.2s;
+    background-color: #f0f2f5;
+  }
+
+  .home-link:hover {
+    background-color: #ffe9ec;
+    color: var(--primary);
+  }
+
+  .home-link svg {
+    width: 18px;
+    height: 18px;
+  }

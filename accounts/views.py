@@ -16,8 +16,7 @@ from django.contrib.auth import views as auth_views
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.views import LoginView
-
+from django.contrib.auth import views as auth_views
 
 from .forms import UserRegistrationForm, UserProfileForm, CustomAuthenticationForm
 from order.models import Order
@@ -250,5 +249,37 @@ class WishlistDeleteView(DeleteView):
 
 
 
-class LoginView(LoginView):
+class LoginView(auth_views.LoginView):
     form_class = CustomAuthenticationForm
+
+class PasswordResetView(auth_views. PasswordResetView):
+    template_name = "registration/pass_reset_form.html"
+    email_template_name = "registration/pass_reset_email.html"
+    subject_template_name = "registration/pass_reset_subject.txt"
+    success_url = reverse_lazy("account:password_reset_done")
+
+    def form_valid(self, form):
+        email = form.cleaned_data["email"]
+        self.request.session["email"] = email
+        print(self.request.session.get("email"))
+        return super().form_valid(form) 
+
+class PasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = "registration/pass_reset_done.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["email"] = self.request.session.get("email")
+        return context
+
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = "registration/pass_reset_confirm.html"
+    success_url = reverse_lazy("account:password_reset_complete")
+
+class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = "registration/pass_reset_complete.html"
+
+class LogoutView(auth_views.LogoutView):
+    pass

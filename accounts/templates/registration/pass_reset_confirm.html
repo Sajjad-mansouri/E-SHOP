@@ -1,0 +1,66 @@
+{%extends 'registration/_base_registration.html'%}
+{% load static %}
+
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/registration/reset_confirm.css'%}">
+
+  {%endblock%}
+  {%block content%}
+
+        {%if validlink%}
+        <div class="auth-container" id="validLinkView">
+            <div class="auth-header">
+                <h1>Set New Password</h1>
+                <p>Please enter your new password below. Make sure it's at least 8 characters long.</p>
+            </div>
+
+            <!-- Client-side error alert -->
+
+            {% if form.errors %}
+                <div class="alert show">
+                    {% for error in form.non_field_errors %}
+                        <p class="error-msg">{{ error }}</p>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p class="error-msg"><strong>{{ field.label }}:</strong> {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}       
+
+
+            <form id="resetPasswordForm"  method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">New Password</label>
+                    <input class="form-control" type="password" id="password" name="new_password1" required minlength="8">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirm New Password</label>
+                    <input class="form-control" type="password" id="confirm_password" name="new_password2" required minlength="8">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Reset Password</button>
+            </form>
+        </div>
+        {%else%}
+
+        <div class="status-card" id="invalidLinkView">
+            <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <h1>Invalid Reset Link</h1>
+            <p>This password reset link is invalid or has already been used. Please request a new password reset link.</p>
+            
+            <a href="{%url 'account:password_reset'%}" class="btn btn-primary">Request New Reset Link</a>
+        </div>
+        {%endif%}
+
+{%endblock%}

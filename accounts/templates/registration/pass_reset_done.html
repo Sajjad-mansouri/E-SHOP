@@ -1,0 +1,32 @@
+{%extends 'registration/_base_registration.html'%}
+{% load static %}
+
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/registration/register_done.css'%}">
+
+  {%endblock%}
+  {%block content%}
+        <!-- SUCCESS STATE -->
+        <div class="status-card success-theme" id="successCard">
+            <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h1>Password Reset Sent!</h1>
+            <p>
+                We have sent password reset instructions to <br>
+                <span class="email-highlight">{{email}}</span>. 
+                Please check your inbox and follow the link to create a new password.
+            </p>
+            <p style="font-size: 0.9em; color: #666;">
+                Don't see it? Check your spam folder or try again in a few minutes.
+            </p>
+            
+            <a href="{%url 'account:login'%}" class="btn btn-primary">Go to Login</a>
+
+        </div>
+
+
+{%endblock%}
