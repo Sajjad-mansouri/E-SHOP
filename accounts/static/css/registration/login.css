@@ -263,51 +263,7 @@
             transition: color 0.2s;
         }
 
-        /* Footer */
-        .footer {
-            background-color: var(--gray-800);
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            margin-top: auto;
-        }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-link {
-            color: var(--gray-300);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-link:hover {
-            color: white;
-        }
-
-        .copyright {
-            color: var(--gray-400);
-            font-size: 0.875rem;
-        }
-
-        /* Loading Animation */
-        .loading {
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
 
         .alert {
             padding: 1rem;

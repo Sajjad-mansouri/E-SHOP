@@ -127,7 +127,9 @@ class UserRegistrationForm(UserCreationForm):
 		user = super().save(commit=False)
 		user.is_active = False
 		user.username = user.email
+		user.user_type = "customer"
 		user.save()
+		
 		self._save(**opts)
 		return user
 

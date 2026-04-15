@@ -25,7 +25,7 @@ class Profile(models.Model):
 	("vip", "VIP")
 	]
 	user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name=_("user"))
-	profile_image = models.ImageField(_("Profile Image"), upload_to="users")
+	profile_image = models.ImageField(_("Profile Image"), upload_to="users", null=True)
 	birth_day = models.DateTimeField(_("Birth Day"), null=True, blank=True)
 	status = models.CharField(_("status"), choices=STATUS, max_length=6, default="normal")
 	

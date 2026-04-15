@@ -23,6 +23,7 @@ from .forms import UserRegistrationForm, UserProfileForm, CustomAuthenticationFo
 from order.models import Order
 from address.models import Address
 from wishlist.models import WishList
+from .models import Profile
 
 UserModel = get_user_model()
 INTERNAL_REGISTRATION_SESSION_TOKEN = "_registration_token"
@@ -44,7 +45,7 @@ class RegistrationView(CreateView):
     from_email = None
     html_email_template_name = None
     subject_template_name = "registration/registration_subject.txt"
-    success_url = reverse_lazy("registration_done")
+    success_url = reverse_lazy("account:registration_done")
     template_name = "registration/register.html"
     title = _("Register")
     token_generator = default_token_generator
@@ -61,12 +62,19 @@ class RegistrationView(CreateView):
             "extra_email_context": self.extra_email_context,
         }
         form.save(**opts)
+        self.request.session["email"] = form.cleaned_data["email"]
         return super().form_valid(form)
+
 
 
 class RegistrationDoneView(PasswordContextMixin, TemplateView):
     template_name = "registration/registration_done.html"
     title = _("Activition Email sent")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["email"] = self.request.session.get("email")
+        return context
 
 
 @method_decorator(login_not_required, name="dispatch")
@@ -96,6 +104,7 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
                     self.validlink=True
                     self.user.is_active=True
                     self.user.save()
+                    Profile.objects.create(user=self.user)
                     return super().dispatch(*args, **kwargs)
             else:
                 if self.token_generator.check_token(self.user, token):

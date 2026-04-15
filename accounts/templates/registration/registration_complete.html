@@ -1,21 +1,44 @@
-{% extends "base.html" %}
+{%extends 'registration/_base_registration.html'%}
 {% load i18n %}
 {% load static %}
 
   {%block style%}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/register.css'%}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/registration/register_completed.css'%}">
 
   {%endblock%}
 
 {%block content%}
-{% if validlink %}
-<p>{% translate "Your registration done.  You may go ahead and log in now." %}</p>
 
-<p><a href="{% url 'login'%}">{% translate 'Log in' %}</a></p>
-{% else %}
-    
-<p>{% translate "The Registration failed, possibly because it has already been used.  Please Registration again." %}</p>
 
-{% endif %}
+    {% if validlink %}
+        <!-- VERIFICATION SUCCESS -->
+        <div class="status-card success-theme" id="successCard">
+            <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h1>Account Verified!</h1>
+            <p>Your email address has been successfully verified and your registration is now complete. Welcome to the E-SHOP community.</p>
+            
+            <a href="{%url 'account:login'%}" class="btn btn-primary">Proceed to Login</a>
+        </div>
+    {% else %}
+        <!-- VERIFICATION FAILED / INVALID LINK -->
+        <div class="status-card error-theme" id="errorCard">
+            <div class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <h1>Verification Failed</h1>
+            <p>We couldn't verify your account. The link may be invalid, already used, or it has expired. Please request a new activation link.</p>
+            
+            <button class="btn btn-primary">Request New Link</button>
+        </div>
+
+    {% endif %}
 
 {%endblock%}
