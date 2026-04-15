@@ -8,6 +8,7 @@ from . import views
 app_name = "account"
 urlpatterns = [
 	path("register/<uidb64>/<token>/", RegistrationConfirmView.as_view(), name="register-confirm"),
+	path("login/", views.LoginView.as_view(), name="login"),
 	# path("", include("django.contrib.auth.urls")),
 	path("register/", RegistrationView.as_view(), name="register"),
 	path("register/registration_done/", RegistrationDoneView.as_view(), name="registration_done"),

@@ -154,3 +154,5 @@ MEDIA_URL = 'media/'
 
 DEFAULT_CURRENCY = 'USD'
 EMAIL_BACKEND = config('EMAIL_BACKEND')
+
+LOGIN_REDIRECT_URL = "catalog:home"

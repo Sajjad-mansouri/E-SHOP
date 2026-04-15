@@ -16,9 +16,10 @@ from django.contrib.auth import views as auth_views
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.views import LoginView
 
 
-from .forms import UserRegistrationForm, UserProfileForm
+from .forms import UserRegistrationForm, UserProfileForm, CustomAuthenticationForm
 from order.models import Order
 from address.models import Address
 from wishlist.models import WishList
@@ -235,3 +236,10 @@ class WishlistDeleteView(DeleteView):
             self.object.delete()
             return JsonResponse({"status":True})
         return JsonResponse({"status":False})
+
+
+
+
+
+class LoginView(LoginView):
+    form_class = CustomAuthenticationForm

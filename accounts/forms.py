@@ -5,9 +5,10 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.forms import _unicode_ci_compare
+from django.contrib.auth.forms import _unicode_ci_compare, AuthenticationForm
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+
 
 
 UserModel = get_user_model()
@@ -137,3 +138,12 @@ class UserProfileForm(forms.ModelForm):
 	class Meta:
 		model = UserModel
 		fields = ["first_name", "last_name", "email", ]
+
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+	def __init__(self, request=None, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.fields["username"].widget.attrs["class"] = "form-input"
+		self.fields["password"].widget.attrs["class"] = "form-input"
