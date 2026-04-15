@@ -113,6 +113,8 @@ class CategoryProducts(ListView):
 		context['attributes'] = attributes
 		context['product_class'] = self.object.product_class
 		context['max_price'] = max_price
+		context['order_by'] = self.order_by
+
 
 
 
@@ -131,6 +133,7 @@ class CategoryProducts(ListView):
 		stocks = stock_records.filter(product__categories__in=descendants).distinct()
 
 		stocks = self.apply_filter(stocks)
+		stocks = self.apply_sorting(stocks)
 		return stocks
 
 	def apply_filter(self, stocks):
@@ -212,8 +215,36 @@ class CategoryProducts(ListView):
 		return attributes
 
 
+	def apply_sorting(self, stocks):
+		sort_by = self.get_order()
+		stocks = stocks.order_by(*sort_by)
+		return stocks
 
-		
+	def get_order(self):
+		self.order_by = self.request.GET.get("sort-by", "best-selling")
+		if self.order_by == "best-selling":
+			sort_by = ["-sold"]
+
+		elif self.order_by == "price-low":
+			sort_by = ["price"]
+
+		elif self.order_by == "price-high":
+			sort_by = ["-price"]
+
+		elif self.order_by == "rating":
+			sort_by = ["-rating"]
+
+		elif self.order_by == "newest":
+			sort_by = ["date_created"]
+
+		elif self.order_by == "oldest":
+			sort_by = ["-date_created"]
+
+		elif self.order_by == "discount":
+			sort_by = ["-offer_discount", "-discount"]
+		else:
+			sort_by = ["-sold"]
+		return sort_by
 class ApplyRating(View):
 	def post(self, request, *args, **kwargs):
 

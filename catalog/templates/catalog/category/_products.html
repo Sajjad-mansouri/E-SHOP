@@ -3,13 +3,16 @@
       <div class="products-count" id="productCount">{{paginator.count}} products exists</div>
       <div class="sort-container">
         <span class="sort-label">Sort by:</span>
-        <select class="sort-select" id="sortSelect">
-          <option value="featured">Featured</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="rating">Customer Rating</option>
-          <option value="newest">Newest Arrivals</option>
-          <option value="best-selling">Best Selling</option>
+        <select class="sort-select" id="sortSelect" onchange="sortProduct()">
+
+          <option value="best-selling" {% is_selected_ordering 'best-selling' %}>Best Selling</option>
+          <option value="price-low" {% is_selected_ordering 'price-low' %}>Price: Low to High</option>
+          <option value="price-high" {% is_selected_ordering 'price-high' %}>Price: High to Low</option>
+          <option value="rating" {% is_selected_ordering 'rating' %}>Customer Rating</option>
+          <option value="newest" {% is_selected_ordering 'newest' %}>Newest Arrivals</option>
+          <option value="oldest" {% is_selected_ordering 'oldest' %}>oldest Arrivals</option>
+          <option value="discount" {% is_selected_ordering 'discount' %}>Most Discount</option>
+
         </select>
       </div>
     </div>

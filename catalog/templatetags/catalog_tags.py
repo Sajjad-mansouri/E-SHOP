@@ -120,20 +120,7 @@ def has_reaction(context, review, action):
 			return "selected"
 
 @register.simple_tag(takes_context=True)
-def get_pagination_path(context, page):
-
-	request = context["request"]
-	category = context["category"]
-	product_class = context["product_class"]
-
-
-
-
-	if "filter" in request.path:
-		return reverse("catalog:category_product_filter_page", kwargs={"page":page, 
-																		"category":category.slug, 
-																		"product_class":product_class.id})
-	else:
-		return reverse("catalog:category_page", kwargs={"page":page, 
-														"category":category.slug, 
-														})
+def is_selected_ordering(context, sort_by):
+	order_by = context["order_by"]
+	if order_by == sort_by:
+		return "selected"

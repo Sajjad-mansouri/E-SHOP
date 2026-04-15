@@ -38,7 +38,7 @@
   let currentPage = 1;
   const productsPerPage = 8;
 
-  let sortBy = 'featured';
+  let sortBy = 'best-selling';
   const filters = {}
   // Filter state
   document.querySelectorAll('.filter-title').forEach(el => {
@@ -123,13 +123,6 @@
       clearAllFilters();
     });
 
-    // Sort select
-    sortSelect.addEventListener('change', (e) => {
-      sortBy = e.target.value;
-
-    });
-
-
 
     applyFilterBtn.addEventListener("click", ()=>{
       const page = null;
@@ -137,6 +130,11 @@
     })
   }
 
+  function sortProduct(){
+      sortBy = event.target.value;
+      const page = null;
+      applyFilters(page)
+  }
   // Initialize price slider
   function initPriceSlider() {
     let isDraggingMin = false;
@@ -241,6 +239,7 @@
 
   // Apply all filters and sorting
   async function applyFilters(page) {
+    console.log('apply')
     const url = serializeFiltersToURL(page)
     const data = await getFetch(url)
     productsSection.innerHTML = ""
@@ -279,6 +278,7 @@
     newURL = `?${params.toString()}`;
 
   }
+    newURL = newURL + `&sort-by=${sortBy}`
     return newURL
   
   }
@@ -326,8 +326,8 @@
     initPriceSlider();
     
     // Reset sort
-    sortSelect.value = 'featured';
-    sortBy = 'featured';
+    sortSelect.value = 'best-selling';
+    sortBy = 'best-selling';
     
     // Apply filters
 

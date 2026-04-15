@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.db import models
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Sum
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
@@ -47,6 +47,7 @@ class StockRecord(models.Model):
 	discount = models.IntegerField(_("discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 	offer_discount = models.IntegerField(_("Offer Discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
 	rating = models.FloatField(_("rating"), default=0.0)
+	sold = models.IntegerField(_("Sold"), default=0)
 
 	# Date information
 	date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
@@ -68,8 +69,10 @@ class StockRecord(models.Model):
 		offers = Offer.objects.filter(Q(status="open"))
 		product_discounts = []
 		for offer in offers:
-			product = offer.offer_type.offer_range.get_products.filter(id=self.product.id).exists()
-			product_discounts.append((self.offer_discount, offer.priority, offer.name))
+
+			is_exists = offer.offer_type.offer_range.get_products.filter(id=self.id).exists()
+			if is_exists:
+				product_discounts.append((self.offer_discount, offer.priority, offer.name))
 
 
 		if not product_discounts:
@@ -79,6 +82,7 @@ class StockRecord(models.Model):
 
 		product_discounts.sort(key=lambda x:x[1])
 		product_discounts.append((self.discount, last_offer_priority, ""))
+
 		return product_discounts
 
 	@property
@@ -115,6 +119,13 @@ class StockRecord(models.Model):
 			return self.product.images.all()[0].image.url
 		else:
 			return ""
+
+	@property
+	def get_sold_count(self):
+
+		agg = self.stock_carts.filter(Q(cart__order__status__in=["pending", "processing", "shipped","delivered"])).aggregate(sell_count=Sum("quantity"))
+		return agg["sell_count"]
+
 
 	def save(self, *args, **kwargs):
 		agg = self.comments.aggregate(rating_mean=Avg("rating", default=0))
