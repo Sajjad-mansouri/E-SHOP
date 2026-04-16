@@ -53,9 +53,9 @@
     </div>
 
     <div class="price-block">
-      <span class="current-price">${{stock_record.get_final_price}}</span>
-      <span class="old-price">${{stock_record.price}}</span>
-      <span class="discount-badge">-{{stock_record.get_discount}}%</span>
+      <span class="current-price">{{stock_record.output_display_final_price}}</span>
+      {%if record.has_dicounted%}<span class="old-price">${{stock_record.price}}</span>
+      <span class="discount-badge">-{{stock_record.get_discount}}%</span>{%endif%}
     </div>
 
 

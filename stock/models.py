@@ -114,9 +114,19 @@ class StockRecord(models.Model):
 	@property
 	@admin.display(description="price after discount")
 	def get_final_price(self):
+		if not self.price:
+			return 0
 		discount = self.get_discount
 
 		return self.price - (self.price * (discount/100))
+
+	@property
+	def output_display_final_price(self):
+		if self.price:
+			return f"${self.get_final_price}"
+		elif not self.price or self.quantity == 0:
+			return "Out of Stock"
+
 
 	@property
 	def get_product_image(self):
