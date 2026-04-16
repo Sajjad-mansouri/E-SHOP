@@ -350,6 +350,7 @@
       font-size: 1rem;
       cursor: pointer;
       width: 100%;
+      margin: 25px 0px;
     }
 
     /* comment list */
@@ -565,6 +566,22 @@
       .product-detail { grid-template-columns: 1fr; }
       .review-grid { grid-template-columns: 1fr; }
     }
+
+
+.auth-message {
+  font-size: 1rem;
+  color: #444;
+  margin: 16px 0 24px;
+  line-height: 1.5;
+}
+
+.auth-login-btn {
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 
 

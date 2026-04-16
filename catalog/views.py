@@ -53,10 +53,7 @@ class ProductDetailView(DetailView):
 		stock_record = get_object_or_404(StockRecord, id=stock_record_id)
 		attributes_values = self.get_attribute_values()
 		comment_form = CommentForm(initial={'stock_record':stock_record})
-		try:
-			user_product_rating = range(UserRating.objects.get(user=self.request.user, product=self.object).rating)
-		except UserRating.DoesNotExist:
-			user_product_rating = []
+
 
 		product_ratings = Comment.objects.filter(stockrecord=stock_record).aggregate(rating_mean=Avg("rating", default=0))
 		product_ratings_count = Comment.objects.filter(stockrecord=stock_record).distinct().count()
@@ -66,7 +63,7 @@ class ProductDetailView(DetailView):
 		context["attributes_values"] = attributes_values
 		context["comment_form"]=comment_form
 		context["cart_form"] = CartItemForm()
-		context["user_product_rating"] = user_product_rating
+
 		context["product_ratings"] = product_ratings["rating_mean"]
 		context["product_ratings_count"] = product_ratings_count
 

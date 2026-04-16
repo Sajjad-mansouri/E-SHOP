@@ -10,7 +10,12 @@
         Write a review
       </h3>
       <p>Share your experience with this product to help other customers.</p>
+      {%if user.is_authenticated%}
       <button class="submit-review" id="writeReviewBtn">Write Your Review</button>
+      {%else%}
+      <button class="submit-review" onclick="openAuthModal()">Write Your Review</button>
+
+      {%endif%}
     </div>
 
     <!-- right: see comments -->

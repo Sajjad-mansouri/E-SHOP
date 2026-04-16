@@ -10,6 +10,8 @@ register = template.Library()
 def is_bookmarked(context, stock_record):
 	user = context["user"]
 	# stock_record = context["stock_record"]
+	if not user.is_authenticated:
+		return False
 	try:
 		cart = Cart.objects.get(user=user, submited=False)
 	except Cart.DoesNotExist:
@@ -112,6 +114,8 @@ def count_review_rection(review, action):
 @register.simple_tag(takes_context=True)
 def has_reaction(context, review, action):
 	user = context["user"]
+	if not user.is_authenticated:
+		return ""
 	if action=="like":
 		if review.review_reactions.filter(user=user, like=True).exists():
 			return "selected"

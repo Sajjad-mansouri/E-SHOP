@@ -74,33 +74,47 @@
     {%endif%}
     {%csrf_token%}
     <!-- action buttons: buy now, add to cart, and wishlist -->
+    
     <div class="cta-buttons">
-      {% is_bookmarked stock_record as is_bookmarked%}
-      <button class="btn-secondary" id="cart" data-cart="{{is_bookmarked}}">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
-        </svg>
-        <span>
-          {%if is_bookmarked%}
-          Remove from Cart
-          {%else%}
-          Add to Cart
-          {%endif%}
-        </span>
+      {%if user.is_authenticated%}
 
-      </button>
+        {% is_bookmarked stock_record as is_bookmarked%}
+        <button class="btn-secondary" id="cart" data-cart="{{is_bookmarked}}" >
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
+          </svg>
+          <span>
+            {%if is_bookmarked%}
+            Remove from Cart
+            {%else%}
+            Add to Cart
+            {%endif%}
+          </span>
+
+        </button>
+      {%else%}
+        <button class="btn-secondary" onclick="openAuthModal()" >
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
+          </svg>
+          <span>Add to Cart</span>
+        </button>
+      {%endif%}
+
+      {%if user.is_authenticated%}
         {%user_has_wishlist as user_has_wishlist%}
         {% if user_has_wishlist %}
-      <button class="btn-wishlist add" id="wishlistBtn" data-wish="remove">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span >
-        Remove from Wishlist
-        </span>
-      </button>
+          <button class="btn-wishlist add" id="wishlistBtn" data-wish="remove" >
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span >
+            Remove from Wishlist
+            </span>
+          </button>
         {%else%}
-          <button class="btn-wishlist remove" id="wishlistBtn" data-wish="add">
+
+          <button class="btn-wishlist remove" id="wishlistBtn" data-wish="add" >
             <svg class="icon" viewBox="0 0 24 24">
               <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/>
             </svg>
@@ -108,8 +122,23 @@
             Add to Wishlist
             </span>
           </button>
+
         {%endif%}
+      {%else%}
+          <button class="btn-wishlist" onclick="openAuthModal()"  >
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/>
+            </svg>
+            <span >
+            Add to Wishlist
+            </span>
+          </button>
+      {%endif%}
     </div>
+    
+
+    
+
   </div>
 </div>
 
@@ -179,7 +208,7 @@
     </div>
     <div class="modal-actions">
       <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
-      <button class="modal-btn primary" onclick="submitReview()">Submit Review</button>
+      <button class="modal-btn primary" onclick="submitReview()" {%if not user.is_authenticated%}disabled{%endif%} >Submit Review</button>
     </div>
   </div>
 </div>
@@ -198,6 +227,25 @@
     </div>
   </div>
 </div>
+
+<div class="modal-overlay" id="authRequiredModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Login Required</h3>
+      <button class="close-modal" onclick="closeAuthModal()">×</button>
+    </div>
+
+    <div class="auth-message">
+      <p>You need to log in to use this feature.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAuthModal()">Close</button>
+      <a href="{%url 'account:login'%}?next={{request.path}}" class="modal-btn primary auth-login-btn">Login</a>
+    </div>
+  </div>
+</div>
+
 {%endblock%}
 
 {%block script%}
@@ -288,6 +336,8 @@
   async function postFetch(url, formData, responseType){
     let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     let data;
+    try{
+
       const response = await fetch(url,{
                               method:'POST',
                               headers:{
@@ -295,13 +345,23 @@
                               },
                               body:formData
                             })
+      console.log(response)
+      if (! response.ok){
+        throw new Error("Http Error")
+      }
       if(responseType=="json"){
          data = await response.json()
 
       }else if(responseType=="text"){
         data = await response.text()
       }
+      
+    }catch(error){
+
+      data = ""
+    }finally{
       return data
+    }
   }
   // Modal functions
   function openModal() {
@@ -417,7 +477,7 @@
       formData.append("commentId", currentReviewId)
       const reviewItem = document.querySelector(`[data-review-id="${currentReviewId}"]`);
       const data = await postFetch(url, formData, "json")
-      console.log(data)
+
       if (reviewItem && data.status) {
         const commentCountSpan = document.querySelector('.comments-list .comment-count');
         const ratingCounts = document.querySelector(".rating-counts");
@@ -425,6 +485,9 @@
         commentCountSpan.innerText = Number(commentCountSpan.innerText) - 1;
         ratingCounts.textContent = data.rating_counts;
         showMessage("Review deleted successfully!", "success")
+
+      }else{
+        showMessage("Review deleted Faild!", "error")
 
       }
     }
@@ -460,8 +523,8 @@
     formData.append("rating", currentRating)
 
     const data = await postFetch(url, formData, output)
-    console.log(url, data, currentRating)
-    if (isEditing && currentReviewId) {
+
+    if (isEditing && currentReviewId && data.status) {
       // Update existing review
       const reviewItem = document.querySelector(`[data-review-id="${currentReviewId}"]`);
 
@@ -488,7 +551,7 @@
         
         
       }
-    } else {
+    } else if(data) {
       // Create new review
       const commentsList = document.querySelector('.comments-list h3');
 
@@ -497,6 +560,8 @@
       
         const commentCountSpan = document.querySelector('.comments-list .comment-count');
         commentCountSpan.innerText = Number(commentCountSpan.innerText) + 1;
+    }else{
+      showMessage("Faild to submit review", "error")
     }
     
     closeModal();
@@ -585,5 +650,16 @@
       }
     }
   });
+function openAuthModal() {
+  document.getElementById("authRequiredModal").style.display = "flex";
+}
+
+function closeAuthModal() {
+  document.getElementById("authRequiredModal").style.display = "none";
+}
+
+  function Login(){
+    window.location.href = "{%url 'account:login'%}" + `?next=` + "{{request.path}}"
+  }
 </script>
 {%endblock%}
