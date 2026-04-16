@@ -75,7 +75,9 @@ class ProductDetailView(DetailView):
 		for attribute in self.object.product_attributes.all():
 			attribute_type = attribute.attribute.type
 			if attribute_type == 'text':
-				attributes_values.append((f"{attribute.attribute}", attribute.value_text))
+				if attribute.value_text:
+					attributes_values.append((f"{attribute.attribute}", attribute.value_text))
+			
 
 
 		return attributes_values

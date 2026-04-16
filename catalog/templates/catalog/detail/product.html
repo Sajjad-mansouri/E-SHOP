@@ -168,8 +168,10 @@
     </h2>
     <table class="spec-table">
       {%for attribute_value in attributes_values%}
-      
+
       <tr><td>{{attribute_value.0}}</td><td>{{attribute_value.1}}</td></tr>
+      {%empty%}
+      There are nonTechnical specifications!
       {%endfor%}
 
     </table>
