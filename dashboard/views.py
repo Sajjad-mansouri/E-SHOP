@@ -159,7 +159,9 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 			
 			self.object = product_form.save()
 		else:
-
+			img_formset = image_formset(data=request.POST,files=request.FILES, prefix="img")
+			product_category_form = ProductCategoryInline(data=request.POST,  prefix="category")
+			stock_record_form = StockRecordForm(data=request.POST)
 			return render(request, "dashboard/product/create_update.html", {
 				"product_form":product_form,
 				"img_formset":img_formset,
@@ -168,10 +170,10 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 				}
 				)
 
+
 		img_formset = image_formset(data=request.POST,files=request.FILES,instance=self.object, prefix="img")
 		product_category_form = ProductCategoryInline(data=request.POST,instance=self.object,  prefix="category")
 		stock_record_form = StockRecordForm(data=request.POST, instance=self.stock)
-
 		if img_formset.is_valid() and product_category_form.is_valid() and stock_record_form.is_valid():
 
 			img_formset.save()
@@ -613,7 +615,6 @@ class CustomerListView(ListView):
 
 		]
 		if ordering and ordering in ordering_options:
-			print(ordering)
 			return users.order_by(ordering)
 		return users
 
@@ -697,7 +698,6 @@ class SalesReport(ListView):
 			range_start = self.request.GET.get("range_start")
 			range_end = self.request.GET.get("range_end")
 			product_selling_q, total_q = Q(), Q()
-			print(period, is_filter, is_range, range_start, range_end)
 			if is_filter=="true" and period !="total":
 				product_selling_q, total_q = self.get_filter_by_period(period, is_range, range_start, range_end)
 

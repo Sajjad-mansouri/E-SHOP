@@ -18,6 +18,7 @@ class ProductClassForm(forms.ModelForm):
 		fields = ["product_class"]
 
 class ProductCategoryForm(forms.ModelForm):
+
 	class Meta:
 		model = ProductCategory
 		fields = ["category"]

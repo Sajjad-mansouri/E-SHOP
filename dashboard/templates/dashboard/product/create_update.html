@@ -33,7 +33,7 @@
     </div>
 
     <!-- RIGHT CONTENT -->
-    <form class="content" id="create_update_product_form" method="POST" enctype="multipart/form-data">
+    <form class="content" id="create_update_product_form" method="POST" enctype="multipart/form-data" novalidate>
         {%csrf_token%}
         <div id="form-errors" class="error-box" 
         {%if not product_form.errors and not product_category_form.errors and not stock_record_form.errors and not simg_formset %}
@@ -43,21 +43,21 @@
         <strong>There were problems creating the product:</strong>
         <ul id="error-list">
             {% for field, errors in product_form.errors.items %}
-            <strong>{{ field}}:</strong>
+            <strong>Product Detail "{{ field}}":</strong>
               {% for error in errors %}
               <li>{{ error }}</li>
               {% endfor %}
             {% endfor %}
 
             {% for field, errors in product_category_form.errors.items %}
-            <strong>{{ field}}:</strong>
+            <strong>Categories "{{ field}}":</strong>
               {% for error in errors %}
               <li>{{ error }}</li>
               {% endfor %}
             {% endfor %}
 
             {% for field, errors in stock_record_form.errors.items %}
-            <strong>{{ field}}:</strong>
+            <strong>Stock and Pricing "{{ field}}":</strong>
               {% for error in errors %}
               <li>{{ error }}</li>
               {% endfor %}
@@ -65,7 +65,7 @@
 
             {% for form in img_formset %}
               {% for field, errors in form.errors.items %}
-              <strong>{{ field}}:</strong>
+              <strong>Images "{{ field}}":</strong>
                 {% for error in errors %}
                 <li>{{ error }}</li>
                 {% endfor %}
