@@ -135,7 +135,12 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 		product_category_form = ProductCategoryInline(instance=self.product, prefix="category")
 		# stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
-		stock_record_form = StockRecordForm(instance=self.stock)
+		offer_discount = False
+		if self.stock:
+			offer_discounts = self.stock.get_offer_discount
+			if offer_discounts:
+				offer_discount = True
+		stock_record_form = StockRecordForm(offer_discount=offer_discount, instance=self.stock)
 
 		return self.render_to_response({
 			"img_formset":img_formset, 

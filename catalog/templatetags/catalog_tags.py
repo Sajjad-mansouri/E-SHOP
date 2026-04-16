@@ -62,9 +62,11 @@ def get_product_breadcrumb(context, product=None, category=None):
 
 		if product:
 			category = product.categories.first()
-
-		breadcrumb = category.get_ancestors()
-		breadcrumb = list(breadcrumb) + [category]
+		if category:
+			breadcrumb = category.get_ancestors()
+			breadcrumb = list(breadcrumb) + [category]
+		else:
+			breadcrumb=None
 		return {"breadcrumb":breadcrumb, "product":product}
 
 

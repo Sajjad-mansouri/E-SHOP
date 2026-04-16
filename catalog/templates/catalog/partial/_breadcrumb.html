@@ -2,10 +2,10 @@
 <div class="breadcrumb-wrapper">
   <div class="breadcrumb">
   <a href="{%url 'catalog:home'%}">Home</a>
+{%for cat in breadcrumb%}
     <svg class="icon icon-sm" viewBox="0 0 24 24">
       <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
     </svg>
-{%for cat in breadcrumb%}
   <a href="{%url 'catalog:category_products' cat.slug%}">{{cat.name}}</a>
   {% if not forloop.last %}
     <svg class="icon icon-sm" viewBox="0 0 24 24">
@@ -13,11 +13,11 @@
     </svg>
   {%endif%}
   {%endfor%}
-  {%if product%}
+{%if product%}
     <svg class="icon icon-sm" viewBox="0 0 24 24">
       <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
     </svg>
   <a href="">{{product.title}}</a>
-  {%endif%}
+{%endif%}
 </div>
 </div>

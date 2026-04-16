@@ -90,6 +90,10 @@
             {{product_form.upc}}
             </div>
             <div class="form-group">
+            <label>Short Description</label>
+            {{product_form.short_description}}
+            </div>
+            <div class="form-group">
             <label>Description</label>
             {{product_form.description}}
             </div>
@@ -165,7 +169,12 @@
                 <label>discount</label>
                 {{stock_record_form.discount}}
             </div>
-
+            {%if stock_record_form.offer_discount%}
+            <div class="form-group">
+                <label>Offer discount</label>
+                {{stock_record_form.offer_discount}}
+            </div>
+            {%endif%}
         </section>
 
         <!-- SEO -->

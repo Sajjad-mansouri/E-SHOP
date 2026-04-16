@@ -65,15 +65,7 @@ class StockRecord(models.Model):
 
 	@property
 	def get_product_discounts(self):
-		from offer.models import  Offer
-		offers = Offer.objects.filter(Q(status="open"))
-		product_discounts = []
-		for offer in offers:
-
-			is_exists = offer.offer_type.offer_range.get_products.filter(id=self.id).exists()
-			if is_exists:
-				product_discounts.append((self.offer_discount, offer.priority, offer.name))
-
+		product_discounts = self.get_offer_discount
 
 		if not product_discounts:
 			last_offer_priority = 0
@@ -82,6 +74,20 @@ class StockRecord(models.Model):
 
 		product_discounts.sort(key=lambda x:x[1])
 		product_discounts.append((self.discount, last_offer_priority, ""))
+
+		return product_discounts
+
+	@property
+	def get_offer_discount(self):
+		from offer.models import  Offer
+		offers = Offer.objects.filter(Q(status="open"))
+		
+		product_discounts = []
+		for offer in offers:
+
+			is_exists = offer.offer_type.offer_range.get_products.filter(id=self.id).exists()
+			if is_exists:
+				product_discounts.append((self.offer_discount, offer.priority, offer.name))
 
 		return product_discounts
 

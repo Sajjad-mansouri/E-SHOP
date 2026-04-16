@@ -80,7 +80,7 @@ class Product(models.Model):
 
 	title = models.CharField(max_length=200, verbose_name=_("title"))
 	slug = models.SlugField(max_length=200, blank=True, verbose_name=_("slug"))
-	short_description = models.TextField(blank=True, verbose_name=_("Short Description"))
+	short_description = models.CharField(max_length=250, blank=True, verbose_name=_("Short Description"))
 	description = models.TextField(blank=True, verbose_name=_("Description"))
 	upc = models.CharField(verbose_name=_("UPC"), help_text=_("Universal Product Code"))
 	product_class = models.ForeignKey(ProductClass,

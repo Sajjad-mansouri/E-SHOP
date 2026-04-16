@@ -27,40 +27,40 @@ class ProductCategoryForm(forms.ModelForm):
 		}
 
 
-ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
+ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=0, can_delete=False)
 
 def _text_form(attr):
-	return forms.CharField(widget=forms.TextInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.CharField(widget=forms.TextInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _decimal_form(attr):
-	return forms.DecimalField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.DecimalField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _integer_form(attr):
-	return forms.IntegerField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.IntegerField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _boolean_form(attr):
-	return forms.BooleanField(widget=forms.CheckboxInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.BooleanField(widget=forms.CheckboxInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _float_form(attr):
-	return forms.FloatField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.FloatField(widget=forms.NumberInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _richtext_form(attr):
-	return forms.CharField(widget=forms.Textarea(attrs={"class":"form-control","rows":5}), label=attr.name)
+	return forms.CharField(widget=forms.Textarea(attrs={"class":"form-control","rows":5}), label=attr.name, required=False)
 
 def _date_form(attr):
-	return forms.DateField(widget=forms.DateInput(attrs={"class":"form-control","type":"date"}), 
+	return forms.DateField(widget=forms.DateInput(attrs={"class":"form-control","type":"date"}, required=False), 
 							label=attr.name)
 
 def _datetime_form(attr):
 
-	return forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class":"form-control"}), 
+	return forms.DateTimeField(widget=forms.DateTimeInput(attrs={"class":"form-control"}, required=False), 
 								label=attr.name)
 
 def _file_form(attr):
-	return forms.FileField(widget=forms.ClearableFileInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.FileField(widget=forms.ClearableFileInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 def _image_form(attr):
-	return forms.ImageField(widget=forms.ClearableFileInput(attrs={"class":"form-control"}), label=attr.name)
+	return forms.ImageField(widget=forms.ClearableFileInput(attrs={"class":"form-control"}), label=attr.name, required=False)
 
 
 class ProductForm(forms.ModelForm):
@@ -79,12 +79,14 @@ class ProductForm(forms.ModelForm):
 	}
 	class Meta:
 		model = Product
-		fields = ["title", "upc", "description", "product_class", "meta_title", "meta_description", "slug",]
+		fields = ["title", "upc", "short_description", "description", "product_class", "meta_title", "meta_description", "slug",]
 		widgets = {
 			"product_class":forms.Select(attrs={"class":"form-control"}),
 
 			"title":forms.TextInput(attrs={"class":"form-control", "placeholder":"e.g. Sony WH‑1000XM5"}),
 			"upc":forms.TextInput(attrs={"class":"form-control"}),
+			"short_description":forms.TextInput(attrs={"class":"form-control", "placeholder":"e.g. Sony WH‑1000XM5"}),
+
 			"description":forms.Textarea(attrs={"class":"form-control","rows":5}),
 			"slug":forms.TextInput(attrs={"class":"form-control","placeholder":"sony-wh-1000xm5"}),
 			"meta_title":forms.TextInput(attrs={"class":"form-control"}),
@@ -151,10 +153,12 @@ image_formset = inlineformset_factory(Product, ProductImage,fields = ["image", "
 
 
 class StockRecordForm(forms.ModelForm):
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, offer_discount=None, **kwargs):
+		print(kwargs)
 		super().__init__(*args, **kwargs)
-
-		# self.fields["sku"].required = True
+		print(offer_discount)
+		if offer_discount:
+			 self.fields['offer_discount'] = forms.FloatField(widget=forms.NumberInput(attrs={"class":"form-control"}))
 
 	class Meta:
 		model = StockRecord
