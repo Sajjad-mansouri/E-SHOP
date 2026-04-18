@@ -146,11 +146,13 @@ class Offer(models.Model):
 
 	image = models.ImageField(_("Image"), upload_to="offer/", blank=True, null=True)
 	OFFER_STATUS = [
-		("open", "open"),
-		("Suspended", "Suspended"),
+		("active", "Active"),
+		("expired", "Expired"),
+		("scheduled", "Scheduled"),
+		("suspended", "Suspended"),
 
 	]
-	status = models.CharField(_("Status"), max_length=50, choices=OFFER_STATUS, default="open")
+	status = models.CharField(_("Status"), max_length=50, choices=OFFER_STATUS, default="active")
 
 	offer_type = models.ForeignKey(
 		OfferType,
@@ -228,6 +230,11 @@ class Offer(models.Model):
 	@property
 	def get_offer_products(self):
 		return self.offer_type.offer_range.get_products
+
+	@property
+	def get_time_until_expire(self):
+		now = timezone.now()
+		return (self.end_datetime - now).total_seconds()/3600
 
 class OfferApplication(models.Model):
 	offer = models.ForeignKey(Offer, on_delete=models.CASCADE, verbose_name=_("offer"))

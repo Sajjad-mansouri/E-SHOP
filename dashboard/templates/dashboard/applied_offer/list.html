@@ -1,0 +1,223 @@
+
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/applied_offer/list.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+{%block content%}
+
+<main class="main">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Applied Offers</h1>
+      <div class="subtitle">Manage and monitor all offers applied to products</div>
+    </div>
+    <a href="apply-offer.html" class="apply-offer-btn">
+      <span>➕</span> Apply New Offer
+    </a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Active Offers</div>
+      <div class="stat-value primary" id="totalActiveOffers">{{total_active_offers.count}}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Products with Offers</div>
+      <div class="stat-value" id="totalProducts">{{products_with_offer.total_product}}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Expiring Soon</div>
+      <div class="stat-value" id="expiringSoon" style="color: #f57c00;">{{expiring_offer_products.total_product}}</div>
+    </div>
+
+  </div>
+
+  <!-- SEARCH SECTION -->
+  <div class="search-section">
+    <div class="search-wrapper">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          id="searchInput" 
+          placeholder="Search by product name or offer name..."
+          autocomplete="off"
+        >
+      </div>
+      <div class="filter-group">
+        <select class="filter-select" id="statusFilter">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="scheduled">Scheduled</option>
+        </select>
+        <select class="filter-select" id="offerFilter">
+          <option value="all">All Offers</option>
+          <option value="summer">Summer Offer</option>
+          <option value="flash">Flash Sale</option>
+          <option value="clearance">Clearance</option>
+          <option value="winter">Winter Warmup</option>
+        </select>
+        <button class="clear-search-btn" id="clearSearchBtn">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFERS TABLE -->
+  <div class="offers-table-container">
+    <div class="table-header">
+      <h2>Applied Offers List</h2>
+    </div>
+    
+      {%include 'dashboard/applied_offer/_list.html'%}
+
+  
+    </div>
+  </div>
+</main>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Remove Offer</h3>
+    <p id="deleteModalMessage">Are you sure you want to remove this offer from the product?</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">Remove</button>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
+{%block script%}
+<script>
+
+    // DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const offerFilter = document.getElementById('offerFilter');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const offersTableBody = document.getElementById('offersTableBody');
+    const noResults = document.getElementById('noResults');
+    const resultCount = document.getElementById('resultCount');
+    const tableContainer = document.querySelector('table');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const deleteModalMessage = document.getElementById('deleteModalMessage');
+    
+    // Stats elements
+    const totalActiveOffersEl = document.getElementById('totalActiveOffers');
+
+    const totalProductsEl = document.getElementById('totalProducts');
+    const expiringSoonEl = document.getElementById('expiringSoon');
+    const totalSavingsEl = document.getElementById('totalSavings');
+
+
+    let offerToDelete = null;
+
+
+
+    // Update stats
+    function updateStats() {
+
+      
+      // Calculate mock savings (simplified)
+      const totalSavings = appliedOffers.reduce((sum, offer) => sum + (offer.discount * 1.5), 0);
+      totalSavingsEl.textContent = `$${totalSavings.toFixed(0)}`;
+    }
+
+    // Filter offers
+    function filterOffers() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const status = statusFilter.value;
+      const offer = offerFilter.value;
+
+
+
+
+    }
+
+
+    // Open delete modal
+    function openDeleteModal(offerId, productName) {
+      offerToDelete = offerId;
+      deleteModalMessage.textContent = `Are you sure you want to remove this offer from "${productName}"? This action cannot be undone.`;
+      deleteModal.classList.add('show');
+    }
+
+    // Delete offer
+    function deleteOffer() {
+      if (offerToDelete) {
+        appliedOffers = appliedOffers.filter(o => o.id !== offerToDelete);
+        filterOffers();
+        offerToDelete = null;
+      }
+      deleteModal.classList.remove('show');
+    }
+
+    // Clear search and filters
+    function clearFilters() {
+      searchInput.value = '';
+      statusFilter.value = 'all';
+      offerFilter.value = 'all';
+      filterOffers();
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterOffers);
+    statusFilter.addEventListener('change', filterOffers);
+    offerFilter.addEventListener('change', filterOffers);
+    clearSearchBtn.addEventListener('click', clearFilters);
+    
+    cancelDeleteBtn.addEventListener('click', () => {
+      deleteModal.classList.remove('show');
+      offerToDelete = null;
+    });
+    
+    confirmDeleteBtn.addEventListener('click', deleteOffer);
+    
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        deleteModal.classList.remove('show');
+        offerToDelete = null;
+      }
+    });
+
+    // Simple pagination (mock)
+    document.querySelectorAll('.page-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (this.id !== 'prevPage' && this.id !== 'nextPage') {
+          document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
+
+    // Escape key to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+        deleteModal.classList.remove('show');
+        offerToDelete = null;
+      }
+    });
+
+    function removeModal(){
+            const btn = event.target
+            const offerId = parseInt(btn.dataset.offerId);
+            const productName = btn.dataset.productName;
+            openDeleteModal(offerId, productName);
+    }
+
+</script>
+
+{%endblock%}

@@ -1,0 +1,74 @@
+{%load dashboard_tags%}
+<div style="overflow-x: auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Offer</th>
+        <th>Discount</th>
+        <th>Status</th>
+        <th>Expires</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="offersTableBody">
+      {%for applied_offer in object_list %}
+      <tr>
+        <td>
+          <div class="product-cell">
+            <div class="product-thumb"><img src="{{applied_offer.stock.get_product_image}}"></div>
+            <div class="product-info">
+              <h4>{{applied_offer.stock.product.title}}</h4>
+              <div class="product-meta">category_placeholder</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="offer-badge">{{applied_offer.offer.name}}</span>
+        </td>
+        <td>
+          <span class="discount-badge">{{applied_offer.offer_discount}}% OFF</span>
+        </td>
+        <td>
+          <span class="status-badge status-{{applied_offer.offer.status}}">{{applied_offer.offer.status}}</span>
+        </td>
+          {%with time_until_expire=applied_offer.offer.get_time_until_expire%}
+        <td>
+          <span class="expiry-date {% get_expire_class time_until_expire %}">{{applied_offer.offer.end_datetime}}</span>
+          
+      {%if time_until_expire < 72  %}<br><small style="color: #f57c00;">Expiring soon</small>{%endif%}
+        </td>
+        {%endwith%}
+        <td>
+          <button class="action-btn delete-btn" data-offer-id="{{applied_offer.id}}" data-product-name="{{applied_offer.stock.product.title}}" onclick="removeModal()">
+            🗑️ Remove
+          </button>
+        </td>
+      </tr>
+      {%endfor%}
+
+          </tbody>
+  </table>
+</div>
+    
+<div id="noResults" class="no-results" style="display: none;">
+  <div class="no-results-icon">🔍</div>
+  <h3>No offers found</h3>
+  <p>Try adjusting your search or filter criteria</p>
+  <div class="empty-state-cta">
+    <a href="apply-offer.html" class="empty-state-btn">➕ Apply New Offer</a>
+  </div>
+</div>
+
+<!-- PAGINATION -->
+<div class="pagination" id="pagination">
+  {% if page_obj.has_previous %}
+  <button class="page-btn" id="prevPage">←</button>
+  {%endif%}
+  {%for page in paginator.page_range%}
+  <button class="page-btn {%if page_obj.number == page%}active {%endif%}">{{page}}</button>
+  {%endfor%}
+  {%if page.obj.has_next%}
+  <button class="page-btn" id="nextPage">→</button>
+  {%endif%}
+</div>

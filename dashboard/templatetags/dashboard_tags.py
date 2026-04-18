@@ -9,3 +9,20 @@ def is_active_link(context, link):
 	print(request.path, link)
 	if link in request.path:
 		return "active"
+
+
+@register.simple_tag
+def get_expire_class(hours):
+	print(hours)
+	if hours <= 24:
+		return "expiry-critical"
+	elif hours <= 72:
+		return "expiry-warning"
+
+@register.simple_tag
+def is_expiring(hours):
+	print('is_expiring')
+	if hours <= 72:
+		return True
+	else:
+		return False

@@ -15,29 +15,10 @@ from django.db.models import Sum, Count, Avg
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from .wizard_views import OfferWizardStepView
-from .forms import (
-					image_formset, 
-					ProductForm, 
-					ProductCategoryInline, 
-					StockRecordInlineForm, 
-					StockRecordForm,
-					ProductClassForm,
-					ProductTypeForm,
-					product_type_attr_formset,
-					CategoryForm,
-
-					OfferRangeForm,
-					OfferDetailForm,
-					OfferTypeForm,
-					OfferRestrictionForm,
-
-					CouponForm,
-					OrderStatusForm,
-					CommentStatusForm
-					)
+from . import forms
 from stock.models import StockRecord
 from catalog.models import Product, ProductClass, ProductAttribute, ProductAttributeValue, Category
-from offer.models import OfferRange, Offer
+from offer.models import OfferRange, Offer, OfferApplication
 from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
@@ -100,7 +81,7 @@ class ProductListView(ListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		product_class_form = ProductClassForm()
+		product_class_form = forms.ProductClassForm()
 		context['product_class_form'] = product_class_form
 		return context
 
@@ -130,17 +111,17 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 	def get(self, request, *args, **kwargs):
 
-		img_formset = image_formset(instance=self.product, prefix="img")
-		product_form = ProductForm(self.product_class , instance=self.product,prefix="product")
+		img_formset = forms.image_formset(instance=self.product, prefix="img")
+		product_form = forms.ProductForm(self.product_class , instance=self.product,prefix="product")
 
-		product_category_form = ProductCategoryInline(instance=self.product, prefix="category")
-		# stock_record_inline = StockRecordInlineForm(instance=self.product, prefix="stock")
+		product_category_form = forms.ProductCategoryInline(instance=self.product, prefix="category")
+		# stock_record_inline = forms.StockRecordInlineForm(instance=self.product, prefix="stock")
 		offer_discount = False
 		if self.stock:
 			offer_discounts = self.stock.get_offer_discount
 			if offer_discounts:
 				offer_discount = True
-		stock_record_form = StockRecordForm(offer_discount=offer_discount, instance=self.stock)
+		stock_record_form = forms.StockRecordForm(offer_discount=offer_discount, instance=self.stock)
 
 		return self.render_to_response({
 			"img_formset":img_formset, 
@@ -154,14 +135,14 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 	def post(self, request, *args, **kwargs):
 
-		product_form = ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
+		product_form = forms.ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
 		if product_form.is_valid():
 			
 			self.object = product_form.save()
 		else:
-			img_formset = image_formset(data=request.POST,files=request.FILES, prefix="img")
-			product_category_form = ProductCategoryInline(data=request.POST,  prefix="category")
-			stock_record_form = StockRecordForm(data=request.POST)
+			img_formset = forms.image_formset(data=request.POST,files=request.FILES, prefix="img")
+			product_category_form = forms.ProductCategoryInline(data=request.POST,  prefix="category")
+			stock_record_form = forms.StockRecordForm(data=request.POST)
 			return render(request, "dashboard/product/create_update.html", {
 				"product_form":product_form,
 				"img_formset":img_formset,
@@ -171,9 +152,9 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 				)
 
 
-		img_formset = image_formset(data=request.POST,files=request.FILES,instance=self.object, prefix="img")
-		product_category_form = ProductCategoryInline(data=request.POST,instance=self.object,  prefix="category")
-		stock_record_form = StockRecordForm(data=request.POST, instance=self.stock)
+		img_formset = forms.image_formset(data=request.POST,files=request.FILES,instance=self.object, prefix="img")
+		product_category_form = forms.ProductCategoryInline(data=request.POST,instance=self.object,  prefix="category")
+		stock_record_form = forms.StockRecordForm(data=request.POST, instance=self.stock)
 		if img_formset.is_valid() and product_category_form.is_valid() and stock_record_form.is_valid():
 
 			img_formset.save()
@@ -241,7 +222,7 @@ class ProductTypeView(ListView):
 
 class ProductTypeCreateUpdateView(UpdateView):
 	model = ProductClass
-	form_class = ProductTypeForm
+	form_class = forms.ProductTypeForm
 	template_name = "dashboard/product_type/create_update.html"
 	success_url = reverse_lazy("dashboard:product_type_list")
 
@@ -280,7 +261,7 @@ class ProductTypeCreateUpdateView(UpdateView):
 
 
 	def get_formset(self):
-		formset = product_type_attr_formset(**self.get_form_kwargs())
+		formset = forms.product_type_attr_formset(**self.get_form_kwargs())
 
 
 		return formset
@@ -320,13 +301,13 @@ class SubCategoryView(DetailView):
 class CategoryCreateView(CreateView):
 	template_name = "dashboard/category/create_update.html"
 	model = Category
-	form_class = CategoryForm
+	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
 
 class CategoryUpdateView(UpdateView):
 	template_name = "dashboard/category/create_update.html"
 	model = Category
-	form_class = CategoryForm
+	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
 
 
@@ -351,13 +332,13 @@ class OfferRangeListView(ListView):
 class OfferRangeCreateView(CreateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
-	form_class = OfferRangeForm
+	form_class = forms.OfferRangeForm
 	success_url = reverse_lazy("dashboard:offer_range")
 
 class OfferRangeUpdateView(UpdateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
-	form_class = OfferRangeForm
+	form_class = forms.OfferRangeForm
 	success_url = reverse_lazy("dashboard:offer_range")
 	search_template_name = "dashboard/offer/range/test.html"
 
@@ -396,11 +377,11 @@ class OfferStepView(View):
 			offer_type=None
 
 		if offer_step==1:
-			form = OfferDetailForm(instance=offer)
+			form = forms.OfferDetailForm(instance=offer)
 		elif offer_step == 2:
-			form = OfferTypeForm(instance=offer_type)
+			form = forms.OfferTypeForm(instance=offer_type)
 		elif offer_step == 3:
-			form = OfferRestrictionForm(instance=offer)
+			form = forms.OfferRestrictionForm(instance=offer)
 		return render(request, f"dashboard/offer/offer/_step_{offer_step}.html", {"form":form})
 
 
@@ -428,13 +409,13 @@ class CouponListView(ListView):
 
 class CouponCreateView(CreateView):
 	model = Coupon
-	form_class = CouponForm
+	form_class = forms.CouponForm
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
 
 class CouponUpdateView(UpdateView):
 	model = Coupon
-	form_class = CouponForm
+	form_class = forms.CouponForm
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
 
@@ -458,7 +439,7 @@ class OderListView(ListView):
 
 class OderDetailView(UpdateView):
 	model = Order
-	form_class = OrderStatusForm
+	form_class = forms.OrderStatusForm
 	template_name = "dashboard/order/order_detail.html"
 
 
@@ -800,7 +781,7 @@ class ReviewListView(ListView):
 
 class ReviewStatusUpdateView(UpdateView):
 	model = Comment
-	form_class = CommentStatusForm
+	form_class = forms.CommentStatusForm
 	def form_valid(self, form):
 		form.save()
 		status = form.cleaned_data["status"]
@@ -818,3 +799,44 @@ class ReviewDeletView(DeleteView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
+
+
+class AppliedOfferListView(ListView):
+	model = OfferApplication
+	template_name = "dashboard/applied_offer/list.html"
+	paginate_by = 1
+
+	def get_queryset(self):
+		qs = super().get_queryset()
+		return qs.filter(stock__seller=self.request.user)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["total_active_offers"] = self.get_total_active_offers
+		context["products_with_offer"] = self.get_product_with_offer
+		context["expiring_offer_products"] = self.get_expired_offers_products
+
+		return context
+
+	@property
+	def get_total_active_offers(self):
+		return self.object_list.filter(offer__status="active")
+
+	@property
+	def get_product_with_offer(self):
+		total_active_offers = self.get_total_active_offers 
+		return self.calc_products_count(total_active_offers)
+
+	def calc_products_count(self, offers):
+		if offers:
+			return offers.aggregate(total_product=Count("stock",distinct=True))
+		else:
+			return {"total_product":0}
+
+	@property
+	def get_expired_offers_products(self):
+		near_to_expire_offers = self.get_expiring_offer()
+		return self.calc_products_count(near_to_expire_offers)
+
+	def get_expiring_offer(self, hours=72):
+		return self.get_total_active_offers.filter(offer__end_datetime__lte=timezone.now() + timedelta(hours=hours))

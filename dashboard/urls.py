@@ -16,6 +16,9 @@ urlpatterns = [
 	path("catalog/product-type/update/<int:pk>/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_update"),
 	path("catalog/product-type/delete/<int:pk>/", views.ProductTypeDeleteView.as_view(), name="product_type_delete"),
 
+	path("catalog/applied_offers/", views.AppliedOfferListView.as_view(), name="applied_offers"),
+
+
 
 	path("catalog/categories/", views.CategoryListView.as_view(), name="categories"),
 	path("catalog/category/<int:pk>/", views.SubCategoryView.as_view(), name="sub_category"),
@@ -60,36 +63,5 @@ urlpatterns = [
 	path("content/reviews/", views.ReviewListView.as_view(), name="reviews"),
 	path("content/review/update/<int:pk>/", views.ReviewStatusUpdateView.as_view(), name="review_update"),
 	path("content/review/delete/<int:pk>/", views.ReviewDeletView.as_view(), name="review_delete"),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
 
 ]
