@@ -228,3 +228,12 @@ class Offer(models.Model):
 	@property
 	def get_offer_products(self):
 		return self.offer_type.offer_range.get_products
+
+class OfferApplication(models.Model):
+	offer = models.ForeignKey(Offer, on_delete=models.CASCADE, verbose_name=_("offer"))
+	stock = models.ForeignKey(StockRecord, on_delete=models.CASCADE, related_name="offer_apps", verbose_name=_("Stock Record"))
+	offer_discount = models.IntegerField(_("Offer Discount"), default=0 , validators=[MinValueValidator(0),MaxValueValidator(100)])
+	is_accepted = models.BooleanField(_("Is Accepted"), default=False)
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+

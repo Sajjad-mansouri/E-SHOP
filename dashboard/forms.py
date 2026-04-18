@@ -28,7 +28,7 @@ class ProductCategoryForm(forms.ModelForm):
 		}
 
 
-ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=0, can_delete=False)
+ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
 
 def _text_form(attr):
 	return forms.CharField(widget=forms.TextInput(attrs={"class":"form-control"}), label=attr.name, required=False)
