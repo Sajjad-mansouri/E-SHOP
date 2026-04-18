@@ -51,24 +51,18 @@
   </table>
 </div>
     
-<div id="noResults" class="no-results" style="display: none;">
-  <div class="no-results-icon">🔍</div>
-  <h3>No offers found</h3>
-  <p>Try adjusting your search or filter criteria</p>
-  <div class="empty-state-cta">
-    <a href="apply-offer.html" class="empty-state-btn">➕ Apply New Offer</a>
-  </div>
-</div>
 
+{%if page_obj%}
 <!-- PAGINATION -->
 <div class="pagination" id="pagination">
-  {% if page_obj.has_previous %}
-  <button class="page-btn" id="prevPage">←</button>
-  {%endif%}
+  
+  <button class="page-btn" id="prevPage" {% if page_obj.has_previous %}data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%}>←</button>
+  
   {%for page in paginator.page_range%}
-  <button class="page-btn {%if page_obj.number == page%}active {%endif%}">{{page}}</button>
+  <button class="page-btn {%if page_obj.number == page%}active {%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
   {%endfor%}
-  {%if page.obj.has_next%}
-  <button class="page-btn" id="nextPage">→</button>
-  {%endif%}
+  
+  <button class="page-btn" id="nextPage" {%if page_obj.has_next%}data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%} >→</button>
+ 
 </div>
+{%endif%}

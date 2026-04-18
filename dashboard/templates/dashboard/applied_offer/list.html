@@ -51,23 +51,18 @@
           id="searchInput" 
           placeholder="Search by product name or offer name..."
           autocomplete="off"
+          oninput="search()" 
         >
       </div>
       <div class="filter-group">
-        <select class="filter-select" id="statusFilter">
+        <select class="filter-select" id="statusFilter" data-filter="status" onchange="offerFilter()">
           <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="expired">Expired</option>
           <option value="scheduled">Scheduled</option>
         </select>
-        <select class="filter-select" id="offerFilter">
-          <option value="all">All Offers</option>
-          <option value="summer">Summer Offer</option>
-          <option value="flash">Flash Sale</option>
-          <option value="clearance">Clearance</option>
-          <option value="winter">Winter Warmup</option>
-        </select>
-        <button class="clear-search-btn" id="clearSearchBtn">Clear</button>
+
+
       </div>
     </div>
   </div>
@@ -103,17 +98,13 @@
 
     // DOM elements
     const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const offerFilter = document.getElementById('offerFilter');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    const offersTableBody = document.getElementById('offersTableBody');
-    const noResults = document.getElementById('noResults');
-    const resultCount = document.getElementById('resultCount');
+
     const tableContainer = document.querySelector('table');
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const deleteModalMessage = document.getElementById('deleteModalMessage');
+    const offerTableContainer = document.querySelector('.offers-table-container')
     
     // Stats elements
     const totalActiveOffersEl = document.getElementById('totalActiveOffers');
@@ -127,25 +118,6 @@
 
 
 
-    // Update stats
-    function updateStats() {
-
-      
-      // Calculate mock savings (simplified)
-      const totalSavings = appliedOffers.reduce((sum, offer) => sum + (offer.discount * 1.5), 0);
-      totalSavingsEl.textContent = `$${totalSavings.toFixed(0)}`;
-    }
-
-    // Filter offers
-    function filterOffers() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const status = statusFilter.value;
-      const offer = offerFilter.value;
-
-
-
-
-    }
 
 
     // Open delete modal
@@ -165,19 +137,7 @@
       deleteModal.classList.remove('show');
     }
 
-    // Clear search and filters
-    function clearFilters() {
-      searchInput.value = '';
-      statusFilter.value = 'all';
-      offerFilter.value = 'all';
-      filterOffers();
-    }
 
-    // Event listeners
-    searchInput.addEventListener('input', filterOffers);
-    statusFilter.addEventListener('change', filterOffers);
-    offerFilter.addEventListener('change', filterOffers);
-    clearSearchBtn.addEventListener('click', clearFilters);
     
     cancelDeleteBtn.addEventListener('click', () => {
       deleteModal.classList.remove('show');
@@ -217,6 +177,84 @@
             const productName = btn.dataset.productName;
             openDeleteModal(offerId, productName);
     }
+
+
+  const filters = {}
+
+  function search(){
+    const value = event.target.value.trim()
+    filters.search = value
+    applyFilters(null)
+  }
+
+
+  function offerFilter(){
+    const value = event.target.value
+    filters.offer = value
+    applyFilters(null)
+  }
+  // Apply all filters and sorting
+  async function applyFilters(page) {
+
+    const url = serializeFiltersToURL(page)
+    const data = await getFetch(url)
+    offerTableContainer.innerHTML = ""
+    offerTableContainer.insertAdjacentHTML('beforeend',data)
+    history.pushState({}, "", url)
+
+  }
+  function serializeFiltersToURL(page) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if(Array.isArray(value)){
+        value.forEach(v => params.append(key, v));
+      }
+      else if(typeof value === "object" && value !==null){
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          params.append(`${key}_${subKey}`, subValue);
+        });
+      }
+      else{
+         params.append(key, value);
+      }
+
+    }
+    let newURL;
+    if(page){
+      const filterParam = params.toString()
+      if(params.toString()==""){
+        newURL = `?page=${page}`;
+
+      }else{
+        newURL = `?${filterParam}&page=${page}`;
+
+      }
+
+  }else{
+    newURL = `?${params.toString()}`;
+
+  }
+    return newURL
+  
+  }
+  async function getFetch(url){
+    
+    const response = await fetch("{%url 'dashboard:applied_offers' %}" + url,{
+      method:"GET",
+      headers:{
+        "AJAX":true,
+      }
+    })
+    const data = await response.text()
+    return data
+  }
+
+function applyPagination(){
+  const btn = event.target.closest(".page-btn")
+  const nextPageNumber = btn.dataset.nextNumber
+  applyFilters(nextPageNumber)
+
+}
 
 </script>
 

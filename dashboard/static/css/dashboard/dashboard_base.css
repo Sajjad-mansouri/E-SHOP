@@ -158,3 +158,9 @@ box-shadow:0 3px 10px rgba(0,0,0,0.05);
 .back-link:hover{
 background:#fff0f3;
 }
+
+button:disabled{
+  cursor: initial;
+  background-color:#ece2e2 ;
+
+}

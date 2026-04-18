@@ -806,9 +806,13 @@ class AppliedOfferListView(ListView):
 	template_name = "dashboard/applied_offer/list.html"
 	paginate_by = 1
 
+
 	def get_queryset(self):
 		qs = super().get_queryset()
-		return qs.filter(stock__seller=self.request.user)
+		qs = qs.filter(stock__seller=self.request.user)
+		qs = self.filter_by_offer_status(qs)
+		qs = self.search(qs)
+		return qs
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -820,7 +824,7 @@ class AppliedOfferListView(ListView):
 
 	@property
 	def get_total_active_offers(self):
-		return self.object_list.filter(offer__status="active")
+		return self.model.objects.filter(offer__status="active")
 
 	@property
 	def get_product_with_offer(self):
@@ -840,3 +844,28 @@ class AppliedOfferListView(ListView):
 
 	def get_expiring_offer(self, hours=72):
 		return self.get_total_active_offers.filter(offer__end_datetime__lte=timezone.now() + timedelta(hours=hours))
+
+
+	def filter_by_offer_status(self, qs):
+		status = self.request.GET.get("offer")
+		query = Q(offer__status=status)
+		if status == "all" or not status:
+			query = Q()
+		return qs.filter(query)
+
+	def search(self, qs):
+		search = self.request.GET.get("search")
+
+		if search:
+			query = Q(offer__name__icontains=search) | Q(stock__product__title__icontains=search)
+		else:
+			query = Q()
+
+		return qs.filter(query)
+
+	def render_to_response(self, *args, **kwargs):
+
+		if self.request.headers.get("AJAX"):
+			self.template_name = "dashboard/applied_offer/_list.html"
+
+		return super().render_to_response(*args, **kwargs)
