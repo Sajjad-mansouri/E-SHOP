@@ -17,6 +17,8 @@ urlpatterns = [
 	path("catalog/product-type/delete/<int:pk>/", views.ProductTypeDeleteView.as_view(), name="product_type_delete"),
 
 	path("catalog/applied_offers/", views.AppliedOfferListView.as_view(), name="applied_offers"),
+	path("catalog/applied_offers/apply_offer/", views.AppliedOfferCreateView.as_view(), name="apply_offer"),
+
 
 
 

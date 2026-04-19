@@ -1,0 +1,30 @@
+
+<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}
+
+
+  {% for widget in group_choices %}
+    {%with instance=widget.value.instance%}
+    <option value="{{ widget.value|stringformat:'s' }}"{% include "django/forms/widgets/attrs.html" %}>
+    <div class="product-option" data-product-id="{{instance.id}}">
+      <div class="product-thumb-sm">-</div>
+      <div class="product-info-compact">
+        <div class="product-title-sm">{{instance.product.title}}</div>
+        <div class="product-meta-sm">
+          <span>UPC: {{instance.product.upc}}</span>
+          <span class="product-price-sm">{{instance.price|floatformat:2}}</span>
+          <span class="product-stock-sm">
+            <span class="stock-indicator ${stockClass}"></span>
+            in stock ({{instance.num_in_stock}})
+          </span>
+        </div>
+      </div>
+    </div>
+    </option>
+    {%endwith%}
+  {%endfor%}
+
+
+{% endfor %}
+</select>
+
+

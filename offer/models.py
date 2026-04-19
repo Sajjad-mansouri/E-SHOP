@@ -244,3 +244,7 @@ class OfferApplication(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	class Meta:
+		unique_together = ("offer", "stock")
+		verbose_name = _("Offer Application")
+		verbose_name_plural = _("Offer Applications")

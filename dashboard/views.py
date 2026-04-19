@@ -1,4 +1,5 @@
 import zoneinfo
+import json
 from datetime import timedelta, datetime
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -11,7 +12,7 @@ from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.forms.models import inlineformset_factory
 from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count, Avg
+from django.db.models import Sum, Count, Avg, F
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from .wizard_views import OfferWizardStepView
@@ -869,3 +870,30 @@ class AppliedOfferListView(ListView):
 			self.template_name = "dashboard/applied_offer/_list.html"
 
 		return super().render_to_response(*args, **kwargs)
+
+class AppliedOfferCreateView(CreateView):
+	model = OfferApplication
+	template_name = "dashboard/applied_offer/create.html"
+	form_class = forms.AppliedOfferForm
+	success_url = reverse_lazy("dashboard:applied_offers")
+
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["stock_records"] = StockRecord.objects.filter(seller=self.request.user)
+		return context
+
+	def form_valid(self, form):
+		raise
+		form.save()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		errors = self.serialize_errors(form)
+		return JsonResponse({"status":False, "errors":errors})
+
+	def serialize_errors(self, form):
+		errors = form.errors.get_json_data()
+		return errors
+

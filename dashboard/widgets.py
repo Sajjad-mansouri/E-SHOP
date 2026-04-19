@@ -1,4 +1,4 @@
-from django.forms.widgets import CheckboxSelectMultiple
+from django.forms.widgets import CheckboxSelectMultiple, Select
 
 class TableCheckboxSelectMultiple(CheckboxSelectMultiple):
 	template_name = "dashboard/forms/widgets/table_checkbox.html"
@@ -16,3 +16,9 @@ class NameCheckboxSelectMultiple(CheckboxSelectMultiple):
 	class Media:
 		css = {"all": ["css/select.css"],}
 		js = ["js/select.js"]
+
+
+class OfferProductApplySelect(Select):
+	template_name = "dashboard/forms/widgets/products_apply_offer.html"
+
+

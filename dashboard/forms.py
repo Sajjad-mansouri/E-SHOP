@@ -6,8 +6,8 @@ from django.db.models import Q
 from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
-from offer.models import OfferRange, Offer, OfferType
-from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple
+from offer.models import OfferRange, Offer, OfferType, OfferApplication
+from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple, OfferProductApplySelect
 from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
@@ -310,3 +310,12 @@ class CommentStatusForm(forms.ModelForm):
 	class Meta:
 		model = Comment
 		fields = ["status"]
+
+
+class AppliedOfferForm(forms.ModelForm):
+	class Meta:
+		model = OfferApplication
+		fields = ["offer", "stock", "offer_discount"]
+		widgets = {
+		"stock":OfferProductApplySelect()
+		}

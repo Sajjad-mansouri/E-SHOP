@@ -1,0 +1,209 @@
+
+
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/applied_offer/create.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+{%block content%}
+<main class="main">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Apply offer to product</h1>
+    <div class="subtitle">Catalog · Offers — assign a specific offer to selected products</div>
+  </div>
+
+  <!-- MAIN CARD: Apply Offer Form -->
+  <div class="card">
+    <form class="apply-form" id="applyOfferForm" method="POST">
+      {%csrf_token%}
+      <div id="messageBox" class="message"></div>
+      <!-- ROW 1: Select Offer -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Select offer <span class="required">*</span></label>
+          {{form.offer}}
+          <div class="hint" id="offerCategoryHint">Applies to category: —</div>
+        </div>
+      </div>
+
+
+      <!-- ROW 2: Search and Select Product -->
+      <div class="form-group">
+        <label>Select product <span class="required">*</span></label>
+        <div class="product-selector">
+          <!-- Search input -->
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              class="search-input" 
+              id="productSearchInput" 
+              placeholder="Search products by name, UPC, or category..."
+              autocomplete="off"
+            >
+          </div>
+          
+          <!-- Product dropdown list -->
+          <div class="product-dropdown" id="productDropdown">
+            <!-- Products will be dynamically populated here -->
+            {%include 'dashboard/applied_offer/_products.html'%}
+          </div>
+        </div>
+        <div class="hint" id="productHint">Search and select a product from the list</div>
+      </div>
+
+
+
+      <!-- ROW 3: Offer Discount + Summary -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Offer discount (%) <span class="required">*</span></label>
+          <div class="discount-wrapper">
+            <input type="number" id="discountInput" min="1" max="99" step="1" value="5" placeholder="e.g. 5" required>
+            <span class="discount-unit">%</span>
+          </div>
+          <div class="hint">Set the discount percentage</div>
+        </div>
+
+
+      </div>
+
+      <!-- FORM ACTIONS -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" onclick="submitForm()">Apply Offer to Product</button>
+      </div>
+    </form>
+  </div>
+
+
+</main>
+{%endblock%}
+{%block script%}
+<script>
+
+
+    // DOM elements
+    const offerSelect = document.getElementById('offerSelect');
+    const productSearchInput = document.getElementById('productSearchInput');
+    const productDropdown = document.getElementById('productDropdown');
+    const offerCategoryHint = document.getElementById('offerCategoryHint');
+    const selectedOfferNameSpan = document.getElementById('selectedOfferName');
+    const categoryTagSpan = document.getElementById('categoryTag');
+    const productCompatibilityMsg = document.getElementById('productCompatibilityMsg');
+    const applyForm = document.getElementById('applyOfferForm');
+    const resetBtn = document.getElementById('resetFormBtn');
+    const tableBody = document.getElementById('appliedOffersTableBody');
+    
+    // Selected product display elements
+    const selectedProductDisplay = document.getElementById('selectedProductDisplay');
+    const selectedThumbnail = document.getElementById('selectedThumbnail');
+    const selectedTitle = document.getElementById('selectedTitle');
+    const selectedUPC = document.getElementById('selectedUPC');
+    const selectedPrice = document.getElementById('selectedPrice');
+    const selectedStock = document.getElementById('selectedStock');
+    const selectedStockBadge = document.getElementById('selectedStockBadge');
+    const selectedCategory = document.getElementById('selectedCategory');
+
+    let selectedProduct = null;
+
+    // Event: Search input
+    productSearchInput.addEventListener('input', () => {
+
+      productDropdown.classList.add('show');
+    });
+
+    productSearchInput.addEventListener('focus', () => {
+
+      productDropdown.classList.add('show');
+    });
+
+    // Event: Select product from dropdown
+    productDropdown.addEventListener('click', (e) => {
+      const option = e.target.closest('.product-option');
+      if (!option) return;
+      
+      const productId = option.dataset.productId;
+      selectedProduct = productId;
+      productDropdown.classList.remove('show');
+
+
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.product-selector')) {
+        productDropdown.classList.remove('show');
+      }
+    });
+
+
+    function submitForm(){
+      event.preventDefault()
+
+
+      const discountInput = document.getElementById('discountInput');
+      const formData = new FormData()
+      const csrf = document.querySelector("input[name='csrfmiddlewaretoken']").value
+      const offer = document.getElementById("id_offer").value
+      formData.append("offer", offer)
+      formData.append("stock", selectedProduct)
+      formData.append("offer_discount", discountInput.value)
+      formData.append('csrfmiddlewaretoken', csrf);
+      postFetch(formData)
+
+    }
+
+  async function postFetch(url, formData){
+    try{
+
+      const response = await fetch("{%url 'dashboard:apply_offer'%}", {
+        method : "POST",
+        body : formData
+      })
+      const data = await response.json()
+      if (!data.status){
+        showFormErrors(data.errors)
+      }
+      else{
+        window.location.href = "{%url 'dashboard:applied_offers'%}"
+      }
+    }catch(error){
+      showError()
+    }
+
+  }
+  function showError(){
+    const box = document.getElementById("messageBox");
+    box.className = "message error";
+    message = "An unexpected error occurred. Please try again later."
+    box.innerHTML = message;
+  }
+  function showFormErrors(errors) {
+      const box = document.getElementById("messageBox");
+      box.className = "message error";
+
+      let html = "<ul>";
+
+      Object.entries(errors).forEach(([field, msgs]) => {
+
+          msgs.forEach(msg => {
+              if (field === "__all__") {
+                console.log(msg)
+                  html += `<li>${msg.message}</li>`;
+              } else {
+                  html += `<li><strong>${field}</strong>: ${msg.message}</li>`;
+              }
+          });
+      });
+
+      html += "</ul>";
+      box.innerHTML = html;
+  }
+
+</script>
+{%endblock%}

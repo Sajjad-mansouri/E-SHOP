@@ -1,0 +1,16 @@
+{%for stock in stock_records%}
+  <div class="product-option ${isSelected ? 'selected' : ''}" data-product-id="{{stock.id}}">
+    <div class="product-thumb-sm"><img src="{{stock.get_product_image}}"></div>
+    <div class="product-info-compact">
+      <div class="product-title-sm">{{stock.product.title}}</div>
+      <div class="product-meta-sm">
+        <span>UPC: {{stock.product.upc}}</span>
+        <span class="product-price-sm">${{stock.price|floatformat:2}}</span>
+        <span class="product-stock-sm">
+          <span class="stock-indicator ${stockClass}"></span>
+         In Stock ({{stock.num_in_stock}})
+        </span>
+      </div>
+    </div>
+  </div>
+{%endfor%}
