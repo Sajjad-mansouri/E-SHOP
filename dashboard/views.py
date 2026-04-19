@@ -897,3 +897,14 @@ class AppliedOfferCreateView(CreateView):
 		errors = form.errors.get_json_data()
 		return errors
 
+
+
+class AppliedOfferDeleteView(DeleteView):
+	model = OfferApplication
+
+	def form_valid(self, form):
+		self.object.delete()
+		return JsonResponse({"status":True})
+
+	def form_invalid(self, form):
+		return JsonResponse({"status":False})

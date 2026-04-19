@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'order',
     'shipping',
     'payment',
+    'collection',
 
     #third party
     'treebeard',

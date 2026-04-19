@@ -66,9 +66,10 @@
       </div>
     </div>
   </div>
-
+<div id="messageBox" class="message"></div>
   <!-- OFFERS TABLE -->
   <div class="offers-table-container">
+    {%csrf_token%}
     <div class="table-header">
       <h2>Applied Offers List</h2>
     </div>
@@ -128,11 +129,24 @@
     }
 
     // Delete offer
-    function deleteOffer() {
-      if (offerToDelete) {
-        appliedOffers = appliedOffers.filter(o => o.id !== offerToDelete);
-        filterOffers();
-        offerToDelete = null;
+    async function deleteOffer() {
+      const baseUrl = "{%url 'dashboard:remove_applied_offer' 0 %}"
+      const url = baseUrl.replace("0", offerToDelete)
+      try{
+
+        const data = await fetchDeleteObject(url)
+        console.log(data)
+        if(data.status){
+          showError("Successfully Removed!", "success")
+          applyFilters(null)
+        }else{
+          showError("Failed Removed!", "error")
+
+        }
+      }catch(error){
+        console.log(error)
+          showError("An unexpected error occurred. Please try again later.", "error")
+
       }
       deleteModal.classList.remove('show');
     }
@@ -255,7 +269,12 @@ function applyPagination(){
   applyFilters(nextPageNumber)
 
 }
-
+  function showError(message, message_class){
+    const box = document.getElementById("messageBox");
+    box.className = `message ${message_class}`;
+    
+    box.innerHTML = message;
+  }
 </script>
 
 {%endblock%}

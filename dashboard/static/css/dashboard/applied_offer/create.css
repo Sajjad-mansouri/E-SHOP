@@ -493,27 +493,4 @@
     }
 
 
-.message{
-    display:none;
-    padding:14px 18px;
-    margin:12px 0;
-    border-radius:6px;
-    font-family:system-ui, sans-serif;
-    font-size:14px;
-}
 
-.message.error{
-    display:block;
-    background:#ffecec;
-    border:1px solid #f5c2c2;
-    color:#a30000;
-}
-
-.message ul{
-    margin:0;
-    padding-left:18px;
-}
-
-.message li{
-    margin:4px 0;
-}

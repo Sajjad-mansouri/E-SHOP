@@ -18,6 +18,8 @@ urlpatterns = [
 
 	path("catalog/applied_offers/", views.AppliedOfferListView.as_view(), name="applied_offers"),
 	path("catalog/applied_offers/apply_offer/", views.AppliedOfferCreateView.as_view(), name="apply_offer"),
+	path("catalog/applied_offers/remove/<int:pk>/", views.AppliedOfferDeleteView.as_view(), name="remove_applied_offer"),
+
 
 
 

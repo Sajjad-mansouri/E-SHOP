@@ -7,7 +7,7 @@ register = template.Library()
 def is_active_link(context, link):
 	request = context["request"]
 	print(request.path, link)
-	if link in request.path:
+	if request.path.startswith(f"/dashboard/{link}"):
 		return "active"
 
 
