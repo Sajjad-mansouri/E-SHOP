@@ -16,7 +16,7 @@ class AbstractList(models.Model):
 		("active", "Active"),
 		("suspended", "Suspended")
 		]
-	name = models.CharField(_("name"), max_length=250, blank=True)
+	name = models.CharField(_("name"), max_length=250)
 	slug = models.SlugField(_("slug"), max_length=250, blank=True)
 	description = models.TextField(_("description"), blank=True)
 	image = models.ImageField(_("image"), upload_to=upload_to_class_name, null=True, blank=True)

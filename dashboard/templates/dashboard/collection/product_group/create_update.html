@@ -1,0 +1,327 @@
+
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/collection/product_group/create.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+{%block content%}
+<main class="main">
+
+<div class="card">
+<h2>Create Product Group</h2>
+
+<!-- ERROR MESSAGE BOX -->
+<div id="messageBox" class="message"></div>
+
+<form id="productGroupForm">
+{%csrf_token%}
+<div class="form-group">
+<label>Name</label>
+<input id="name" name="name" type="text">
+</div>
+
+<div class="form-group">
+<label>Slug</label>
+<input id="slug" name="slug" type="text">
+</div>
+
+<div class="form-group">
+<label>Description</label>
+<textarea id="description" name="description" rows="4"></textarea>
+</div>
+
+<div class="form-group">
+<label>Image</label>
+<input id="image" name="image" type="file">
+</div>
+
+<div class="form-group">
+<label>Status</label>
+{{form.status}}
+</div>
+
+<div class="form-group">
+<label>Product Class</label>
+{{form.product_classes}}
+</div>
+
+<div class="form-group">
+<label>Categories</label>
+{{form.categories}}
+</div>
+
+<div class="form-group">
+<label>Stock Records</label>
+
+<div class="stock-selector" onclick="openModal()">
+Click to add stock records
+</div>
+
+<div class="selected-products">
+
+<table id="selectedProductsTable">
+
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+<th>UPC</th>
+<th>In Stock</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody id="selectedProducts"></tbody>
+
+</table>
+
+</div>
+
+
+</div>
+
+<button type="submit" class="btn">Create Product Group</button>
+
+</form>
+</div>
+
+</main>
+
+<!-- MODAL -->
+
+<div class="modal" id="productModal">
+
+<div class="modal-content">
+
+<h3>Select Products</h3>
+
+<input class="search-box" type="text" placeholder="Search product...">
+
+<table>
+
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+<th>UPC</th>
+<th>In Stock</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+{%for stock in stock_records%}
+<tr>
+	<td><img src="{{stock.get_product_image}}"></td>
+	<td>{{stock.product.title}}</td>
+	<td>${{stock.price}}</td>
+	<td>{{stock.product.upc}}</td>
+	<td>{{stock.num_in_stock}}</td>
+
+	<td>
+		<button class="btn toggle-btn"
+		data-id="{{stock.id}}"
+		data-name="{{stock.product.title}}"
+		data-price="${{stock.price}}"
+		data-upc="{{stock.product.upc}}"
+		data-stock="{{stock.num_in_stock}}"
+		data-img="{{stock.get_product_image}}"
+		onclick="addRemove()" 
+		>
+		Add
+		</button>
+	</td>
+
+</tr>
+{%endfor%}
+
+</tbody>
+
+</table>
+
+<br>
+
+<button class="btn" onclick="closeModal()">Close</button>
+
+</div>
+
+</div>
+{%endblock%}
+
+{%block script%}
+
+<script>
+let stock_records = []
+/* ---------- MODAL CONTROL ---------- */
+
+function openModal(){
+	document.getElementById("productModal").style.display="flex";
+}
+
+function closeModal(){
+	document.getElementById("productModal").style.display="none";
+}
+
+
+
+/* ---------- ERROR HANDLING SYSTEM ---------- */
+
+function clearErrors() {
+	document.getElementById("messageBox").style.display = "none";
+	document.getElementById("messageBox").innerHTML = "";
+
+	document.querySelectorAll(".error").forEach(el => {
+	el.classList.remove("error");
+	});
+}
+
+function showErrors(errors) {
+		    const box = document.getElementById("messageBox");
+		    box.className = "message error";
+
+		    let html = "<ul>";
+
+		    Object.entries(errors).forEach(([field, msgs]) => {
+		      console.log(field, msgs)
+		        msgs.forEach(msg => {
+		            if (field === "__all__") {
+		              console.log(msg)
+		                html += `<li>${msg.message}</li>`;
+		            } else {
+		                html += `<li><strong>${field}</strong>: ${msg.message}</li>`;
+		            }
+		        });
+		    });
+
+		    html += "</ul>";
+		    box.innerHTML = html;
+}
+
+/* ---------- FORM SUBMIT ---------- */
+
+document.getElementById("productGroupForm").addEventListener("submit", async function(e){
+	e.preventDefault();
+	const categories = document.getElementById("id_categories")
+
+
+	const productClasses = document.getElementById("id_product_classes")
+
+
+
+	const status = document.getElementById("id_status").value
+	const imageInput = document.getElementById("image")
+	const name = document.getElementById("name").value
+	const slug = document.getElementById("slug").value
+	const description = document.getElementById("description").value
+
+	let formData = new FormData()
+
+	formData.append("name", name)
+	formData.append("slug", slug)
+	formData.append("description", description)
+	formData.append("status", status)
+	formData = getMultipleSelectValues(categories, formData, "categories")
+	formData = getMultipleSelectValues(productClasses, formData, "product_classes")
+	stock_records.forEach(value=>{
+		formData.append("stock_records", value)
+	})
+
+
+	formData.append("image", imageInput.files[0])
+	const url = "{%url 'dashboard:product_group_create'%}"
+	try{
+
+		const data = await fetchPost(url, formData)
+		if (data.status){
+			window.location.href = "{%url 'dashboard:product_group'%}"
+		}else{
+
+			const errors = data.errors
+			showErrors(errors);
+		}
+	}catch(error){
+		showError("An unexpected error occurred. Please try again later.", "error")
+	}
+
+});
+
+function getMultipleSelectValues(multipeInput, formData, field){
+	Array.from(multipeInput.selectedOptions).forEach(option => {
+		formData.append(field, option.value)
+	})
+	return formData
+}
+
+
+/* --------- PRODUCT TOGGLE SYSTEM -------- */
+
+function addRemove(){
+	btn = event.target
+	const id = btn.dataset.id
+	stock_records.push(id)
+	const name = btn.dataset.name
+	const price = btn.dataset.price
+	const img = btn.dataset.img
+	const upc = btn.dataset.upc
+	const stock = btn.dataset.stock
+	const table = document.getElementById("selectedProducts")
+	const existing = table.querySelector(`[data-item="${upc}"]`)
+
+	if(!existing){
+
+		const row = document.createElement("tr")
+		row.dataset.item = upc
+
+		row.innerHTML = `
+		<td><img src="${img}"></td>
+		<td>${name}</td>
+		<td>${price}</td>
+		<td>${upc}</td>
+		<td>${stock}</td>
+		<td>
+		<button class="btn remove-btn">Remove</button>
+		</td>
+		`
+
+		table.appendChild(row)
+
+		btn.textContent="Remove"
+		btn.style.background="gray"
+
+		/* remove button in selected table */
+
+		row.querySelector(".remove-btn").onclick=()=>{
+
+		row.remove()
+		btn.textContent="Add"
+		btn.style.background=""
+
+		}
+
+	}else{
+
+		existing.remove()
+		btn.textContent="Add"
+		btn.style.background=""
+
+	}
+
+	}
+
+
+  function showError(message, message_class){
+    const box = document.getElementById("messageBox");
+    box.className = `message ${message_class}`;
+    
+    box.innerHTML = message;
+  }
+</script>
+
+{%endblock%}

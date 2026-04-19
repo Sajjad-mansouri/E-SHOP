@@ -1,0 +1,184 @@
+/* MAIN */
+
+.main{
+padding:40px;
+max-width:1100px;
+margin:auto;
+}
+
+/* CARD */
+
+.card{
+background:white;
+padding:30px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+margin-bottom:30px;
+}
+
+.card h2{
+margin-bottom:20px;
+}
+
+/* FORM */
+
+.form-group{
+margin-bottom:20px;
+}
+
+label{
+display:block;
+margin-bottom:6px;
+font-weight:600;
+}
+
+input, textarea, select{
+width:100%;
+padding:10px;
+border:1px solid #ddd;
+border-radius:10px;
+font-size:14px;
+}
+
+textarea{
+resize:vertical;
+}
+
+input.error, textarea.error, select.error{
+border-color:#ef4056;
+background:#fff0f2;
+}
+
+/* BUTTON */
+
+.btn{
+background:var(--primary);
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:12px;
+font-weight:600;
+cursor:pointer;
+}
+
+/* STOCK SELECTOR */
+
+.stock-selector{
+border:1px dashed #ccc;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+background:#fafafa;
+}
+
+.selected-products{
+margin-top:15px;
+}
+
+.selected-item{
+display:flex;
+align-items:center;
+gap:10px;
+padding:8px;
+border-bottom:1px solid #eee;
+}
+
+.selected-item img{
+width:40px;
+height:40px;
+border-radius:6px;
+object-fit:cover;
+}
+
+/* MESSAGE BOX */
+
+.message{
+padding:12px;
+border-radius:10px;
+margin-bottom:20px;
+display:none;
+background:#ffecec;
+border:1px solid #ffb9b9;
+color:#b10000;
+font-weight:600;
+}
+
+/* MODAL */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+display:none;
+align-items:center;
+justify-content:center;
+}
+
+.modal-content{
+background:white;
+width:900px;
+max-height:80vh;
+overflow:auto;
+padding:20px;
+border-radius:var(--radius);
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+th{
+background:#fafafa;
+}
+
+td img{
+width:45px;
+height:45px;
+border-radius:6px;
+object-fit:cover;
+}
+
+.search-box{
+margin-top:10px;
+}
+
+
+.selected-products{
+margin-top:15px;
+max-height:220px;
+overflow-y:auto;
+border:1px solid #eee;
+border-radius:10px;
+background:#fafafa;
+}
+
+#selectedProductsTable{
+width:100%;
+border-collapse:collapse;
+}
+
+#selectedProductsTable th,
+#selectedProductsTable td{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+#selectedProductsTable img{
+width:40px;
+height:40px;
+border-radius:6px;
+object-fit:cover;
+}

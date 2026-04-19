@@ -103,10 +103,9 @@
 {%endblock%}
 
 <script type="text/javascript">
-async function fetchDeleteObject(url){
+async function fetchPost(url, formData){
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
-    const formData = new FormData()
     const response = await fetch(url, {
         method:"POST",
         headers:{

@@ -18,7 +18,7 @@
       <tr>
         <td>
           <div class="group-cell">
-            <img class="img-preview" src="{{group.image.url}}" alt="{{group.name}}">
+            <img class="img-preview" src="{%if group.image%}{{group.image.url}}{%endif%}" alt="{{group.name}}">
             <div class="item-info">
                 <h4>{{group.name}}</h4>
                 

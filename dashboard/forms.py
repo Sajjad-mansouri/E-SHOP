@@ -11,6 +11,7 @@ from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple, Of
 from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
+from collection.models import ProductList
 
 class ProductClassForm(forms.ModelForm):
 	class Meta:
@@ -319,3 +320,8 @@ class AppliedOfferForm(forms.ModelForm):
 		widgets = {
 		"stock":OfferProductApplySelect()
 		}
+
+class ProductGroupForm(forms.ModelForm):
+	class Meta:
+		model = ProductList
+		fields = ["name", "slug", "description", "image", "status", "categories", "stock_records", "product_classes"]

@@ -89,8 +89,8 @@
     async function deleteObject() {
       const url = baseDeleteUrl.replace("0", objectToDelete)
       try{
-
-        const data = await fetchDeleteObject(url)
+        const formData = new FormData()
+        const data = await fetchPost(url, formData)
         console.log(data)
         if(data.status){
           showError("Successfully Removed!", "success")
