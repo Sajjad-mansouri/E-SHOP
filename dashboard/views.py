@@ -23,6 +23,7 @@ from offer.models import OfferRange, Offer, OfferApplication
 from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
+from collection.models import ProductList, CollectionList
 
 
 UserModel = get_user_model()
@@ -908,3 +909,38 @@ class AppliedOfferDeleteView(DeleteView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
+
+
+class ProductGroupListView(ListView):
+	model = ProductList
+	template_name = "dashboard/collection/product_group/list.html"
+	paginate_by = 1
+
+	def get_queryset(self):
+		qs = super().get_queryset()
+		qs = self.apply_filter(qs)
+		qs = self.search(qs)
+		return qs
+
+	def apply_filter(self, qs):
+		status = self.request.GET.get("status")
+		query = Q()
+		if status != "all" and status:
+
+			query = Q(status=status)
+		return qs.filter(query)
+
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		print(search)
+		query = Q()
+		if search:
+			query = Q(name__icontains=search)
+
+		return qs.filter(query)
+
+	def render_to_response(self, *args, **kwargs):
+		if self.request.headers.get("AJAX"):
+			self.template_name = "dashboard/collection/product_group/_list.html"
+
+		return super().render_to_response(*args, **kwargs)

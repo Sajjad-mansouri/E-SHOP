@@ -1,0 +1,65 @@
+{%load dashboard_tags%}
+<div class="table-header">
+  <h2 id="tableTitle">Items</h2>
+  <span class="result-count" id="resultCount">{{paginator.count}} results</span>
+</div>
+<div style="overflow-x: auto;">
+  <table id="dataTable">
+    <thead id="tableHeader">
+      <tr>
+        <th>Group</th>
+        <th>Products</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      {%for group in object_list%}
+      <tr>
+        <td>
+          <div class="group-cell">
+            <img class="img-preview" src="{{group.image.url}}" alt="{{group.name}}">
+            <div class="item-info">
+                <h4>{{group.name}}</h4>
+                
+            </div>
+          </div>
+        </td>
+        <td>{{group.get_stocks.count}}</td>
+        <td>
+          <span class="badge badge-{%if group.status == 'active' %}active{%else%}expired{%endif%}">{{group.status}}</span>
+        </td>
+
+
+        <td>
+          <button class="action-btn edit-btn" data-id="${itemId}">✏️ Edit</button>
+          <button class="action-btn delete-btn" data-id="{{group.id}}" onclick="openDeleteModal('{{group.id}}', '{{group.name}}')">🗑️ Remove</button>
+        </td>
+      </tr>
+      {%endfor%}
+    </tbody>
+  </table>
+</div>
+<div id="noResultsMessage" class="no-results" style="display: none;">
+  <div class="no-results-icon">🖼️</div>
+  <h3>No items found</h3>
+  <p>Try adjusting filters or create new</p>
+  <button class="empty-state-btn" id="emptyStateActionBtn">Create new</button>
+</div>
+
+    
+
+{%if page_obj%}
+<!-- PAGINATION -->
+<div class="pagination" id="pagination">
+  
+  <button class="page-btn" id="prevPage" {% if page_obj.has_previous %}data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%}>←</button>
+  
+  {%for page in paginator.page_range%}
+  <button class="page-btn {%if page_obj.number == page%}active {%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
+  {%endfor%}
+  
+  <button class="page-btn" id="nextPage" {%if page_obj.has_next%}data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%} >→</button>
+ 
+</div>
+{%endif%}

@@ -68,4 +68,9 @@ urlpatterns = [
 	path("content/review/update/<int:pk>/", views.ReviewStatusUpdateView.as_view(), name="review_update"),
 	path("content/review/delete/<int:pk>/", views.ReviewDeletView.as_view(), name="review_delete"),
 
+
+
+	path("collection/product_group/", views.ProductGroupListView.as_view(), name="product_group"),
+
+
 ]

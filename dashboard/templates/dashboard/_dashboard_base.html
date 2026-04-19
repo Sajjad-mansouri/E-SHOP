@@ -28,14 +28,22 @@
 <a class="nav-item {% is_active_link 'overview' %}" href="{%url 'dashboard:overview'%}">Overview</a>
 
 <div class="nav-group">
-<a class="nav-item {% is_active_link 'catalog' %}" >Catalog</a>
-<div class="sub-nav">
-<a href="{%url 'dashboard:products'%}">Products</a>
-<a href="{%url 'dashboard:product_type_list'%}">Product Types</a>
-<a href="{%url 'dashboard:categories'%}">Categories</a>
-<a href="{%url 'dashboard:applied_offers'%}">Applied Offers</a>
+    <a class="nav-item {% is_active_link 'catalog' %}" >Catalog</a>
+    <div class="sub-nav">
+    <a href="{%url 'dashboard:products'%}">Products</a>
+    <a href="{%url 'dashboard:product_type_list'%}">Product Types</a>
+    <a href="{%url 'dashboard:categories'%}">Categories</a>
+    <a href="{%url 'dashboard:applied_offers'%}">Applied Offers</a>
 
+    </div>
 </div>
+
+<div class="nav-group">
+    <a class="nav-item {% is_active_link 'collection' %}" >Collection</a>
+    <div class="sub-nav">
+    <a href="">Product List</a>
+    <a href="">collection</a>
+    </div>
 </div>
 
 <div class="nav-group">

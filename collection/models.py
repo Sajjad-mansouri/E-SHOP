@@ -1,5 +1,6 @@
 import os
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from catalog.models import Category, ProductClass
 from stock.models import StockRecord
@@ -32,7 +33,26 @@ class ProductList(AbstractList):
 	stock_records = models.ManyToManyField(StockRecord, verbose_name=_("stock records"), blank=True)
 	product_classes = models.ManyToManyField(ProductClass, verbose_name=_("product classes"), blank=True)
 
+	@property
+	def get_stocks(self):
 
+		# included_products
+		# excluded_products
+		# classes
+		# included_categories
+		# excluded_categories
+		included_stocks_filter = Q(id__in=self.stock_records.values("id"))
+		included_categories_filter = Q(product__categories__in=self.categories.values("id"))
+
+		classes_filter = Q(product__product_class__in=self.product_classes.values("id"))
+
+
+		_filter = (included_stocks_filter | included_categories_filter | classes_filter)
+			
+			
+		total_stocks = StockRecord.objects.filter(_filter)
+
+		return total_stocks
 
 	class Meta:
 		verbose_name = "Product List"
