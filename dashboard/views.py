@@ -946,12 +946,7 @@ class ProductGroupListView(ListView):
 		return super().render_to_response(*args, **kwargs)
 
 
-class ProductGroupCreateView(CreateView):
-	model = ProductList
-	template_name = "dashboard/collection/product_group/create_update.html"
-	form_class = forms.ProductGroupForm
-
-
+class FormHandlerMixin:
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context["stock_records"] = StockRecord.objects.filter(seller=self.request.user)
@@ -960,7 +955,7 @@ class ProductGroupCreateView(CreateView):
 	def form_valid(self, form):
 		form.save()
 		return JsonResponse({"status":True})
-		
+
 	def form_invalid(self, form):
 		errors = self.serialize_errors(form)
 		return JsonResponse({"status":False, "errors":errors})
@@ -968,3 +963,16 @@ class ProductGroupCreateView(CreateView):
 	def serialize_errors(self, form):
 		errors = form.errors.get_json_data()
 		return errors
+
+class ProductGroupCreateView(FormHandlerMixin, CreateView):
+	model = ProductList
+	template_name = "dashboard/collection/product_group/create_update.html"
+	form_class = forms.ProductGroupForm
+
+
+
+
+class ProductGroupUpdateView(FormHandlerMixin, UpdateView):
+	model = ProductList
+	template_name = "dashboard/collection/product_group/create_update.html"
+	form_class = forms.ProductGroupForm

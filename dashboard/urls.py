@@ -72,6 +72,8 @@ urlpatterns = [
 
 	path("collection/product_group/", views.ProductGroupListView.as_view(), name="product_group"),
 	path("collection/product_group/create/", views.ProductGroupCreateView.as_view(), name="product_group_create"),
+	path("collection/product_group/update/<int:pk>/", views.ProductGroupUpdateView.as_view(), name="product_group_update"),
+
 
 
 

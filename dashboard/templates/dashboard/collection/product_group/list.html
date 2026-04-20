@@ -19,7 +19,7 @@
     <div class="page-header-left">
       <h1 id="pageTitle">Product Groups</h1>
     </div>
-    <button class="primary-action-btn" id="globalActionBtn">➕ Create New Group</button>
+    <button class="primary-action-btn" id="globalActionBtn" onclick="createNew()">➕ Create New Group</button>
   </div>
 
   <div class="stats-grid" id="statsContainer"></div>
@@ -222,6 +222,18 @@ function applyPagination(){
     box.className = `message ${message_class}`;
     
     box.innerHTML = message;
+  }
+
+  function update(id){
+    const baseUpdateUrl = "{%url 'dashboard:product_group_update' 0 %}"
+    const url = baseUpdateUrl.replace(0, id)
+    window.location.href = url
+  }
+  function createNew(){
+    const url = "{%url 'dashboard:product_group_create'%}"
+
+    window.location.href = url
+
   }
 </script>
 

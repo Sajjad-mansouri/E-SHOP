@@ -22,22 +22,26 @@
 {%csrf_token%}
 <div class="form-group">
 <label>Name</label>
-<input id="name" name="name" type="text">
+{{form.name}}
+
 </div>
 
 <div class="form-group">
 <label>Slug</label>
-<input id="slug" name="slug" type="text">
+{{form.slug}}
+
 </div>
 
 <div class="form-group">
 <label>Description</label>
-<textarea id="description" name="description" rows="4"></textarea>
+{{form.description}}
+
 </div>
 
 <div class="form-group">
 <label>Image</label>
-<input id="image" name="image" type="file">
+{{form.image}}
+
 </div>
 
 <div class="form-group">
@@ -77,7 +81,21 @@ Click to add stock records
 </tr>
 </thead>
 
-<tbody id="selectedProducts"></tbody>
+<tbody id="selectedProducts">
+	{%for stock in object.stock_records.all%}
+	<tr data-item="{{stock.id}}">
+		<td><img src="{{stock.get_product_image}}"></td>
+		<td>{{stock.product.title}}</td>
+		<td>{{stock.price}}</td>
+		<td>{{stock.product.upc}}</td>
+		<td>{{stock.num_in_stock}}</td>
+		<td>
+		<button class="btn remove-btn">Remove</button>
+		</td>
+
+	</tr>
+	{%endfor%}
+</tbody>
 
 </table>
 
@@ -86,7 +104,7 @@ Click to add stock records
 
 </div>
 
-<button type="submit" class="btn">Create Product Group</button>
+<button type="submit" class="btn">{%if object%}Update{%else%}Create{%endif%} Product Group</button>
 
 </form>
 </div>
@@ -135,7 +153,11 @@ Click to add stock records
 		data-img="{{stock.get_product_image}}"
 		onclick="addRemove()" 
 		>
+		{%if stock in object.stock_records.all%}
+		remove
+		{%else%}
 		Add
+		{%endif%}
 		</button>
 	</td>
 
@@ -159,6 +181,11 @@ Click to add stock records
 
 <script>
 let stock_records = []
+document.querySelectorAll("#selectedProducts  tr").forEach(tr=>{
+	stock_records.push(tr.dataset.item)
+})
+
+
 /* ---------- MODAL CONTROL ---------- */
 
 function openModal(){
@@ -216,10 +243,10 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 
 
 	const status = document.getElementById("id_status").value
-	const imageInput = document.getElementById("image")
-	const name = document.getElementById("name").value
-	const slug = document.getElementById("slug").value
-	const description = document.getElementById("description").value
+	const imageInput = document.getElementById("id_image")
+	const name = document.getElementById("id_name").value
+	const slug = document.getElementById("id_slug").value
+	const description = document.getElementById("id_description").value
 
 	let formData = new FormData()
 
@@ -235,10 +262,10 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 
 
 	formData.append("image", imageInput.files[0])
-	const url = "{%url 'dashboard:product_group_create'%}"
+	
 	try{
 
-		const data = await fetchPost(url, formData)
+		const data = await fetchPost("{{request.path}}", formData)
 		if (data.status){
 			window.location.href = "{%url 'dashboard:product_group'%}"
 		}else{
@@ -272,12 +299,12 @@ function addRemove(){
 	const upc = btn.dataset.upc
 	const stock = btn.dataset.stock
 	const table = document.getElementById("selectedProducts")
-	const existing = table.querySelector(`[data-item="${upc}"]`)
+	const existing = table.querySelector(`[data-item="${id}"]`)
 
 	if(!existing){
 
 		const row = document.createElement("tr")
-		row.dataset.item = upc
+		row.dataset.item = id
 
 		row.innerHTML = `
 		<td><img src="${img}"></td>
@@ -306,7 +333,7 @@ function addRemove(){
 		}
 
 	}else{
-
+		stock_records = stock_records.filter(item=>item!==id)
 		existing.remove()
 		btn.textContent="Add"
 		btn.style.background=""

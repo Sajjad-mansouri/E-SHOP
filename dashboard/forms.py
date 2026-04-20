@@ -325,3 +325,6 @@ class ProductGroupForm(forms.ModelForm):
 	class Meta:
 		model = ProductList
 		fields = ["name", "slug", "description", "image", "status", "categories", "stock_records", "product_classes"]
+		widgets = {
+			"description":forms.Textarea(attrs={"rows":4}),
+		}
