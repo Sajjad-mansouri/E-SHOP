@@ -78,11 +78,13 @@ class DashboardOverView(TemplateView):
 		return earns
 
 
-class ProductListView(mixins.FilterQuerySetMixin, mixins.AjaxMixin, ListView):
+class ProductListView(mixins.AjaxQuerysetMixin, ListView):
 	template_name = "dashboard/catalog/product/list.html"
 	model = StockRecord
 	Ajax_template = "dashboard/catalog/product/_list.html"
 	paginate_by = 10
+	filterable = True
+	searchable = True
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -215,15 +217,25 @@ class DeleteProductView(mixins.DeleteMixin, DeleteView):
 
 
 
-class ProductTypeView(ListView):
+class ProductTypeView(mixins.AjaxQuerysetMixin, ListView):
 	model = ProductClass
-	template_name = "dashboard/product_type/product_type_list.html"
+	template_name = "dashboard/catalog/product_type/list.html"
+	Ajax_template = "dashboard/catalog/product_type/_list.html"
+	paginate_by = 1
+	filterable = False
+	searchable = True
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = Q(name__icontains=search)
 
+		return qs.filter(query)
 
 class ProductTypeCreateUpdateView(UpdateView):
 	model = ProductClass
 	form_class = forms.ProductTypeForm
-	template_name = "dashboard/product_type/create_update.html"
+	template_name = "dashboard/catalog/product_type/create_update.html"
 	success_url = reverse_lazy("dashboard:product_type_list")
 
 
@@ -277,9 +289,8 @@ class ProductTypeCreateUpdateView(UpdateView):
 
 
 class ProductTypeDeleteView(mixins.DeleteMixin, DeleteView):
-	template_name = "dashboard/product_type/delete_product_type.html"
 	model = ProductClass
-	success_url = reverse_lazy("product_type_list")
+
 
 
 class CategoryListView(ListView):

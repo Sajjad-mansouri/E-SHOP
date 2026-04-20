@@ -1,0 +1,242 @@
+
+{%extends 'dashboard/_dashboard_base.html'%}
+{%load static%}
+
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/general_list.css'%}">
+{%endblock%}
+
+{%block title%}
+{%endblock%}
+
+{%block content%}
+
+<main class="main">
+  <!-- MESSAGE BOX for delete success/fail notifications -->
+  <div id="messageBox" class="message"></div>
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 id="pageTitle">Product Type</h1>
+    </div>
+    <button class="primary-action-btn" id="globalActionBtn" onclick="createNew()">➕ Create Product Type</button>
+  </div>
+
+  <div class="stats-grid" id="statsContainer"></div>
+
+  <div class="search-section">
+    <div class="search-wrapper">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="globalSearch" placeholder="Search by name..." autocomplete="off" oninput="search()">
+      </div>
+
+
+    </div>
+  </div>
+  {%csrf_token%}
+  <div class="data-table-container">
+    {%include 'dashboard/catalog/product_type/_list.html'%}
+  </div>
+</main>
+
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Confirm removal</h3>
+    <p id="modalMessage">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+
+
+{%endblock%}
+
+{%block script%}
+<script>
+
+    // DOM elements
+    const objectsUrl = "{%url 'dashboard:product_type_list' %}"
+    const baseDeleteUrl = "{%url 'dashboard:product_type_delete' 0 %}"
+    const baseUpdateUrl = "{%url 'dashboard:product_type_update' 0 %}"
+    const baseCreateurl = "{%url 'dashboard:product_type_create'%}"
+
+
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const modalMessage = document.getElementById('modalMessage');
+    const dataTableContainer = document.querySelector('.data-table-container')
+    
+
+    let objectToDelete = null;
+
+
+
+
+
+    // Open delete modal
+    function openDeleteModal(offerId, productName) {
+      objectToDelete = offerId;
+      modalMessage.textContent = `Are you sure you want to remove this offer from "${productName}"? This action cannot be undone.`;
+      deleteModal.classList.add('show');
+    }
+
+    // Delete offer
+    async function deleteObject() {
+      const url = baseDeleteUrl.replace("0", objectToDelete)
+      try{
+        const formData = new FormData()
+        const data = await fetchPost(url, formData)
+        console.log(data)
+        if(data.status){
+          showError("Successfully Removed!", "success")
+          applyFilters(null)
+        }else{
+          showError("Failed Removed!", "error")
+
+        }
+      }catch(error){
+        console.log(error)
+          showError("An unexpected error occurred. Please try again later.", "error")
+
+      }
+      deleteModal.classList.remove('show');
+    }
+
+
+    
+    cancelDeleteBtn.addEventListener('click', () => {
+      deleteModal.classList.remove('show');
+      objectToDelete = null;
+    });
+    
+    confirmDeleteBtn.addEventListener('click', deleteObject);
+    
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        deleteModal.classList.remove('show');
+        objectToDelete = null;
+      }
+    });
+
+
+
+    // Escape key to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+        deleteModal.classList.remove('show');
+        objectToDelete = null;
+      }
+    });
+
+
+
+
+  const filters = {}
+
+  function search(){
+    const value = event.target.value.trim()
+    filters.search = value
+    applyFilters(null)
+  }
+
+
+  function objectFilter(key){
+    const value = event.target.value
+    filters[key] = value
+    applyFilters(null)
+  }
+  // Apply all filters and sorting
+  async function applyFilters(page) {
+
+    const url = serializeFiltersToURL(page)
+    const data = await getFetch(url)
+    dataTableContainer.innerHTML = ""
+    dataTableContainer.insertAdjacentHTML('beforeend',data)
+    history.pushState({}, "", url)
+
+  }
+  function serializeFiltersToURL(page) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if(Array.isArray(value)){
+        value.forEach(v => params.append(key, v));
+      }
+      else if(typeof value === "object" && value !==null){
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          params.append(`${key}_${subKey}`, subValue);
+        });
+      }
+      else{
+         params.append(key, value);
+      }
+
+    }
+    let newURL;
+    if(page){
+      const filterParam = params.toString()
+      if(params.toString()==""){
+        newURL = `?page=${page}`;
+
+      }else{
+        newURL = `?${filterParam}&page=${page}`;
+
+      }
+
+  }else{
+    newURL = `?${params.toString()}`;
+
+  }
+    return newURL
+  
+  }
+  async function getFetch(url){
+    
+    const response = await fetch(objectsUrl + url,{
+      method:"GET",
+      headers:{
+        "AJAX":true,
+      }
+    })
+    const data = await response.text()
+    return data
+  }
+
+function applyPagination(){
+  const btn = event.target.closest(".page-btn")
+  const nextPageNumber = btn.dataset.nextNumber
+  applyFilters(nextPageNumber)
+
+}
+  function showError(message, message_class){
+    const box = document.getElementById("messageBox");
+    box.className = `message ${message_class}`;
+    
+    box.innerHTML = message;
+  }
+
+  function update(id){
+    
+    const url = baseUpdateUrl.replace(0, id)
+    window.location.href = url
+  }
+  function createNew(){
+    
+    window.location.href = baseCreateurl
+
+  }
+
+
+
+  function closeModal(){
+    document.getElementById("modal").style.display="none"
+  }
+
+
+</script>
+
+{%endblock%}

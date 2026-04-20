@@ -15,7 +15,7 @@
 
 {%block content%}
 
-
+<main class="main">
     <a class="back-link" href="{%url 'dashboard:product_type_list' %}">← Back to Product Types</a>
 
     <div id="errorBox" class="error-box"></div>
@@ -66,13 +66,13 @@
     </div>
 
     <div class="actions">
-    <button class="save-btn" type="submit">Create Product Type</button>
+    <button class="save-btn" type="submit">{%if object%}Update{%else%}Create{%endif%} Product Type</button>
     <a class="cancel-btn" type="button" href="{%url 'dashboard:product_type_list'%}">Cancel</a>
     </div>
 
     </form>
 
-
+</main>
 {%endblock%}
 
 {%block extra%}
