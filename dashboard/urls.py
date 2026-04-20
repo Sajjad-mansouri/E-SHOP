@@ -77,6 +77,8 @@ urlpatterns = [
 
 	path("collection/collection_list/", views.CollectionListView.as_view(), name="collection_list"),
 	path("collection/collection_list/delete/<int:pk>/", views.CollectionListDeleteView.as_view(), name="collection_list_delete"),
+	path("collection/collection_list/create/", views.CollectionListCreateView.as_view(), name="collection_list_create"),
+	path("collection/collection_list/update/<int:pk>/", views.CollectionListUpdateView.as_view(), name="collection_list_update"),
 
 
 

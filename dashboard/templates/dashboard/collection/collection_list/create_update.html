@@ -13,7 +13,7 @@
 <main class="main">
 
 <div class="card">
-<h2>{%if object%}Update{%else%}Create{%endif%}Product Group</h2>
+<h2>{%if object%}Update{%else%}Create{%endif%} Collection</h2>
 
 <!-- ERROR MESSAGE BOX -->
 <div id="messageBox" class="message"></div>
@@ -60,35 +60,35 @@
 </div>
 
 <div class="form-group">
-<label>Stock Records</label>
+<label>Product Groups</label>
 
 <div class="object-selector" onclick="openModal()">
-Click to add stock records
+Click to add Product Group
 </div>
 
-<div class="selected-products">
+<div class="selected-objects">
 
-<table id="selectedProductsTable">
+<table id="selectedProductListsTable">
 
 <thead>
 <tr>
 <th>Image</th>
 <th>Name</th>
-<th>Price</th>
-<th>UPC</th>
-<th>In Stock</th>
+<th>products</th>
+<th>status</th>
+
 <th></th>
 </tr>
 </thead>
 
-<tbody id="selectedProducts">
-	{%for stock in object.stock_records.all%}
-	<tr data-item="{{stock.id}}">
-		<td><img src="{{stock.get_product_image}}"></td>
-		<td>{{stock.product.title}}</td>
-		<td>{{stock.price}}</td>
-		<td>{{stock.product.upc}}</td>
-		<td>{{stock.num_in_stock}}</td>
+<tbody id="selectedProductLists">
+	{%for product_group in object.product_lists.all%}
+	<tr data-item="{{product_group.id}}">
+		<td><img src="{%if product_group.image%}{{product_group.image}}{%endif%}"></td>
+		<td>{{product_group.name}}</td>
+		<td>-</td>
+		<td>{{product_group.status}}</td>
+
 		<td>
 		<button class="btn remove-btn" onclick="removeSelected()">Remove</button>
 		</td>
@@ -104,7 +104,7 @@ Click to add stock records
 
 </div>
 
-<button type="submit" class="btn">{%if object%}Update{%else%}Create{%endif%} Product Group</button>
+<button type="submit" class="btn">{%if object%}Update{%else%}Create{%endif%} Collection</button>
 
 </form>
 </div>
@@ -127,33 +127,30 @@ Click to add stock records
 <tr>
 <th>Image</th>
 <th>Name</th>
-<th>Price</th>
-<th>UPC</th>
-<th>In Stock</th>
+<th>products</th>
+<th>status</th>
 <th></th>
 </tr>
 </thead>
 
 <tbody>
-{%for stock in stock_records%}
+{%for product_group in product_groups%}
 <tr>
-	<td><img src="{{stock.get_product_image}}"></td>
-	<td>{{stock.product.title}}</td>
-	<td>${{stock.price}}</td>
-	<td>{{stock.product.upc}}</td>
-	<td>{{stock.num_in_stock}}</td>
+	<td><img src="{%if product_group.image%}{{product_group.image.url}}{%endif%}"></td>
+	<td>{{product_group.name}}</td>
+	<td>-</td>
+	<td>{{product_group.status}}</td>
 
 	<td>
 		<button class="btn toggle-btn"
-		data-id="{{stock.id}}"
-		data-name="{{stock.product.title}}"
-		data-price="${{stock.price}}"
-		data-upc="{{stock.product.upc}}"
-		data-stock="{{stock.num_in_stock}}"
-		data-img="{{stock.get_product_image}}"
+		data-id="{{product_group.id}}"
+		data-name="{{product_group.name}}"
+		data-status="{{product_group.status}}"
+		data-products="-"
+		data-img="{%if product_group.image%}{{product_group.image.url}}{%endif%}"
 		onclick="addRemove()" 
 		>
-		{%if stock in object.stock_records.all%}
+		{%if product_group.image in object.product_lists.all%}
 		remove
 		{%else%}
 		Add
@@ -180,9 +177,9 @@ Click to add stock records
 {%block script%}
 
 <script>
-let stock_records = []
-document.querySelectorAll("#selectedProducts  tr").forEach(tr=>{
-	stock_records.push(tr.dataset.item)
+let productListIDs = []
+document.querySelectorAll("#selectedProductLists  tr").forEach(tr=>{
+	productListIDs.push(tr.dataset.item)
 })
 
 
@@ -255,9 +252,8 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 	formData.append("description", description)
 	formData.append("status", status)
 	formData = getMultipleSelectValues(categories, formData, "categories")
-	formData = getMultipleSelectValues(productClasses, formData, "product_classes")
-	stock_records.forEach(value=>{
-		formData.append("stock_records", value)
+	productListIDs.forEach(value=>{
+		formData.append("product_lists", value)
 	})
 
 
@@ -267,7 +263,7 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 
 		const data = await fetchPost("{{request.path}}", formData)
 		if (data.status){
-			window.location.href = "{%url 'dashboard:product_group'%}"
+			window.location.href = "{%url 'dashboard:collection_list'%}"
 		}else{
 
 			const errors = data.errors
@@ -292,13 +288,15 @@ function getMultipleSelectValues(multipeInput, formData, field){
 function addRemove(){
 	btn = event.target
 	const id = btn.dataset.id
-	stock_records.push(id)
+	productListIDs.push(id)
 	const name = btn.dataset.name
-	const price = btn.dataset.price
+	const status = btn.dataset.status
+	const products = btn.dataset.proudcts
+
 	const img = btn.dataset.img
-	const upc = btn.dataset.upc
-	const stock = btn.dataset.stock
-	const table = document.getElementById("selectedProducts")
+
+
+	const table = document.getElementById("selectedProductLists")
 	const existing = table.querySelector(`[data-item="${id}"]`)
 
 	if(!existing){
@@ -309,9 +307,8 @@ function addRemove(){
 		row.innerHTML = `
 		<td><img src="${img}"></td>
 		<td>${name}</td>
-		<td>${price}</td>
-		<td>${upc}</td>
-		<td>${stock}</td>
+		<td>${products}</td>
+		<td>${status}</td>
 		<td>
 		<button class="btn remove-btn" onclick="removeSelected()">Remove</button>
 		</td>
@@ -327,7 +324,7 @@ function addRemove(){
 
 
 	}else{
-		stock_records = stock_records.filter(item=>item!==id)
+		productListIDs = productListIDs.filter(item=>item!==id)
 		existing.remove()
 		btn.textContent="Add"
 		btn.style.background=""
@@ -335,6 +332,7 @@ function addRemove(){
 	}
 
 	}
+
 	function removeSelected(){
 		event.preventDefault()
 		const btn = event.target
@@ -345,7 +343,6 @@ function addRemove(){
 		btn.textContent="Add"
 		btn.style.background=""
 	}
-
   function showError(message, message_class){
     const box = document.getElementById("messageBox");
     box.className = `message ${message_class}`;

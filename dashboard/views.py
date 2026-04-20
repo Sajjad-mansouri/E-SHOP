@@ -889,3 +889,24 @@ class CollectionListView(mixins.collectionMixin, ListView):
 
 class CollectionListDeleteView(mixins.DeleteMixin, DeleteView):
 	model = CollectionList
+
+class CollectionListCreateView( mixins.FormHandlerMixin, CreateView):
+	model = CollectionList
+	template_name = "dashboard/collection/collection_list/create_update.html"
+	form_class = forms.CollectionListForm
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["product_groups"] = ProductList.objects.filter(status="active")
+		return context
+
+
+class CollectionListUpdateView( mixins.FormHandlerMixin, UpdateView):
+	model = CollectionList
+	template_name = "dashboard/collection/collection_list/create_update.html"
+	form_class = forms.CollectionListForm
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["product_groups"] = ProductList.objects.filter(status="active")
+		return context

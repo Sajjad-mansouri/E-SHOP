@@ -220,12 +220,12 @@ function applyPagination(){
   }
 
   function update(id){
-    const baseUpdateUrl = "{%url 'dashboard:product_group_update' 0 %}"
+    const baseUpdateUrl = "{%url 'dashboard:collection_list_update' 0 %}"
     const url = baseUpdateUrl.replace(0, id)
     window.location.href = url
   }
   function createNew(){
-    const url = "{%url 'dashboard:product_group_create'%}"
+    const url = "{%url 'dashboard:collection_list_create'%}"
 
     window.location.href = url
 

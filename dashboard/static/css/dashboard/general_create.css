@@ -63,7 +63,7 @@ cursor:pointer;
 
 /* STOCK SELECTOR */
 
-.stock-selector{
+.object-selector{
 border:1px dashed #ccc;
 padding:12px;
 border-radius:10px;
@@ -71,9 +71,7 @@ cursor:pointer;
 background:#fafafa;
 }
 
-.selected-products{
-margin-top:15px;
-}
+
 
 .selected-item{
 display:flex;
@@ -156,7 +154,7 @@ margin-top:10px;
 }
 
 
-.selected-products{
+.selected-objects{
 margin-top:15px;
 max-height:220px;
 overflow-y:auto;

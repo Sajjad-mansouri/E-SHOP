@@ -11,7 +11,7 @@ from .widgets import TableCheckboxSelectMultiple, NameCheckboxSelectMultiple, Of
 from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
-from collection.models import ProductList
+from collection.models import ProductList, CollectionList
 
 class ProductClassForm(forms.ModelForm):
 	class Meta:
@@ -325,6 +325,14 @@ class ProductGroupForm(forms.ModelForm):
 	class Meta:
 		model = ProductList
 		fields = ["name", "slug", "description", "image", "status", "categories", "stock_records", "product_classes"]
+		widgets = {
+			"description":forms.Textarea(attrs={"rows":4}),
+		}
+
+class CollectionListForm(forms.ModelForm):
+	class Meta:
+		model = CollectionList
+		fields = ["name", "slug", "description", "image", "status", "categories", "product_lists"]
 		widgets = {
 			"description":forms.Textarea(attrs={"rows":4}),
 		}
