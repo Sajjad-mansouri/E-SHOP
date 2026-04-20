@@ -293,23 +293,34 @@ class ProductTypeDeleteView(mixins.DeleteMixin, DeleteView):
 
 
 
-class CategoryListView(ListView):
-	template_name = "dashboard/category/categories.html"
+class CategoryListView(mixins.AjaxQuerysetMixin, ListView):
+	template_name = "dashboard/catalog/category/categories.html"
+	Ajax_template = "dashboard/catalog/product_type/_list.html"
 	model = Category
+	paginate_by = 10
+	filterable = False
+	searchable = True
 
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = Q(name__icontains=search)
+
+		return qs.filter(query)
 class SubCategoryView(DetailView):
-	template_name = "dashboard/category/categories.html"
+	template_name = "dashboard/catalog/category/categories.html"
 	model = Category
 
 
 class CategoryCreateView(CreateView):
-	template_name = "dashboard/category/create_update.html"
+	template_name = "dashboard/catalog/category/create_update.html"
 	model = Category
 	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
 
 class CategoryUpdateView(UpdateView):
-	template_name = "dashboard/category/create_update.html"
+	template_name = "dashboard/catalog/category/create_update.html"
 	model = Category
 	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
