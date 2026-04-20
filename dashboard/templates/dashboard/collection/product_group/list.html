@@ -40,7 +40,7 @@
       </div>
     </div>
   </div>
-
+  {%csrf_token%}
   <div class="data-table-container">
     {%include 'dashboard/collection/product_group/_list.html'%}
   </div>
@@ -63,7 +63,7 @@
 
     // DOM elements
     const objectsUrl = "{%url 'dashboard:product_group' %}"
-    const baseDeleteUrl = ""
+    const baseDeleteUrl = "{%url 'dashboard:product_group_delete' 0 %}"
 
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDelete');
@@ -133,12 +133,7 @@
       }
     });
 
-    function removeModal(){
-            const btn = event.target
-            const offerId = parseInt(btn.dataset.offerId);
-            const productName = btn.dataset.productName;
-            openDeleteModal(offerId, productName);
-    }
+
 
 
   const filters = {}

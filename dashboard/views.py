@@ -24,6 +24,7 @@ from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
 from collection.models import ProductList, CollectionList
+from . import mixins
 
 
 UserModel = get_user_model()
@@ -184,18 +185,10 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 
 
-class DeleteProductView(DeleteView):
+class DeleteProductView(mixins.DeleteMixin, DeleteView):
 	template_name = "dashboard/delete_product.html"
 	model = Product
 	success_url = reverse_lazy("dashboard:products")
-
-	def form_valid(self, form):
-		self.object.delete()
-
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 
 class SearchProduct(View):
@@ -278,18 +271,11 @@ class ProductTypeCreateUpdateView(UpdateView):
 		return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
 
-class ProductTypeDeleteView(DeleteView):
+class ProductTypeDeleteView(mixins.DeleteMixin, DeleteView):
 	template_name = "dashboard/product_type/delete_product_type.html"
 	model = ProductClass
 	success_url = reverse_lazy("product_type_list")
 
-	def form_valid(self, form):
-		self.object.delete()
-
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 class CategoryListView(ListView):
 	template_name = "dashboard/category/categories.html"
@@ -313,18 +299,11 @@ class CategoryUpdateView(UpdateView):
 	success_url = reverse_lazy("dashboard:categories")
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(mixins.DeleteMixin, DeleteView):
 	template_name = "dashboard/category/category_delete.html"
 	model = Category
 	success_url = reverse_lazy("dashboard:categories")
 
-	def form_valid(self, form):
-		self.object.delete()
-
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 class OfferRangeListView(ListView):
 	model = OfferRange
@@ -345,17 +324,11 @@ class OfferRangeUpdateView(UpdateView):
 	search_template_name = "dashboard/offer/range/test.html"
 
 
-class OfferRangeDeleteView(DeleteView):
+class OfferRangeDeleteView(mixins.DeleteMixin, DeleteView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/delete.html"
 	success_url = reverse_lazy("offer_range")
 
-	def form_valid(self, form):
-		self.object.delete()
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 class OfferListView(ListView):
 	model = Offer
@@ -391,18 +364,12 @@ class OfferStepView(View):
 class UpdateOfferView(CreateOfferView):
 	update = True
 
-class DeleteOfferView(DeleteView):
+class DeleteOfferView(mixins.DeleteMixin, DeleteView):
 	template_name = "dashboard/offer/offer/delete.html"
 	model = Offer
 	success_url = reverse_lazy("dashboard:offer_list")
 
-	def form_valid(self, form):
-		success_url = self.get_success_url()
-		self.object.offer_type.delete()
-		return JsonResponse({"status":True})
 
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 
 class CouponListView(ListView):
@@ -421,17 +388,12 @@ class CouponUpdateView(UpdateView):
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
 
-class CouponDeleteView(DeleteView):
+class CouponDeleteView(mixins.DeleteMixin, DeleteView):
 	model = Coupon
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/delete.html"
 
-	def form_valid(self, form):
-		self.object.delete()
-		return JsonResponse({"status":True})
 
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 
 
@@ -792,15 +754,10 @@ class ReviewStatusUpdateView(UpdateView):
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
 
-class ReviewDeletView(DeleteView):
+class ReviewDeletView(mixins.DeleteMixin, DeleteView):
 	model = Comment
 
-	def form_valid(self, form):
-		self.object.delete()
-		return JsonResponse({"status":True})
 
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 
 class AppliedOfferListView(ListView):
@@ -900,15 +857,9 @@ class AppliedOfferCreateView(CreateView):
 
 
 
-class AppliedOfferDeleteView(DeleteView):
+class AppliedOfferDeleteView(mixins.DeleteMixin, DeleteView):
 	model = OfferApplication
 
-	def form_valid(self, form):
-		self.object.delete()
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		return JsonResponse({"status":False})
 
 
 class ProductGroupListView(ListView):
@@ -976,3 +927,6 @@ class ProductGroupUpdateView(FormHandlerMixin, UpdateView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/create_update.html"
 	form_class = forms.ProductGroupForm
+
+class ProductGroupDeleteView(mixins.DeleteMixin, DeleteView):
+	model = ProductList
