@@ -13,7 +13,13 @@ class Coupon(models.Model):
 	valid_from = models.DateTimeField(_("valid from"))
 	valid_to = models.DateTimeField(_("valid to"))
 	discount = models.IntegerField(_("discount"), validators=[MinValueValidator(0),MaxValueValidator(100)])
-	active = models.BooleanField(_("active"))
+	OFFER_STATUS = [
+		("active", "Active"),
+		("expired", "Expired"),
+		("suspended", "Suspended"),
+
+	]
+	status = models.CharField(_("Status"), max_length=50, choices=OFFER_STATUS, default="active")
 
 	SINGLE_USE, MULTI_USE, ONCE_PER_CUSTOMER = (
 		"Single use",

@@ -8,18 +8,29 @@
     <thead id="tableHeader">
       <tr>
         <th>Name</th>
-        <th>Attributes</th>
+        <th>Offer type</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>Priority</th>
+        <th>Is available</th>
+        <th>Uses</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody id="tableBody">
-      {%for product_type in object_list%}
+      {%for offer in object_list%}
       <tr>
-        <td>{{product_type.name}}</td>
-        <td>{{product_type.attributes.count}}</td>
+        <td>{{offer.name}}</td>
+        <td>{{offer.offer_type.type}}</td>
+        <td>{{offer.start_datetime}}</td>
+        <td>{{offer.end_datetime}}</td>
+        <td>{{offer.priority}}</td>
+        <td>{{offer.status}}</td>
+        <td>-</td>
+
         <td>
-          <button class="action-btn edit-btn"  onclick="update('{{product_type.id}}')">✏️ Edit</button>
-          <button class="action-btn delete-btn" data-id="{{product_type.id}}" onclick="openDeleteModal('{{product_type.id}}', '{{product_type.name}}')">🗑️ Remove</button>
+          <button class="action-btn edit-btn"  onclick="update('{{offer.id}}')">✏️ Edit</button>
+          <button class="action-btn delete-btn" data-id="{{offer.id}}" onclick="openDeleteModal('{{offer.id}}', '{{offer.name}}')">🗑️ Remove</button>
         </td>
       </tr>
       {%endfor%}

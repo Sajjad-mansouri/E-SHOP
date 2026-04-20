@@ -55,6 +55,8 @@ urlpatterns = [
 
 	path("fulfilment/orders/", views.OderListView.as_view(), name="order_list"),
 	path("fulfilment/order/<int:pk>/", views.OderDetailView.as_view(), name="order_detail"),
+	path("fulfilment/order/delete/<int:pk>/", views.OrderDeleteView.as_view(), name="order_delete"),
+
 
 	path("fulfilment/statistics/", views.FulfilmentStatistic.as_view(), name="statistics"),
 

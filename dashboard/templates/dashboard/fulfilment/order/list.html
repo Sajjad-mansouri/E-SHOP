@@ -17,9 +17,8 @@
 
   <div class="page-header">
     <div class="page-header-left">
-      <h1 id="pageTitle">Offer Ranges</h1>
+      <h1 id="pageTitle">Orders</h1>
     </div>
-    <button class="primary-action-btn" id="globalActionBtn" onclick="createNew()">➕ Create Offer Range</button>
   </div>
 
   <div class="stats-grid" id="statsContainer"></div>
@@ -30,13 +29,25 @@
         <span class="search-icon">🔍</span>
         <input type="text" class="search-input" id="globalSearch" placeholder="Search by name..." autocomplete="off" oninput="search()">
       </div>
+      <div class="filter-group" id="dynamicFilters">
+        <select class="filter-select" onchange="objectFilter('status')">
+          <option value="all">All Type</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
 
+
+
+        </select>
+      </div>
 
     </div>
   </div>
   {%csrf_token%}
   <div class="data-table-container">
-    {%include "dashboard/offer/range/_list.html"%}
+    {%include "dashboard/fulfilment/order/_list.html"%}
   </div>
 </main>
 
@@ -59,10 +70,10 @@
 <script>
 
     // DOM elements
-    const objectsUrl = "{%url 'dashboard:offer_range' %}"
-    const baseDeleteUrl = "{%url 'dashboard:offer_range_delete' 0 %}"
-    const baseUpdateUrl = "{%url 'dashboard:offer_range_update' 0 %}"
-    const baseCreateurl = "{%url 'dashboard:offer_range_create'%}"
+    const objectsUrl = "{%url 'dashboard:order_list' %}"
+    const baseDeleteUrl = "{%url 'dashboard:order_delete' 0 %}"
+    const baseUpdateUrl = "{%url 'dashboard:order_detail' 0 %}"
+
 
 
     const deleteModal = document.getElementById('deleteModal');
@@ -219,17 +230,13 @@ function applyPagination(){
     box.innerHTML = message;
   }
 
+
+
   function update(id){
     
     const url = baseUpdateUrl.replace(0, id)
     window.location.href = url
   }
-  function createNew(){
-    
-    window.location.href = baseCreateurl
-
-  }
-
 
 
   function closeModal(){

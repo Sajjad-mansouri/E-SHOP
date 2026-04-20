@@ -7,19 +7,26 @@
   <table id="dataTable">
     <thead id="tableHeader">
       <tr>
-        <th>Name</th>
-        <th>Attributes</th>
+        <th>code</th>
+        <th>discount</th>
+        <th>valid from</th>
+        <th>valid to</th>
+        <th>status</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody id="tableBody">
-      {%for product_type in object_list%}
+      {%for coupon in object_list%}
       <tr>
-        <td>{{product_type.name}}</td>
-        <td>{{product_type.attributes.count}}</td>
+        <td>{{coupon.code}}</td>
+        <td>{{coupon.discount}}</td>
+        <td>{{coupon.valid_from}}</td>
+        <td>{{coupon.valid_to}}</td>
+        <td>{{coupon.status}}</td>
+
         <td>
-          <button class="action-btn edit-btn"  onclick="update('{{product_type.id}}')">✏️ Edit</button>
-          <button class="action-btn delete-btn" data-id="{{product_type.id}}" onclick="openDeleteModal('{{product_type.id}}', '{{product_type.name}}')">🗑️ Remove</button>
+          <button class="action-btn edit-btn"  onclick="update('{{coupon.id}}')">✏️ Edit</button>
+          <button class="action-btn delete-btn" data-id="{{coupon.id}}" onclick="openDeleteModal('{{coupon.id}}', '{{coupon.code}}')">🗑️ Remove</button>
         </td>
       </tr>
       {%endfor%}

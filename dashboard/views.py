@@ -56,7 +56,7 @@ class DashboardOverView(TemplateView):
 		return customers
 
 	def get_stock_products(self):
-		stock_records = StockRecord.objects.filter(is_public=True, num_in_stock__gt=0)
+		stock_records = StockRecord.objects.filter(status="public", num_in_stock__gt=0)
 		return stock_records
 
 	def get_orders(self):
@@ -332,10 +332,21 @@ class CategoryDeleteView(mixins.DeleteMixin, DeleteView):
 	success_url = reverse_lazy("dashboard:categories")
 
 
-class OfferRangeListView(ListView):
+class OfferRangeListView(mixins.AjaxQuerysetMixin,ListView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/list.html"
+	Ajax_template = "dashboard/offer/range/_list.html"
 
+	paginate_by = 1
+	filterable = False
+	searchable = True
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = Q(name__icontains=search)
+
+		return qs.filter(query)
 
 class OfferRangeCreateView(CreateView):
 	model = OfferRange
@@ -353,14 +364,31 @@ class OfferRangeUpdateView(UpdateView):
 
 class OfferRangeDeleteView(mixins.DeleteMixin, DeleteView):
 	model = OfferRange
-	template_name = "dashboard/offer/range/delete.html"
-	success_url = reverse_lazy("offer_range")
 
 
-class OfferListView(ListView):
+
+class OfferListView(mixins.AjaxQuerysetMixin, ListView):
 	model = Offer
 	template_name = "dashboard/offer/offer/list.html"
+	Ajax_template = "dashboard/offer/offer/_list.html"
 
+	paginate_by = 1
+	filterable = True
+	searchable = True
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = Q(name__icontains=search)
+
+		return qs.filter(query)
+	def apply_filter(self, qs):
+		status = self.request.GET.get("status")
+		query = Q()
+		if status != "all" and status:
+
+			query = Q(status=status)
+		return qs.filter(query)
 
 class CreateOfferView(OfferWizardStepView):
 
@@ -399,10 +427,28 @@ class DeleteOfferView(mixins.DeleteMixin, DeleteView):
 
 
 
-class CouponListView(ListView):
+class CouponListView(mixins.AjaxQuerysetMixin, ListView):
 	model = Coupon
 	template_name = "dashboard/offer/coupon/list.html"
+	Ajax_template = "dashboard/offer/coupon/_list.html"
 
+	paginate_by = 1
+	filterable = True
+	searchable = True
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = Q(code__icontains=search)
+
+		return qs.filter(query)
+	def apply_filter(self, qs):
+		status = self.request.GET.get("status")
+		query = Q()
+		if status != "all" and status:
+
+			query = Q(status=status)
+		return qs.filter(query)
 class CouponCreateView(CreateView):
 	model = Coupon
 	form_class = forms.CouponForm
@@ -424,14 +470,32 @@ class CouponDeleteView(mixins.DeleteMixin, DeleteView):
 
 
 
-class OderListView(ListView):
+class OderListView(mixins.AjaxQuerysetMixin, ListView):
 	model = Order
-	template_name = "dashboard/order/orders.html"
+	template_name = "dashboard/fulfilment/order/list.html"
+	Ajax_template = "dashboard/fulfilment/order/_list.html"
 
+	paginate_by = 1
+	filterable = True
+	searchable = True
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = (Q(order_number__icontains=search)|Q(shipping_address__full_name__icontains=search))
+
+		return qs.filter(query)
+	def apply_filter(self, qs):
+		status = self.request.GET.get("status")
+		query = Q()
+		if status != "all" and status:
+
+			query = Q(status=status)
+		return qs.filter(query)
 class OderDetailView(UpdateView):
 	model = Order
 	form_class = forms.OrderStatusForm
-	template_name = "dashboard/order/order_detail.html"
+	template_name = "dashboard/fulfilment/order/order_detail.html"
 
 
 	def form_valid(self, form):
@@ -441,6 +505,8 @@ class OderDetailView(UpdateView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
+class OrderDeleteView(mixins.DeleteMixin, DeleteView):
+	model = Order
 
 
 class FulfilmentStatistic(TemplateView):
@@ -874,6 +940,8 @@ class ProductGroupListView(mixins.collectionMixin, ListView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/list.html"
 	paginate_by = 1
+	filterable = True
+	searchable = True
 
 
 	def render_to_response(self, *args, **kwargs):
@@ -907,7 +975,8 @@ class CollectionListView(mixins.collectionMixin, ListView):
 	model = CollectionList
 	template_name = "dashboard/collection/collection_list/list.html"
 	paginate_by = 1
-
+	filterable = True
+	searchable = True
 	def render_to_response(self, *args, **kwargs):
 		if self.request.headers.get("AJAX"):
 			self.template_name = "dashboard/collection/collection_list/_list.html"

@@ -36,11 +36,9 @@
   </div>
   {%csrf_token%}
   <div class="data-table-container">
-    {%if object%}
-    {%include "dashboard/catalog/category/_sub_categories2.html"%}
-    {%else%}
-    {%include "dashboard/catalog/category/_categories2.html"%}
-    {%endif%}
+
+    {%include "dashboard/catalog/product_type/_list.html"%}
+
   </div>
 </main>
 

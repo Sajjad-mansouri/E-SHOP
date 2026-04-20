@@ -7,19 +7,32 @@
   <table id="dataTable">
     <thead id="tableHeader">
       <tr>
-        <th>Name</th>
-        <th>Attributes</th>
+        <th>Order Number</th>
+        <th>Full Name</th>
+        <th>Items Cost</th>
+        <th>Coupon Discount</th>
+        <th>Shipping Cost</th>
+        <th>Tax</th>
+        <th>Cost</th>
+        <th>Status</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody id="tableBody">
-      {%for product_type in object_list%}
+      {%for order in object_list%}
       <tr>
-        <td>{{product_type.name}}</td>
-        <td>{{product_type.attributes.count}}</td>
+        <td>{{order.order_number|truncatechars:10}}</td>
+        <td>{{order.shipping_address.full_name}}</td>
+        <td>{{order.calc_items_price}}</td>
+        <td>{{order.calc_discount}}</td>
+        <td>{{order.calc_shipping_cost}}</td>
+        <td>{{order.calc_tax}}</td>
+        <td>{{order.calc_total_cost}}</td>
+        <td>{{order.status}}</td>
+        
         <td>
-          <button class="action-btn edit-btn"  onclick="update('{{product_type.id}}')">✏️ Edit</button>
-          <button class="action-btn delete-btn" data-id="{{product_type.id}}" onclick="openDeleteModal('{{product_type.id}}', '{{product_type.name}}')">🗑️ Remove</button>
+          <button class="action-btn edit-btn"  onclick="update('{{order.id}}')">✏️ Edit</button>
+          <button class="action-btn delete-btn" data-id="{{order.id}}" onclick="openDeleteModal('{{order.id}}', '{{order.order_number}}')">🗑️ Remove</button>
         </td>
       </tr>
       {%endfor%}

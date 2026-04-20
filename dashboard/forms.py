@@ -220,8 +220,8 @@ class OfferRangeForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		self.fields["included_products"].queryset = StockRecord.objects.filter(is_public=True)
-		self.fields["excluded_products"].queryset = StockRecord.objects.filter(is_public=True)
+		self.fields["included_products"].queryset = StockRecord.objects.filter(status="public")
+		self.fields["excluded_products"].queryset = StockRecord.objects.filter(status="public")
 
 	class Meta:
 		model = OfferRange
@@ -290,7 +290,7 @@ class CouponForm(forms.ModelForm):
 			field.widget.attrs.update({"class":"form-control"})
 	class Meta:
 		model = Coupon
-		fields = ["code", "description", "valid_from", "valid_to", "discount", "active", "usage"]
+		fields = ["code", "description", "valid_from", "valid_to", "discount", "status", "usage"]
 		widgets = {
 				"valid_from":forms.DateTimeInput(attrs={"type":"datetime-local"}),
 				"valid_to":forms.DateTimeInput(attrs={"type":"datetime-local"}),
