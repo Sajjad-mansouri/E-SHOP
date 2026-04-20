@@ -14,6 +14,10 @@ from comment.models import Comment
 User = get_user_model()
 
 class StockRecord(models.Model):
+	STATUS_CHOICES = [
+		("public", "Public"),
+		("private", "Private")
+	]
 	product = models.ForeignKey(
 		"catalog.Product",
 		on_delete=models.CASCADE,
@@ -27,7 +31,7 @@ class StockRecord(models.Model):
 		verbose_name=_("seller"),
 		related_name="stockrecords",
 	)
-	is_public = models.BooleanField(default=True)
+	status = models.CharField(_("status"), choices=STATUS_CHOICES, default="public", max_length=10)
 	comments = GenericRelation(Comment, related_query_name="stockrecord")
 	sku = models.CharField(max_length=128, verbose_name=_("SKU"))
 	price_currency = models.CharField(

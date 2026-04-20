@@ -356,3 +356,83 @@
       .nav-bar { padding: 0 16px; overflow-x: auto; }
       .img-preview { width: 44px; height: 44px; }
     }
+
+
+    .old{
+text-decoration:line-through;
+color:#888;
+font-size:0.8rem;
+}
+
+.discount{
+color:var(--primary);
+font-size:0.8rem;
+font-weight:600;
+}
+
+
+
+/*specific product*/
+/* MODAL */
+
+
+
+.modal-box{
+background:white;
+padding:25px;
+width:360px;
+border-radius:16px;
+box-shadow:0 12px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.modal-close{
+background:none;
+border:none;
+font-size:20px;
+cursor:pointer;
+}
+
+.modal-box p{
+font-size:0.9rem;
+color:#666;
+margin-bottom:15px;
+}
+
+.modal-box select{
+width:100%;
+padding:10px;
+border:1px solid #ddd;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.modal-actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+}
+
+.cancel{
+background:#eee;
+padding:8px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.continue{
+background:var(--primary);
+color:white;
+padding:8px 14px;
+border:none;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+}

@@ -78,9 +78,11 @@ class DashboardOverView(TemplateView):
 		return earns
 
 
-class ProductListView(ListView):
-	template_name = "dashboard/product/products.html"
+class ProductListView(mixins.FilterQuerySetMixin, mixins.AjaxMixin, ListView):
+	template_name = "dashboard/catalog/product/list.html"
 	model = StockRecord
+	Ajax_template = "dashboard/catalog/product/_list.html"
+	paginate_by = 10
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -88,8 +90,28 @@ class ProductListView(ListView):
 		context['product_class_form'] = product_class_form
 		return context
 
+	def apply_filter(self, qs):
+		status = self.request.GET.get("status")
+
+		query = Q()
+		if status != "all" and status:
+
+			query = Q(status=status)
+
+		return qs.filter(query)
+
+	def search(self, qs):
+		search = self.request.GET.get("search")
+		query = Q()
+		if search:
+			query = (Q(product__title__icontains=search)|Q(product__upc__icontains=search))
+
+		return qs.filter(query)
+
+
+
 class CreateUpdateProductView(TemplateResponseMixin, View):
-	template_name = "dashboard/product/create_update.html"
+	template_name = "dashboard/catalog/product/create_update.html"
 
 	def dispatch(self, request, *args, **kwargs):
 		product_class_id = request.GET.get('product_class')
@@ -140,7 +162,8 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 		product_form = forms.ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
 		if product_form.is_valid():
-			
+
+			product_form.instance.product_class = self.product_class
 			self.object = product_form.save()
 		else:
 			img_formset = forms.image_formset(data=request.POST,files=request.FILES, prefix="img")
@@ -173,7 +196,7 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		else:
 
 			self.object.delete()
-			return render(request, "dashboard/product/create_update.html", {
+			return render(request, "dashboard/catalog/product/create_update.html", {
 				"product_form":product_form,
 				"img_formset":img_formset,
 				"product_category_form":product_category_form,
@@ -188,26 +211,8 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 class DeleteProductView(mixins.DeleteMixin, DeleteView):
 	template_name = "dashboard/delete_product.html"
 	model = Product
-	success_url = reverse_lazy("dashboard:products")
+	
 
-
-class SearchProduct(View):
-
-	def get(self, request, *args, **kwargs):
-		search = request.GET.get("search")
-
-		if search:	
-			object_list = StockRecord.objects.filter(
-				Q(product__title__icontains=search)|
-				Q(product__upc__icontains=search)
-				)
-
-		else:
-			object_list = StockRecord.objects.all()
-		if object_list:
-			return render(request, "dashboard/_records.html", {"object_list":object_list, "search":True})
-		else:
-			return HttpResponse("")
 
 
 class ProductTypeView(ListView):

@@ -31,13 +31,21 @@ class FormHandlerMixin:
 		errors = form.errors.get_json_data()
 		return errors
 
-
-class collectionMixin:
+class FilterQuerySetMixin:
 	def get_queryset(self):
 		qs = super().get_queryset()
 		qs = self.apply_filter(qs)
 		qs = self.search(qs)
 		return qs
+		
+class AjaxMixin:
+	def render_to_response(self, context, **response_kwargs):
+		is_ajax = self.request.headers.get("AJAX")
+		if is_ajax == 'true':
+			self.template_name = self.Ajax_template
+		return super().render_to_response(context, **response_kwargs)
+
+class collectionMixin(FilterQuerySetMixin):
 
 	def apply_filter(self, qs):
 		status = self.request.GET.get("status")

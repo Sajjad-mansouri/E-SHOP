@@ -9,7 +9,7 @@ urlpatterns = [
 	path("catalog/product/create/", views.CreateUpdateProductView.as_view(), name="create_product"),
 	path("catalog/product/update/<int:pk>/", views.CreateUpdateProductView.as_view(), name="update_product"),
 	path("catalog/product/delete/<int:pk>/", views.DeleteProductView.as_view(), name="delete_product"),
-	path("catalog/product/search", views.SearchProduct.as_view(), name="search_product"),
+
 
 	path("catalog/product-type/", views.ProductTypeView.as_view(), name="product_type_list"),
 	path("catalog/product-type/create/", views.ProductTypeCreateUpdateView.as_view(), name="product_type_create"),
