@@ -829,31 +829,12 @@ class AppliedOfferListView(ListView):
 
 		return super().render_to_response(*args, **kwargs)
 
-class AppliedOfferCreateView(CreateView):
+class AppliedOfferCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, CreateView):
 	model = OfferApplication
 	template_name = "dashboard/applied_offer/create.html"
 	form_class = forms.AppliedOfferForm
 	success_url = reverse_lazy("dashboard:applied_offers")
 
-
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context["stock_records"] = StockRecord.objects.filter(seller=self.request.user)
-		return context
-
-	def form_valid(self, form):
-		raise
-		form.save()
-		return JsonResponse({"status":True})
-
-	def form_invalid(self, form):
-		errors = self.serialize_errors(form)
-		return JsonResponse({"status":False, "errors":errors})
-
-	def serialize_errors(self, form):
-		errors = form.errors.get_json_data()
-		return errors
 
 
 
@@ -862,33 +843,11 @@ class AppliedOfferDeleteView(mixins.DeleteMixin, DeleteView):
 
 
 
-class ProductGroupListView(ListView):
+class ProductGroupListView(mixins.collectionMixin, ListView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/list.html"
 	paginate_by = 1
 
-	def get_queryset(self):
-		qs = super().get_queryset()
-		qs = self.apply_filter(qs)
-		qs = self.search(qs)
-		return qs
-
-	def apply_filter(self, qs):
-		status = self.request.GET.get("status")
-		query = Q()
-		if status != "all" and status:
-
-			query = Q(status=status)
-		return qs.filter(query)
-
-	def search(self, qs):
-		search = self.request.GET.get("search")
-		print(search)
-		query = Q()
-		if search:
-			query = Q(name__icontains=search)
-
-		return qs.filter(query)
 
 	def render_to_response(self, *args, **kwargs):
 		if self.request.headers.get("AJAX"):
@@ -897,25 +856,9 @@ class ProductGroupListView(ListView):
 		return super().render_to_response(*args, **kwargs)
 
 
-class FormHandlerMixin:
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context["stock_records"] = StockRecord.objects.filter(seller=self.request.user)
-		return context
 
-	def form_valid(self, form):
-		form.save()
-		return JsonResponse({"status":True})
 
-	def form_invalid(self, form):
-		errors = self.serialize_errors(form)
-		return JsonResponse({"status":False, "errors":errors})
-
-	def serialize_errors(self, form):
-		errors = form.errors.get_json_data()
-		return errors
-
-class ProductGroupCreateView(FormHandlerMixin, CreateView):
+class ProductGroupCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, CreateView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/create_update.html"
 	form_class = forms.ProductGroupForm
@@ -923,10 +866,26 @@ class ProductGroupCreateView(FormHandlerMixin, CreateView):
 
 
 
-class ProductGroupUpdateView(FormHandlerMixin, UpdateView):
+class ProductGroupUpdateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, UpdateView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/create_update.html"
 	form_class = forms.ProductGroupForm
 
 class ProductGroupDeleteView(mixins.DeleteMixin, DeleteView):
 	model = ProductList
+
+
+
+class CollectionListView(mixins.collectionMixin, ListView):
+	model = CollectionList
+	template_name = "dashboard/collection/collection_list/list.html"
+	paginate_by = 1
+
+	def render_to_response(self, *args, **kwargs):
+		if self.request.headers.get("AJAX"):
+			self.template_name = "dashboard/collection/collection_list/_list.html"
+
+		return super().render_to_response(*args, **kwargs)
+
+class CollectionListDeleteView(mixins.DeleteMixin, DeleteView):
+	model = CollectionList

@@ -75,6 +75,11 @@ urlpatterns = [
 	path("collection/product_group/update/<int:pk>/", views.ProductGroupUpdateView.as_view(), name="product_group_update"),
 	path("collection/product_group/delete/<int:pk>/", views.ProductGroupDeleteView.as_view(), name="product_group_delete"),
 
+	path("collection/collection_list/", views.CollectionListView.as_view(), name="collection_list"),
+	path("collection/collection_list/delete/<int:pk>/", views.CollectionListDeleteView.as_view(), name="collection_list_delete"),
+
+
+
 
 
 
