@@ -114,7 +114,8 @@ document.getElementById("confirmDelete").onclick=async function(){
     const id = document.getElementById("confirmDelete").getAttribute("data-id")
     const baseUrl = "{%url 'dashboard:category_delete' 0 %}"
     const url = baseUrl.replace("0", id)
-    const data = await deleteObject(url)
+    const formData = new FormData()
+    const data = await fetchPost(url, formData)
 
     if (data.status){
 

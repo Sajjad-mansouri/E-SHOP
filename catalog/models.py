@@ -91,7 +91,7 @@ class Product(models.Model):
 									 verbose_name=_("product type"),
 									 help_text=_("Choose what type of product this is"),
 									 )
-	categories = models.ManyToManyField(Category, through='ProductCategory', verbose_name=_("categories"))
+	categories = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("categories"))
 	attributes = models.ManyToManyField("ProductAttribute", through="ProductAttributeValue", verbose_name=_("attributes"))
 	brand = models.CharField(_("Brand"), max_length=200, null=True)
 	created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
@@ -130,17 +130,6 @@ class ShortDescriptions(models.Model):
 	title = models.CharField(_("title"), max_length=250, blank=True)
 
 
-class ProductCategory(models.Model):
-	category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("category"))
-	product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("product"))
-
-	class Meta:
-		unique_together = ("product", "category")
-		verbose_name = _("Product category")
-		verbose_name_plural = _("Product categories")
-
-	def __str__(self):
-		return f"{self.category}-{self.product}"
 
 class ProductAttribute(models.Model):
 

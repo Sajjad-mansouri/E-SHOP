@@ -14,7 +14,9 @@
 {%endblock%}
 
 {%block content%}
-    <a class="back-link" href="categories.html">← Back to Categories</a>
+<main class="main">
+
+    <a class="back-link" href="{%url 'dashboard:categories'%}">← Back to Categories</a>
 
     <div class="page-title">Create Category</div>
 
@@ -100,6 +102,7 @@
     </div>
 
     </form>
+</main>
 {%endblock%}
 
 {%block extra%}
