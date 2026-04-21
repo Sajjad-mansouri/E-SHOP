@@ -3,7 +3,7 @@ from treebeard.forms import movenodeform_factory
 from treebeard.admin import TreeAdmin
 from .models import (
 					ProductClass, Category, Product, 
-					ProductCategory, ProductAttribute, 
+					ProductAttribute, 
 					ProductAttributeValue, ProductImage,
 					UserRating,ShortDescriptions
 
@@ -26,7 +26,6 @@ class ProductAdmin(admin.ModelAdmin):
 	list_display = ['pk','title', 'slug', 'created', 'updated']
 
 admin.site.register(ShortDescriptions)
-admin.site.register(ProductCategory)
 admin.site.register(ProductAttribute)
 admin.site.register(ProductAttributeValue)
 admin.site.register(ProductImage)

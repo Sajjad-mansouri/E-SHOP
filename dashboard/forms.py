@@ -3,7 +3,7 @@ from django import forms
 from django.forms.models import BaseInlineFormSet
 from django.utils import timezone
 from django.db.models import Q
-from catalog.models import Product, ProductImage, ProductCategory, ProductClass, ProductAttributeValue, ProductAttribute, Category
+from catalog.models import Product, ProductImage, ProductClass, ProductAttributeValue, ProductAttribute, Category
 from stock.models import StockRecord
 from treebeard.forms import movenodeform_factory
 from offer.models import OfferRange, Offer, OfferType, OfferApplication
@@ -13,23 +13,10 @@ from order.models import Order
 from comment.models import Comment
 from collection.models import ProductList, CollectionList
 
-class ProductClassForm(forms.ModelForm):
-	class Meta:
-		model = Product
-		fields = ["product_class"]
-
-class ProductCategoryForm(forms.ModelForm):
-
-	class Meta:
-		model = ProductCategory
-		fields = ["category"]
-		widgets = {
-			"category":forms.Select(attrs={"class":"form-control"})
-
-		}
 
 
-ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
+
+# ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
 
 def _text_form(attr):
 	return forms.CharField(widget=forms.TextInput(attrs={"class":"form-control"}), label=attr.name, required=False)
@@ -81,7 +68,7 @@ class ProductForm(forms.ModelForm):
 	}
 	class Meta:
 		model = Product
-		fields = ["title", "upc", "short_description", "description", "product_class", "meta_title", "meta_description", "slug",]
+		fields = ["title", "upc", "short_description", "description", "meta_title", "meta_description", "slug",]
 		widgets = {
 			"product_class":forms.Select(attrs={"class":"form-control"}),
 
@@ -173,10 +160,6 @@ class StockRecordForm(forms.ModelForm):
 
 
 		}
-
-
-StockRecordInlineForm = inlineformset_factory(Product, StockRecord,fields = ["sku", "num_in_stock", "price", ],form=StockRecordForm,extra=1)
-
 
 
 class ProductTypeForm(forms.ModelForm):

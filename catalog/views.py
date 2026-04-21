@@ -125,7 +125,7 @@ class CategoryProducts(ListView):
 
 	def get_stocks(self, stock_records):
 		descendants = self.object.get_descendants(include_self=True)
-		stocks = stock_records.filter(product__categories__in=descendants).distinct()
+		stocks = stock_records.filter(product__category__in=descendants).distinct()
 
 		stocks = self.apply_filter(stocks)
 		stocks = self.apply_sorting(stocks)

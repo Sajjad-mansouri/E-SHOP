@@ -42,9 +42,9 @@ class ProductList(AbstractList):
 		# included_categories
 		# excluded_categories
 		included_stocks_filter = Q(id__in=self.stock_records.values("id"))
-		included_categories_filter = Q(product__categories__in=self.categories.values("id"))
+		included_categories_filter = Q(product__category__in=self.categories.values("id"))
 
-		classes_filter = Q(product__product_class__in=self.product_classes.values("id"))
+		classes_filter = Q(product__category__product_class__in=self.product_classes.values("id"))
 
 
 		_filter = (included_stocks_filter | included_categories_filter | classes_filter)

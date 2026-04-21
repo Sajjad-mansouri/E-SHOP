@@ -76,9 +76,9 @@ class OfferRange(models.Model):
 		# excluded_categories
 		included_products_filter = Q(id__in=self.included_products.values("id"))
 		excluded_products_filter = ~Q(id__in=self.excluded_products.values("id"))
-		included_categories_filter = Q(product__categories__in=self.included_categories.values("id"))
-		excluded_categories_filter = ~Q(product__categories__in=self.excluded_categories.values("id"))
-		classes_filter = Q(product__product_class__in=self.classes.values("id"))
+		included_categories_filter = Q(product__category__in=self.included_categories.values("id"))
+		excluded_categories_filter = ~Q(product__category__in=self.excluded_categories.values("id"))
+		classes_filter = Q(product__category__product_class__in=self.classes.values("id"))
 		public_filter = Q(status="public") 
 		if self.includes_all_products:
 			_filter = (

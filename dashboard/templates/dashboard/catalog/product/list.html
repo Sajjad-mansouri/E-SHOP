@@ -68,10 +68,11 @@
     <button class="modal-close" onclick="closeModal()">×</button>
     </div>
 
-    <p>Select the product type.</p>
+    <p>Select the Category</p>
+    <div class="message category"></div>
 
-  <form method="GET" action="{%url 'dashboard:create_product'%}">
-    {{product_class_form}}
+  <form method="GET" >
+    {{category_form}}
   </form>
 
     <div class="modal-actions">
@@ -91,7 +92,7 @@
     const objectsUrl = "{%url 'dashboard:products' %}"
     const baseDeleteUrl = "{%url 'dashboard:delete_product' 0 %}"
     const baseUpdateUrl = "{%url 'dashboard:update_product' 0 %}"
-    const baseCreateurl = "{%url 'dashboard:create_product'%}"
+    const baseCreateurl = "{%url 'dashboard:create_product' 0 %}"
 
 
     const deleteModal = document.getElementById('deleteModal');
@@ -269,10 +270,18 @@ function applyPagination(){
 
 function createProduct(){
 
-    const productClass=document.getElementById("id_product_class").value
+    const category=document.getElementById("id_category").value
 
+    if (category==""){
+      const message = document.querySelector(".message.category")
+      message.innerText= "Please Select Category"
+      message.classList.add("error")
+    }else{
+      const url = baseCreateurl.replace(0, category)
+      window.location.href= url
 
-    window.location.href= "{%url 'dashboard:create_product'%}?product_class="+productClass
+    }
+
 }
 </script>
 

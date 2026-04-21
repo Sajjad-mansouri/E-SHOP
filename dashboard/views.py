@@ -3,6 +3,7 @@ import json
 from datetime import timedelta, datetime
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django import forms as dj_forms
 from django.db.models import Q, Max
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -89,7 +90,7 @@ class ProductListView(mixins.AjaxQuerysetMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		product_class_form = forms.ProductClassForm()
-		context['product_class_form'] = product_class_form
+		context['category_form'] = dj_forms.modelform_factory(Product, fields=["category"])
 		return context
 
 	def apply_filter(self, qs):
@@ -116,15 +117,22 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 	template_name = "dashboard/catalog/product/create_update.html"
 
 	def dispatch(self, request, *args, **kwargs):
-		product_class_id = request.GET.get('product_class')
+		product_id=None
+		product_class_id = None
+		category_id = kwargs.get('category_id')
 		product_id = kwargs.get('pk')
+
 		if product_id:
 			self.stock = get_object_or_404(StockRecord, id=product_id)
 			self.product = self.stock.product
-			self.product_class = self.product.product_class
+			self.category = self.product.category
+			self.product_class = self.category.product_class
 
-		elif product_class_id:
-			self.product_class = get_object_or_404(ProductClass, id=product_class_id)
+		elif category_id:
+			self.category = get_object_or_404(Category, id=category_id)
+			product_class = self.category.product_class
+			print("category_id",category_id,"product_class",product_class)
+			self.product_class = product_class
 			self.product=None
 			self.stock = None
 
@@ -132,6 +140,7 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 			self.product_class = None
 			self.product=None
 			self.stock = None
+			self.category = None
 
 
 		return super().dispatch(request, *args, **kwargs)
@@ -141,8 +150,6 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		img_formset = forms.image_formset(instance=self.product, prefix="img")
 		product_form = forms.ProductForm(self.product_class , instance=self.product,prefix="product")
 
-		product_category_form = forms.ProductCategoryInline(instance=self.product, prefix="category")
-		# stock_record_inline = forms.StockRecordInlineForm(instance=self.product, prefix="stock")
 		offer_discount = False
 		if self.stock:
 			offer_discounts = self.stock.get_offer_discount
@@ -153,9 +160,10 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		return self.render_to_response({
 			"img_formset":img_formset, 
 			"product_form":product_form, 
-			"product_category_form":product_category_form,
 			"stock_record_form":stock_record_form,
-			"product_class":self.product_class
+			"product_class":self.product_class,
+			"object":self.stock,
+			"category":self.category
 
 
 			})
@@ -165,28 +173,26 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 		product_form = forms.ProductForm(self.product_class, instance=self.product, data=request.POST, prefix="product")
 		if product_form.is_valid():
 
-			product_form.instance.product_class = self.product_class
+			product_form.instance.category = self.category
+
 			self.object = product_form.save()
 		else:
 			img_formset = forms.image_formset(data=request.POST,files=request.FILES, prefix="img")
-			product_category_form = forms.ProductCategoryInline(data=request.POST,  prefix="category")
+
 			stock_record_form = forms.StockRecordForm(data=request.POST)
 			return render(request, "dashboard/product/create_update.html", {
 				"product_form":product_form,
 				"img_formset":img_formset,
-				"product_category_form":product_category_form,
 				"stock_record_form":stock_record_form,
 				}
 				)
 
 
 		img_formset = forms.image_formset(data=request.POST,files=request.FILES,instance=self.object, prefix="img")
-		product_category_form = forms.ProductCategoryInline(data=request.POST,instance=self.object,  prefix="category")
 		stock_record_form = forms.StockRecordForm(data=request.POST, instance=self.stock)
-		if img_formset.is_valid() and product_category_form.is_valid() and stock_record_form.is_valid():
+		if img_formset.is_valid()  and stock_record_form.is_valid():
 
 			img_formset.save()
-			product_category_form.save()
 
 			stock = stock_record_form.save(commit=False)
 			stock.product = self.object
@@ -201,7 +207,6 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 			return render(request, "dashboard/catalog/product/create_update.html", {
 				"product_form":product_form,
 				"img_formset":img_formset,
-				"product_category_form":product_category_form,
 				"stock_record_form":stock_record_form,
 
 				})

@@ -6,7 +6,7 @@ app_name = "dashboard"
 urlpatterns = [
 	path("overview/", views.DashboardOverView.as_view(), name="overview"),
 	path("catalog/products/", views.ProductListView.as_view(), name="products"),
-	path("catalog/product/create/", views.CreateUpdateProductView.as_view(), name="create_product"),
+	path("catalog/product/create/<int:category_id>/", views.CreateUpdateProductView.as_view(), name="create_product"),
 	path("catalog/product/update/<int:pk>/", views.CreateUpdateProductView.as_view(), name="update_product"),
 	path("catalog/product/delete/<int:pk>/", views.DeleteProductView.as_view(), name="delete_product"),
 

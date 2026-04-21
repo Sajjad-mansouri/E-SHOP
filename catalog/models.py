@@ -83,15 +83,8 @@ class Product(models.Model):
 	short_description = models.CharField(max_length=250, blank=True, verbose_name=_("Short Description"))
 	description = models.TextField(blank=True, verbose_name=_("Description"))
 	upc = models.CharField(verbose_name=_("UPC"), help_text=_("Universal Product Code"))
-	product_class = models.ForeignKey(ProductClass,
-									 null=True,
-									 blank=True, 
-									 on_delete=models.PROTECT,
-									 related_name="products",
-									 verbose_name=_("product type"),
-									 help_text=_("Choose what type of product this is"),
-									 )
-	categories = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("categories"))
+
+	category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name=_("category"))
 	attributes = models.ManyToManyField("ProductAttribute", through="ProductAttributeValue", verbose_name=_("attributes"))
 	brand = models.CharField(_("Brand"), max_length=200, null=True)
 	created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
