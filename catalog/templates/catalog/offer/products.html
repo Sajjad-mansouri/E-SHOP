@@ -28,8 +28,8 @@
     <span class="category-name">All Offers</span>
   </div>
   {%for category in categories%}
-  <div class="category-item" data-cat="{{category.name}}">
-    <img class="category-thumb" src="{{category.get_image}}" alt="Electronics">
+  <div class="category-item" data-cat="{{category.id}}">
+    <img class="category-thumb" src="{{category.get_image}}" alt="{{category.name}}">
     <span class="category-name">{{category.name}}</span>
   </div>
   {%endfor%}
@@ -74,10 +74,10 @@
   });
   filters["price"]={"min":minPrice, "max":maxPrice}
   console.log(filters)
-
+  let activeCategory = 'all';
   // DOM Elements
   const productsSection = document.querySelector(".products-section");
-
+  const catItems = document.querySelectorAll('.category-item');
   const productsContainer = document.getElementById('productsContainer');
   const productCount = document.getElementById('productCount');
   const sortSelect = document.getElementById('sortSelect');
@@ -85,7 +85,7 @@
 
 
   const applyFilterBtn = document.getElementById("applyFiltersBtn");
-
+  const categories = document.querySelectorAll(".category-item")
   // Price slider elements
   const priceMinInput = document.getElementById('priceMin');
   const priceMaxInput = document.getElementById('priceMax');
@@ -370,6 +370,21 @@ function applyPagination(){
   applyFilters(nextPageNumber)
 
 }
+
+    // Category switch
+    function switchCategory(cat) {
+      activeCategory = cat;
+      catItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.cat === cat);
+      });
+      filters["category"] = cat
+      applyFilters(null)
+    }
+
+    // Event listeners
+    catItems.forEach(item => {
+      item.addEventListener('click', () => switchCategory(item.dataset.cat));
+    });
 </script>
 {%endblock%}
 

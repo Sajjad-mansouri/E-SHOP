@@ -280,7 +280,15 @@ class OfferProductListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, 
 						q= get_constant_attr_q(key, value)
 						q_sub = q_sub|q
 					q_total = q_total & q_sub
-		if category:
-			q_total = q_total & Q(product__category=category)
+
+		try:
+			category = int(category)
+			category_obj = Category.objects.get(id=category)
+			descendant_ids = category_obj.get_descendants(include_self=True).values_list("id", flat=True)
+			q_total = q_total & Q(product__category_id__in=descendant_ids)
+		except Exception as e:
+			pass
+
+
 		return q_total
 

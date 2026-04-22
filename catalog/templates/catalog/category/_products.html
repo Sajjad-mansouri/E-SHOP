@@ -25,7 +25,7 @@
             <span class="rating-count">{{stock.rating}} ({{stock.comments.count}})</span>
           </div>
           <div class="product-image">
-            <img src="{{stock.get_product_image}}" alt="${product.name}" loading="lazy">
+            <img src="{{stock.get_product_image}}" alt="{{stock.product.title}}" loading="lazy">
           </div>
           <div class="product-info">
             {%if stock.get_type_of_discount%}<div class="product-badge ${badgeClass}">{{stock.get_type_of_discount}} offer</div>{%endif%}
