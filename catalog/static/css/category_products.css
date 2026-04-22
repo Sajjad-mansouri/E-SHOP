@@ -786,3 +786,101 @@
     width: 20px;
     height: 20px;
 }
+
+
+
+
+
+    /* Page hero */
+    .offer-hero {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      padding: 28px 30px;
+      border-radius: 28px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #2d2a24;
+    }
+    .offer-hero h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .offer-badge {
+      background: var(--primary);
+      color: white;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .global-timer {
+      background: rgba(0,0,0,0.06);
+      padding: 10px 22px;
+      border-radius: 60px;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Circular category thumbnails */
+    .offer-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      justify-content: flex-start;
+    }
+
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      min-width: 90px;
+    }
+
+    .category-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .category-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid transparent;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: white;
+      padding: 2px;
+    }
+
+    .category-item.active .category-thumb {
+      border-color: var(--primary);
+      box-shadow: 0 6px 16px rgba(239,64,86,0.3);
+    }
+
+    .category-name {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #444;
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .category-item.active .category-name {
+      color: var(--primary);
+    }
+
+    /* Main content layout with sidebar */
+    .offer-main-layout {
+      display: flex;
+      gap: 30px;
+    }

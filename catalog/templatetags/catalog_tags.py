@@ -1,8 +1,9 @@
 from django import template
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.urls import reverse
 from cart.models import Cart
 from catalog.models import UserRating, Product, Category
+from offer.models import OfferApplication
 
 register = template.Library()
 
@@ -79,14 +80,14 @@ def humanize_timedelta(value):
     seconds = value.seconds
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
-    parts = []
+    text = ""
     if days:
-        parts.append(f"{days} day{'s' if days != 1 else ''}")
+        text += f"{days}d "
     if hours:
-        parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+        text += f"{hours}h "
     if minutes:
-        parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
-    return ", ".join(parts)
+        text += f"{minutes}m "
+    return text
 
 
 
@@ -128,6 +129,7 @@ def has_reaction(context, review, action):
 @register.simple_tag(takes_context=True)
 def is_selected_ordering(context, sort_by):
 	order_by = context["order_by"]
+
 	if order_by == sort_by:
 		return "selected"
 
@@ -141,3 +143,13 @@ def get_navbar():
 		if category.is_root():
 			root_categories.append(category)
 	return {"categories":root_categories, }
+
+
+
+@register.inclusion_tag("catalog/partial/_offer.html")
+def get_offer_apps(offer_name):
+	q = Q(offer__status="active") & Q(offer__name=offer_name) & Q(is_accepted=True)
+	offer_apps = OfferApplication.objects.filter(q)
+
+
+	return {"offer_apps":offer_apps, "offer_name":offer_name}

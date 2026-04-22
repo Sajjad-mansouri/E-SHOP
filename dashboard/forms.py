@@ -15,7 +15,6 @@ from collection.models import ProductList, CollectionList
 
 
 
-
 # ProductCategoryInline = inlineformset_factory(Product, ProductCategory, form=ProductCategoryForm,fields = ["category"],extra=1, can_delete=False)
 
 def _text_form(attr):
@@ -241,7 +240,7 @@ class OfferDetailForm(forms.ModelForm):
 class OfferTypeForm(forms.ModelForm):
 	class Meta:
 		model = OfferType
-		fields = ["offer_range", "type", "max_discount"]
+		fields = ["offer_range", "type"]
 		widgets = {
 			"offer_range":forms.Select(attrs={"class":"form-select"}),
 			"type":forms.Select(attrs={"class":"form-select"}),

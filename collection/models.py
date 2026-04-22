@@ -18,6 +18,7 @@ class AbstractList(models.Model):
 		]
 	name = models.CharField(_("name"), max_length=250)
 	slug = models.SlugField(_("slug"), max_length=250, blank=True)
+	short_description = models.CharField(_("short description"), max_length=250, blank=True)
 	description = models.TextField(_("description"), blank=True)
 	image = models.ImageField(_("image"), upload_to=upload_to_class_name, null=True, blank=True)
 	status = models.CharField(choices=STATUS_CHOICE, default="active")
@@ -25,7 +26,11 @@ class AbstractList(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
-
+	def get_image(self):
+		if self.image:
+			return self.image.url
+		else:
+			return ""
 	class Meta:
 		abstract = True
 

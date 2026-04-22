@@ -81,7 +81,7 @@ class StockRecord(models.Model):
 	@property
 	def get_offer_discount(self):
 		product_discounts = []
-		offer_apps = self.offer_apps.select_related("offer").filter(Q(offer__status="open"))
+		offer_apps = self.offer_apps.select_related("offer").filter(Q(offer__status="active"))
 		if offer_apps:
 			offer_app = offer_apps[0]
 			product_discounts.append((offer_app.offer_discount, offer_app.offer.priority, offer_app.offer.name))

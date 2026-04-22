@@ -54,6 +54,12 @@ class Category(MP_Node):
 	class Meta:
 		verbose_name = _("category")
 		verbose_name_plural = _("categories")
+
+	def get_image(self):
+		if self.image:
+			return self.image.url
+		else:
+			return ""
 	def __str__(self):
 
 		return self.get_name
@@ -86,7 +92,9 @@ class Product(models.Model):
 
 	category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name=_("category"))
 	attributes = models.ManyToManyField("ProductAttribute", through="ProductAttributeValue", verbose_name=_("attributes"))
-	brand = models.CharField(_("Brand"), max_length=200, null=True)
+	brand = models.CharField(_("Brand"), max_length=100, null=True)
+	color = models.CharField(_("color"), max_length=100, null=True)
+
 	created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
 	updated = models.DateTimeField(auto_now=True, verbose_name=_("updated"))
 

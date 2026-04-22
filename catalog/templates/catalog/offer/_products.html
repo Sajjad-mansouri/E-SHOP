@@ -1,0 +1,74 @@
+{%load catalog_tags%}
+    <div class="products-header">
+      <div class="products-count" id="productCount">{{paginator.count}} products exists</div>
+      <div class="sort-container">
+        <span class="sort-label">Sort by:</span>
+        <select class="sort-select" id="sortSelect" onchange="sortProduct()">
+
+          <option value="best-selling" {% is_selected_ordering 'best-selling' %}>Best Selling</option>
+          <option value="price-low" {% is_selected_ordering 'price-low' %}>Price: Low to High</option>
+          <option value="price-high" {% is_selected_ordering 'price-high' %}>Price: High to Low</option>
+          <option value="rating" {% is_selected_ordering 'rating' %}>Customer Rating</option>
+          <option value="newest" {% is_selected_ordering 'newest' %}>Newest Arrivals</option>
+          <option value="oldest" {% is_selected_ordering 'oldest' %}>oldest Arrivals</option>
+          <option value="discount" {% is_selected_ordering 'discount' %}>Most Discount</option>
+
+        </select>
+      </div>
+    </div>
+   <div class="products-grid" id="productsContainer">
+    {%for stock in page_obj%}
+    <div class="product-card">
+          
+          <div class="product-rating">
+            <div class="stars"><svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+            <span class="rating-count">{{stock.rating}} ({{stock.comments.count}})</span>
+          </div>
+          <div class="product-image">
+            <img src="{{stock.get_product_image}}" alt="${product.name}" loading="lazy">
+          </div>
+          <div class="product-info">
+            {%if stock.get_type_of_discount%}<div class="product-badge ${badgeClass}">{{stock.get_type_of_discount}} offer</div>{%endif%}
+
+            <h3 class="product-title"><a href="{%url 'catalog:product_detail' stock.product.slug stock.id %}">{{stock.product.title}}</a></h3>
+            <p class="product-description">{{stock.product.short_description}} </p>
+
+            <div class="product-price">
+              <span class="current-price">${{stock.get_final_price}}</span>
+              {%if stock.get_discount > 0%}
+              <span class="original-price">${{stock.price}}</span>
+              <span class="discount">-{{stock.get_discount}}%</span>
+              {%endif%}
+            </div>
+
+          </div>
+    </div>
+    {%endfor%}
+  </div>
+
+  <!-- PAGINATION -->
+  {%if page_obj%}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+    <a class="page-btn arrow" id="prevPage" data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </a>
+    {%endif%}
+
+    {%for page in paginator.page_range%}
+    <button class="page-btn {%if page_obj.number == page %}active{%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
+
+    {%endfor%}
+    {% if page_obj.has_next %}
+
+    <button class="page-btn arrow" id="nextPage" data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </svg>
+    </button>
+    {%endif%}
+  </div> 
+
+{%endif%}

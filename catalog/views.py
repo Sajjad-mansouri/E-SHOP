@@ -1,34 +1,43 @@
 from datetime import timedelta
 from decimal import Decimal
+from collections import defaultdict
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.db.models import Q, Sum, Prefetch
 from django.http import JsonResponse
-from django.db.models import Avg, Max
+from django.db.models import Avg, Max, Case, When, Value, CharField, F
+from django.db.models.functions import Cast
 from django.utils import timezone
 
 from catalog.models import Category, Product, UserRating, ProductAttributeValue, ProductAttribute, ProductClass
 from stock.models import StockRecord
 from comment.forms import CommentForm
 from cart.forms import CartItemForm
-from offer.models import Offer
+from offer.models import Offer,OfferApplication
 from comment.models import Comment
+from collection.models import CollectionList
+from . import mixins
+from .utils import get_constant_attr_q
+
+CONSTANT_ATTR = ["price_min", "price_max", "availability", "rating", "brand", "color"]
 
 class HomePageView(TemplateResponseMixin, View):
-	template_name = "catalog/list/home.html"
+	template_name = "catalog/list/home2.html"
 	def get(self, request, *args, **kwargs):
 
 				
 
 		stock_records = self.get_trending_products()
-		offers = Offer.objects.filter(status="open")
+
+		categories = Category.objects.filter(depth=1)
+		collections = CollectionList.objects.filter(status="active")
 		context = {
 
 					"stock_records":stock_records,
-					"offers":offers,
-					"now":timezone.now()
+					"collections":collections,
+					"categories":categories
 					}
 		return self.render_to_response(context)
 
@@ -83,36 +92,22 @@ class ProductDetailView(DetailView):
 		return attributes_values
 
 
-class CategoryProducts(ListView):
+class CategoryProducts(mixins.AjaxSortingResponse, mixins.StockContexMixin, ListView):
 	model = StockRecord
 	template_name = "catalog/category/products.html"
-	paginate_by = 1
+	AJAX_template_name = "catalog/category/_products.html"
+	paginate_by = 5
 
-	def dispatch(self, request, *args, **kwargs):
-		self.is_ajax = request.headers.get('AJAX')
-		if self.is_ajax:
-			self.template_name = "catalog/category/_products.html"
-
-		return super().dispatch(request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		breadcrumb = self.object.get_ancestors()
 		breadcrumb = list(breadcrumb) + [self.object]
 		attributes = self.get_attribute_values()
-
-		agg =self.object_list.aggregate(max_price=Max("price"))
-		max_price = agg["max_price"]
 		context["breadcrumb"] = breadcrumb
 		context['category'] = self.object
 		context['attributes'] = attributes
 		context['product_class'] = self.object.product_class
-		context['max_price'] = max_price
-		context['order_by'] = self.order_by
-
-
-
-
 
 
 		return context
@@ -138,19 +133,29 @@ class CategoryProducts(ListView):
 
 	def get_filter(self):
 		q_total=Q()
-		for key, value in self.request.GET.items():
 
-			if key  in ["price_min", "price_max", "availability", "rating"]:
-				q= self.get_stock_q(key, value)
-				q_total = q_total & q
+		for key, values in self.request.GET.lists():
+
+			if key  in CONSTANT_ATTR:
+					q_sub=Q()
+					for value in values:
+						q= get_constant_attr_q(key, value)
+						q_sub = q_sub|q
+					q_total = q_total & q_sub
 
 			else:
 				try:
-					product_class = ProductClass.objects.get(id=self.object.product_class.id)
-					product_attribute = ProductAttribute.objects.get(name=key, product_class=product_class)
-					value_type = product_attribute.type
-					q = self.get_q(value_type, value)
-					q_total = q_total & q
+					if self.object.product_class:
+						q_sub=Q()
+
+						for value in values:
+							product_class = ProductClass.objects.get(id=self.object.product_class.id)
+							product_attribute = ProductAttribute.objects.get(name=key, product_class=product_class)
+							value_type = product_attribute.type
+							q = self.get_q(value_type, value)
+							q_sub = q_sub|q
+
+						q_total = q_total & q_sub
 
 
 				except (ProductAttribute.DoesNotExist, ProductClass.DoesNotExist) as e:
@@ -175,26 +180,6 @@ class CategoryProducts(ListView):
 		}
 		return QUERY[value_type]
 
-	def get_stock_q(self, key, value):
-		if isinstance(value, Decimal):
-			value = Decimal(value)
-
-		if key == "price_min":
-			q = Q(price__gte=value)
-
-		elif key == "price_max":
-
-			q = Q(price__lte=value)
-
-		elif key == "availability":
-			
-			q = Q(num_in_stock__gt=0)
-		elif key == "rating":
-			value = float(value)
-			q = Q(rating__gte=value)
-
-
-		return q
 
 	def get_attribute_value_field(self, attr_type):
 		ATTR_TYPE= {
@@ -203,47 +188,35 @@ class CategoryProducts(ListView):
 		return ATTR_TYPE[attr_type]
 
 	def get_attribute_values(self):
-		print(self.object)
-		print(self.object.product_class)
+
 		if self.object.product_class:
-			attributes =  (self.object.product_class.attributes.all()
-							.prefetch_related(Prefetch("attribute_values", to_attr="values"))
-				)
+			# attributes =  (self.object.product_class.attributes.all()
+			# 				.prefetch_related(Prefetch("attribute_values", to_attr="values"))
+			# 	)
+			qs = ProductAttributeValue.objects.filter(attribute__product_class=self.object.product_class).select_related("attribute")
+			qs = qs.annotate(value_display = Case(
+				When(attribute__type="text", then=F("value_text")),
+				When(attribute__type="decimal", then=Cast("value_decimal", CharField())),
+				When(attribute__type="boolean", then=Cast("value_boolean", CharField())),
+
+
+				default=Value("")
+				)).values("attribute__name", "value_display").distinct()
+			attributes = defaultdict(list)
+			for item in qs:
+				if item["value_display"]:
+					attributes[item["attribute__name"]].append(item["value_display"])
+			attributes = dict(attributes)
 		else:
 			attributes = ""
+
+
 		return attributes
 
 
-	def apply_sorting(self, stocks):
-		sort_by = self.get_order()
-		stocks = stocks.order_by(*sort_by)
-		return stocks
 
-	def get_order(self):
-		self.order_by = self.request.GET.get("sort-by", "best-selling")
-		if self.order_by == "best-selling":
-			sort_by = ["-sold"]
 
-		elif self.order_by == "price-low":
-			sort_by = ["price"]
 
-		elif self.order_by == "price-high":
-			sort_by = ["-price"]
-
-		elif self.order_by == "rating":
-			sort_by = ["-rating"]
-
-		elif self.order_by == "newest":
-			sort_by = ["date_created"]
-
-		elif self.order_by == "oldest":
-			sort_by = ["-date_created"]
-
-		elif self.order_by == "discount":
-			sort_by = ["-offer_discount", "-discount"]
-		else:
-			sort_by = ["-sold"]
-		return sort_by
 class ApplyRating(View):
 	def post(self, request, *args, **kwargs):
 
@@ -262,11 +235,52 @@ class ApplyRating(View):
 			UserRating.objects.create(user=request.user, product=product, rating=rating)
 		return JsonResponse({"status":True})
 
-class OfferProductListView(DetailView):
+class OfferProductListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, ListView):
 	model = Offer
 	template_name = "catalog/offer/products.html"
+	AJAX_template_name = "catalog/offer/_products.html"
+	paginate_by = 4
+
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context["offer_stocks"] = self.object.get_offer_products
+		context["categories"] = Category.objects.filter(depth=1)
 		return context
+	def get_queryset(self):
+		q = super().get_queryset()
+		slug = self.kwargs.get("slug")
+		self.object = get_object_or_404(q, slug=slug, status="active")
+		stocks = self.get_stocks()
+		return stocks
+
+
+
+	def get_stocks(self):
+		stocks = StockRecord.objects.filter(offer_apps__offer=self.object, offer_apps__is_accepted=True)
+		stocks = self.apply_filter(stocks)
+		stocks = self.apply_sorting(stocks)
+
+		return stocks
+
+	def apply_filter(self, stocks):
+		q = self.get_filter()
+		stocks = stocks.filter(q)
+		return stocks
+
+	def get_filter(self):
+
+		category = self.request.GET.get("category")
+		q_total=Q()
+
+		for key, values in self.request.GET.lists():
+
+			if key  in CONSTANT_ATTR:
+					q_sub=Q()
+					for value in values:
+						q= get_constant_attr_q(key, value)
+						q_sub = q_sub|q
+					q_total = q_total & q_sub
+		if category:
+			q_total = q_total & Q(product__category=category)
+		return q_total
+

@@ -1,127 +1,375 @@
 {%extends 'base.html'%}
-{% load static catalog_tags%}
+{%load static catalog_tags%}
 
-  {%block style%}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/offer/products.css'%}">
-
-  {%endblock%}
-
+{%block style%}
+<link rel="stylesheet" type="text/css" href="{%static 'css/category_products.css'%}">
+{%endblock%}
 {%block content%}
 
-<!-- OFFER HERO SECTION -->
-<section class="offer-hero">
-  <div class="offer-hero-content">
-    <div class="offer-badge">LIMITED TIME OFFER</div>
-    <h1>Up to {{object.offer_type.max_discount}}% OFF</h1>
-    <p>{{offer.description}}</p>
-    
-    <div class="offer-timer">
-      <div class="timer-unit">
-        <span class="timer-value" id="days">02</span>
-        <span class="timer-label">Days</span>
-      </div>
-      <div class="timer-unit">
-        <span class="timer-value" id="hours">14</span>
-        <span class="timer-label">Hours</span>
-      </div>
-      <div class="timer-unit">
-        <span class="timer-value" id="minutes">38</span>
-        <span class="timer-label">Minutes</span>
-      </div>
-      <div class="timer-unit">
-        <span class="timer-value" id="seconds">12</span>
-        <span class="timer-label">Seconds</span>
-      </div>
-    </div>
-    
 
+
+<div class="offer-hero">
+  <div>
+    <h1>
+      <span>🔥 INCREDIBLE OFFERS</span>
+      <span class="offer-badge">limited time</span>
+    </h1>
+    <p style="margin-top: 8px; opacity:0.8;">Grab the best deals before they're gone – up to 70% off</p>
   </div>
-</section>
-
-
-<!-- OFFER GRID -->
-<div class="offer-grid">
-  {%for stock in offer_stocks%}
-
-  <div class="offer-card flash">
-    <div class="offer-card-header">
-      <span class="offer-brand">{{stock.product.brand}}</span>
-      <span class="offer-discount">-{{stock.get_discount}}%</span>
-    </div>
-    <a href="{%url 'catalog:product_detail' stock.product.slug stock.id %}">
-     <img src="{{stock.get_product_image}}" alt="{{stock.product.title}}" class="offer-card-img">
-    <div class="offer-card-content">
-      <h3>{{stock.product.title}}</h3>
-
-      <div class="offer-price">
-        <span class="current-price">${{stock.get_final_price|floatformat:2}}</span>
-        <span class="original-price">${{stock.price|floatformat:2}}</span>
-      </div>
-      <div class="offer-stats">
-        <span><i class="fa-regular fa-clock"></i> Ends in {{object.get_expire|humanize_timedelta}} </span>
-
-      </div>
-
-    </div>     
-    </a>
-
+  <div class="global-timer" id="globalTimerDisplay">
+    ⏳ Global sale ends in <span id="globalCountdown">08:22:15</span>
   </div>
-  {%endfor%}
-
-
 </div>
 
+<!-- Circular category thumbnails -->
+<div class="offer-categories" id="categoryFilters">
+  <div class="category-item active" data-cat="all">
+    <img class="category-thumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ef4056'/%3E%3Ctext x='50' y='67' font-size='44' text-anchor='middle' fill='white' font-family='Arial'%3E✨%3C/text%3E%3C/svg%3E" alt="All Offers">
+    <span class="category-name">All Offers</span>
+  </div>
+  {%for category in categories%}
+  <div class="category-item" data-cat="{{category.name}}">
+    <img class="category-thumb" src="{{category.get_image}}" alt="Electronics">
+    <span class="category-name">{{category.name}}</span>
+  </div>
+  {%endfor%}
+</div>
+<!-- MAIN CONTENT -->
+<div class="category-container">
+  <!-- FILTER SIDEBAR -->
+  {%include 'catalog/offer/_filter.html'%}
 
+  
+  <!-- PRODUCTS SECTION -->
+  <main class="products-section">
 
+    
 
+      {%include 'catalog/offer/_products.html'%}
+
+    
+
+  </main>
+</div>
 
 {%endblock%}
+
 
 {%block script%}
 <script>
-  // Countdown timer functionality
-  function updateCountdown() {
-    const now = new Date();
-    const target = new Date({{object.end_datetime|date:'U'}}*1000);
+  const minPrice = 0;
+  const maxPrice = Math.ceil(Number("{{max_price}}") + Number("{{max_price}}")/100 ) ;
 
-    const diff = target - now;
 
-    if (diff <= 0) {
-      document.getElementById('days').textContent = '00';
-      document.getElementById('hours').textContent = '00';
-      document.getElementById('minutes').textContent = '00';
-      document.getElementById('seconds').textContent = '00';
-      return;
+  // State management
+  let currentPage = 1;
+  const productsPerPage = 8;
+
+  let sortBy = 'best-selling';
+  const filters = {}
+  // Filter state
+  document.querySelectorAll('.filter-title').forEach(el => {
+      const key = el.dataset.filter;  // reads data-filter="something"
+      filters[key] = [];               // or some default value
+  });
+  filters["price"]={"min":minPrice, "max":maxPrice}
+  console.log(filters)
+
+  // DOM Elements
+  const productsSection = document.querySelector(".products-section");
+
+  const productsContainer = document.getElementById('productsContainer');
+  const productCount = document.getElementById('productCount');
+  const sortSelect = document.getElementById('sortSelect');
+  const clearFiltersBtn = document.getElementById('clearFilters');
+
+
+  const applyFilterBtn = document.getElementById("applyFiltersBtn");
+
+  // Price slider elements
+  const priceMinInput = document.getElementById('priceMin');
+  const priceMaxInput = document.getElementById('priceMax');
+  const priceMinHandle = document.getElementById('priceMinHandle');
+  const priceMaxHandle = document.getElementById('priceMaxHandle');
+  const priceTrack = document.getElementById('priceTrack');
+  const priceMinValue = document.getElementById('priceMinValue');
+  const priceMaxValue = document.getElementById('priceMaxValue');
+  const priceSlider = document.getElementById('priceSlider');
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    initFilters();
+    initPriceSlider();
+
+
+  });
+
+
+  // Initialize filter toggles
+  function initFilters() {
+    // Filter section toggles
+    document.querySelectorAll('.filter-title').forEach(title => {
+      title.addEventListener('click', () => {
+        const filterId = title.getAttribute('data-filter');
+        const content = document.getElementById(`${filterId}Filter`);
+        const toggle = title.querySelector('.filter-toggle');
+        
+        content.classList.toggle('expanded');
+        toggle.classList.toggle('rotated');
+      });
+    });
+
+    // Filter checkbox toggles
+    document.querySelectorAll('.filter-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const checkbox = option.querySelector('.filter-checkbox');
+        checkbox.classList.toggle('checked');
+        
+        const filterType = option.closest('.filter-content').id.replace('Filter', '');
+        const value = option.getAttribute('data-value');
+        
+        if (checkbox.classList.contains('checked')) {
+          if (!filters[filterType].includes(value)) {
+            filters[filterType].push(value);
+          }
+
+        } else {
+          const index = filters[filterType].indexOf(value);
+
+          if (index > -1) {
+            filters[filterType].splice(index, 1);
+          }
+        }
+
+        
+
+      });
+    });
+
+    // Clear filters button
+    clearFiltersBtn.addEventListener('click', () => {
+      clearAllFilters();
+    });
+
+
+    applyFilterBtn.addEventListener("click", ()=>{
+      const page = null;
+      applyFilters(page)
+    })
+  }
+
+  function sortProduct(){
+      sortBy = event.target.value;
+      const page = null;
+      applyFilters(page)
+  }
+  // Initialize price slider
+  function initPriceSlider() {
+    let isDraggingMin = false;
+    let isDraggingMax = false;
+    const sliderRect = priceSlider.getBoundingClientRect();
+    const sliderWidth = sliderRect.width;
+
+    
+    // Update slider position
+    function updateSlider() {
+      const minPercent = (filters.price.min - minPrice) / (maxPrice - minPrice) * 90;
+      const maxPercent = (filters.price.max - minPrice) / (maxPrice - minPrice) * 90;
+      
+      priceMinHandle.style.left = `${minPercent}%`;
+      priceMaxHandle.style.left = `${maxPercent}%`;
+      priceTrack.style.left = `${minPercent}%`;
+      priceTrack.style.width = `${maxPercent - minPercent}%`;
+      
+      priceMinInput.value = filters.price.min;
+      priceMaxInput.value = filters.price.max;
+      priceMinValue.textContent = filters.price.min;
+      priceMaxValue.textContent = filters.price.max;
     }
     
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    // Set initial position
+    updateSlider();
     
-    document.getElementById('days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-  }
-  
-  // Update countdown every second
-  setInterval(updateCountdown, 1000);
-  updateCountdown(); // Initial call
-  
-  // Filter button functionality
-  document.querySelectorAll('.filter-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      
-      // In a real implementation, this would filter the offers
-      // For now, we'll just show a simple alert
-      const filterText = this.textContent;
-      console.log(`Filtering by: ${filterText}`);
+    // Handle mouse events for min handle
+    priceMinHandle.addEventListener('mousedown', (e) => {
+      isDraggingMin = true;
+      document.addEventListener('mousemove', handleMinDrag);
+      document.addEventListener('mouseup', () => {
+        isDraggingMin = false;
+        document.removeEventListener('mousemove', handleMinDrag);
+      });
     });
-  });
-  
+    
+    // Handle mouse events for max handle
+    priceMaxHandle.addEventListener('mousedown', (e) => {
+      isDraggingMax = true;
+      document.addEventListener('mousemove', handleMaxDrag);
+      document.addEventListener('mouseup', () => {
+        isDraggingMax = false;
+        document.removeEventListener('mousemove', handleMaxDrag);
+      });
+    });
+    
+    // Handle min handle drag
+    function handleMinDrag(e) {
+      if (!isDraggingMin) return;
+      
+      const rect = priceSlider.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      x = Math.max(0, Math.min(x, rect.width));
+      
+      const percent = (x / rect.width) * 100;
+      const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
 
+      if (newPrice < filters.price.max ) {
+        filters.price.min = newPrice;
+        updateSlider();
+      }
+    }
+    
+    // Handle max handle drag
+    function handleMaxDrag(e) {
+      if (!isDraggingMax) return;
+      
+      const rect = priceSlider.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      x = Math.max(0, Math.min(x, rect.width));
+      
+      const percent = (x / rect.width) * 100;
+      const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
+      
+      if (newPrice > filters.price.min ) {
+        filters.price.max = newPrice;
+        updateSlider();
+
+      }
+    }
+    
+    // Input change events
+    priceMinInput.addEventListener('change', () => {
+      let value = parseInt(priceMinInput.value);
+      if (isNaN(value)) value = minPrice;
+      value = Math.max(minPrice, Math.min(value, filters.price.max - 50));
+      filters.price.min = value;
+      updateSlider();
+
+    });
+    
+    priceMaxInput.addEventListener('change', () => {
+      let value = parseInt(priceMaxInput.value);
+      if (isNaN(value)) value = maxPrice;
+      value = Math.min(maxPrice, Math.max(value, filters.price.min + 50));
+      filters.price.max = value;
+      updateSlider();
+
+    });
+  }
+
+  // Apply all filters and sorting
+  async function applyFilters(page) {
+    const url = serializeFiltersToURL(page)
+    const data = await getFetch(url)
+    productsSection.innerHTML = ""
+    productsSection.innerHTML = data
+    history.pushState({}, "", url)
+
+  }
+  function serializeFiltersToURL(page) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if(Array.isArray(value)){
+        value.forEach(v => params.append(key, v));
+      }
+      else if(typeof value === "object" && value !==null){
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          params.append(`${key}_${subKey}`, subValue);
+        });
+      }
+      else{
+         params.append(key, value);
+      }
+
+    }
+    let newURL;
+    if(page){
+      const filterParam = params.toString()
+      if(params.toString()==""){
+        newURL = `?page=${page}`;
+
+      }else{
+        newURL = `?${filterParam}&page=${page}`;
+
+      }
+
+  }else{
+    newURL = `?${params.toString()}`;
+
+  }
+    newURL = newURL + `&sort-by=${sortBy}`
+    return newURL
+  
+  }
+  async function getFetch(url){
+    
+    const response = await fetch("{{request.path}}" + url,{
+      method:"GET",
+      headers:{
+        "AJAX":true,
+      }
+    })
+    const data = await response.text()
+    return data
+  }
+
+
+
+  // Clear all filters
+  function clearAllFilters() {
+    // Reset filter state
+    Object.entries(filters).forEach(([key, value])=>{
+      if (key=="price"){
+
+        filters.price = { min: minPrice, max: maxPrice };
+      }else{
+        filters[key]=[]
+      }
+    })
+    
+    filters.brand = [];
+    filters.type = [];
+    filters.rating = [];
+
+    // Reset UI checkboxes
+    document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+      checkbox.classList.remove('checked');
+    });
+    
+    // Check "In Stock" by default
+    document.querySelector('.filter-option[data-value="in-stock"] .filter-checkbox').classList.add('checked');
+    
+    // Reset price slider
+    priceMinInput.value = 0;
+    priceMaxInput.value = 5000;
+    initPriceSlider();
+    
+    // Reset sort
+    sortSelect.value = 'best-selling';
+    sortBy = 'best-selling';
+    
+    // Apply filters
+
+  }
+
+
+
+
+
+function applyPagination(){
+  const btn = event.target.closest(".page-btn")
+  const nextPageNumber = btn.dataset.nextNumber
+  applyFilters(nextPageNumber)
+
+}
 </script>
 {%endblock%}
+

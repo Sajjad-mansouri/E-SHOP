@@ -192,8 +192,8 @@
       
       const percent = (x / rect.width) * 100;
       const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
-      
-      if (newPrice < filters.price.max - 50) {
+
+      if (newPrice < filters.price.max ) {
         filters.price.min = newPrice;
         updateSlider();
       }
@@ -210,7 +210,7 @@
       const percent = (x / rect.width) * 100;
       const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
       
-      if (newPrice > filters.price.min + 50) {
+      if (newPrice > filters.price.min ) {
         filters.price.max = newPrice;
         updateSlider();
 
@@ -239,7 +239,6 @@
 
   // Apply all filters and sorting
   async function applyFilters(page) {
-    console.log('apply')
     const url = serializeFiltersToURL(page)
     const data = await getFetch(url)
     productsSection.innerHTML = ""
@@ -249,6 +248,7 @@
   }
   function serializeFiltersToURL(page) {
     const params = new URLSearchParams();
+    console.log(filters)
     for (const [key, value] of Object.entries(filters)) {
       if(Array.isArray(value)){
         value.forEach(v => params.append(key, v));
@@ -263,6 +263,7 @@
       }
 
     }
+    console.log(params)
     let newURL;
     if(page){
       const filterParam = params.toString()

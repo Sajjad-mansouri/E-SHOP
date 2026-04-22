@@ -89,7 +89,6 @@ class ProductListView(mixins.AjaxQuerysetMixin, ListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		product_class_form = forms.ProductClassForm()
 		context['category_form'] = dj_forms.modelform_factory(Product, fields=["category"])
 		return context
 
