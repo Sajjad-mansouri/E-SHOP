@@ -131,11 +131,11 @@
     }
 
     /* Collection grid */
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-    }
+.collection-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
 
     .collection-card {
       background: white;
@@ -244,3 +244,96 @@
   .dropdown { display: none !important; } /* simpler mobile fallback */
   .hero-content h1 { font-size: 2.2rem; }
 }
+
+
+
+/* Horizontal scroll area */
+.category-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 12px;
+}
+
+
+/* 2-row layout inside one block */
+.category-grid-scroll {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(1, auto);
+  grid-auto-columns: 140px;
+  column-gap: 20px;
+  row-gap: 20px;
+  width: max-content;   /* prevents big empty margins */
+}
+
+/* Single category item */
+.cat-item {
+
+  background: white;
+  border-radius: 18px;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--dark);
+  box-shadow: var(--card-shadow);
+  border: 1px solid #eee;
+  scroll-snap-align: start;
+  transition: transform 0.2s;
+}
+
+.cat-item:hover {
+  transform: translateY(-4px);
+}
+
+/* Category circle */
+.cat-circle {
+  width: 70px;
+  height: 70px;
+  background: #f5f5f5;
+  border-radius: 50%;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e5e5;
+}
+.cat-circle img{
+  width: 100%;
+}
+.cat-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+
+    /* Refined Product Cards */
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+      border: 1px solid #f0f0f0;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      border-color: var(--primary);
+    }
+    .product-img {
+      height: 220px; /* Standardized height */
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+
+
+

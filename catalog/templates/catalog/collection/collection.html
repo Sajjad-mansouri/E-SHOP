@@ -1,0 +1,89 @@
+
+{%extends "base.html"%}
+{% load static catalog_tags%}
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/collection/collection.css'%}">
+
+
+  {%endblock%}
+{%block content%}
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-wrapper">
+  <div class="breadcrumb">
+    <a href="#">Home</a>
+    <svg class="icon icon-sm" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+    <a href="#">Collections</a>
+    <svg class="icon icon-sm" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+    <span style="color:#222; font-weight:500;">{{object.name}}</span>
+  </div>
+</div>
+
+<main>
+  <!-- Collection Hero -->
+  <div class="collection-hero">
+    <div class="collection-hero-content">
+      <h1>{{object.name}} Collection</h1>
+      <p>{{object.description}}</p>
+
+    </div>
+  </div>
+
+  <!-- Subcategory Navigation -->
+  <div class="subcategory-nav">
+    {%for product_list in object.product_lists.all%}
+    <a href="#{{product_list.slug}}" class="subcategory-link {%if forloop.first%}active{%endif%}">{{product_list.name}}</a>
+    {%endfor%}
+  </div>
+
+  <!-- Product Group 1: Camp Products -->
+{%for product_list in object.product_lists.all%}
+  <section id="{{product_list.slug}}" class="product-group">
+    <div class="group-header">
+      <div class="group-title">
+        <span>{{product_list.name}}</span>
+        <span class="group-count">24 products</span>
+      </div>
+      <a href="#" class="group-link">
+        View all
+        <svg class="icon icon-sm" viewBox="0 0 24 24">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+        </svg>
+      </a>
+    </div>
+    <div class="product-grid">
+      {%for stock in product_list.get_stocks%}
+
+        {%include 'catalog/category/_stock_card.html'%}
+      {%endfor%}
+    </div>
+  </section>
+{%endfor%}
+
+</main>
+{%endblock%}
+
+{%block script%}
+
+<script>
+  // Smooth scroll for subcategory navigation
+  document.querySelectorAll('.subcategory-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // Update active state
+      document.querySelectorAll('.subcategory-link').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+{%endblock%}

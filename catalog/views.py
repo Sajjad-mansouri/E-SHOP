@@ -245,6 +245,7 @@ class OfferProductListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context["categories"] = Category.objects.filter(depth=1)
+		context["object"] = self.object
 		return context
 	def get_queryset(self):
 		q = super().get_queryset()
@@ -292,3 +293,18 @@ class OfferProductListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, 
 
 		return q_total
 
+
+
+class CollectionListView(DetailView):
+	model = CollectionList
+	template_name = "catalog/collection/collection.html"
+
+
+class SubCategoryListView(DetailView):
+	model = Category
+	template_name = "catalog/category/sub_categories.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["categories"] = self.object.get_children()
+		return context

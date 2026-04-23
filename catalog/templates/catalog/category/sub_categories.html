@@ -1,0 +1,77 @@
+{%extends "base.html"%}
+{% load static catalog_tags%}
+  {%block style%}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/category/sub_categories.css'%}">
+
+
+  {%endblock%}
+
+{%block content%}
+<!-- BREADCRUMB -->
+<div class="breadcrumb-wrapper">
+  <div class="breadcrumb">
+    <a href="#">Home</a>
+    <svg class="icon icon-sm" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+    <a href="#">category</a>
+    <svg class="icon icon-sm" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+    <span style="color:#222; font-weight:500;">{{object.name}}</span>
+  </div>
+</div>
+<main>
+  <!-- Main Category Hero Section (similar style but adapted) -->
+<div class="category-hero" data-bg="green" data-icon="🛒">
+  <div class="category-hero-content">
+    <h1 class="category-title">{{object.name}}</h1>
+    <p class="category-description">
+      {{object.description}}
+    </p>
+
+
+  </div>
+</div>
+
+
+  <!-- Subcategory Navigation (specific to this main category) -->
+  <div class="subcategory-nav">
+  {%for category in categories%}
+    <a href="#{{category.slug}}" class="subcategory-link {%if forloop.first%}active{%endif%}">{{category.name}}</a>
+ 
+  {%endfor%}
+  </div>
+{%for category in categories%}
+  {% category_products category%}
+
+{%endfor%}
+
+</main>
+{%endblock%}
+
+{%block script%}
+<script>
+  document.querySelectorAll('.subcategory-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, null, targetId);
+      }
+      document.querySelectorAll('.subcategory-link').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // highlight active on hash load
+  if (window.location.hash) {
+    const activeLink = document.querySelector(`.subcategory-link[href="${window.location.hash}"]`);
+    if (activeLink) activeLink.classList.add('active');
+    const target = document.querySelector(window.location.hash);
+    if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+</script>
+{%endblock%}

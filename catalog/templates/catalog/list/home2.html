@@ -27,7 +27,7 @@
 
     <div class="collection-grid">
       {%for collection in collections%}
-      <a href="#" class="collection-card">
+      <a href="{%url 'catalog:collection' collection.slug %}" class="collection-card">
         <div class="collection-img" style="background-image: url('{{collection.get_image}}');"></div>
         <div class="collection-info">
           <h3>{{collection.name}}</h3>
@@ -39,35 +39,27 @@
     </div>
   </section>
 
-  <!-- COLLECTIONS SECTION -->
-  <section class="section">
-    <div class="section-header">
-      <div class="section-title">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--primary)">
-          <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2zm13 0h3v2h-3v-2zm-3-3h3v2h-3v-2zm0-5h3v2h-3V8zM3 4h18v16H3V4z"/>
-        </svg>
-        Shop by Categories
-      </div>
-      <a href="#" class="view-all-link">
-        View all Categories
-        <svg class="icon icon-sm" viewBox="0 0 24 24">
-          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-        </svg>
-      </a>
-    </div>
 
-    <div class="collection-grid">
+
+
+  <section class="section">
+  <div class="section-header">
+    <div class="section-title">Shop by Category</div>
+  </div>
+
+  <div class="category-scroll">
+    <div class="category-grid-scroll">
       {%for category in categories%}
-      <a href="#" class="collection-card">
-        <div class="collection-img" style="background-image: url('{{category.get_image}}');"></div>
-        <div class="collection-info">
-          <h3>{{category.name}}</h3>
-        </div>
+      <a class="cat-item" href="{%url 'catalog:sub_categories' category.slug %}">
+        <div class="cat-circle"><img src="{{category.get_image}}"></div>
+        <div class="cat-title">{{category.name}}</div>
       </a>
       {%endfor%}
 
     </div>
-  </section>
+  </div>
+</section>
+
 </main>
 
 

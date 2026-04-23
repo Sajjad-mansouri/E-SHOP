@@ -1,0 +1,19 @@
+<a href="{%url 'catalog:product_detail' stock.product.slug stock.id %}" class="product-card">
+  <div class="product-img-wrapper">
+      {%if stock.get_type_of_discount%}<div class="offer-badge">{{stock.get_type_of_discount}}</div>{%endif%}
+      <div class="product-img" style="background-image: url('{{stock.get_product_image}}');">
+
+      </div>
+      <div class="discount-badge">-{{stock.get_discount}}%</div>
+      </div><div class="product-category">{{stock.product.category}}</div>
+      <div class="product-name">{{stock.product.title}}</div>
+      <div class="product-description">{{stock.product.short_description}}</div>
+      <div class="price-wrapper">
+        <span class="current-price">${{stock.get_final_price}}</span>
+        {%if stock.get_discount > 0%}
+        <span class="old-price">${{stock.price}}</span>
+        <span class="discount-percent">Save ${{stock.save_with_discount}}</span></div>
+        {%endif%}
+      <div class="product-rating">★{{stock.rating}} ({{stock.comments.count}})
+  </div>
+</a>

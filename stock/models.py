@@ -109,13 +109,17 @@ class StockRecord(models.Model):
 		return product_discounts[0][2]
 
 	@property
+	def save_with_discount(self):
+		discount = self.get_discount
+		return (self.price * (discount/100))
+	@property
 	@admin.display(description="price after discount")
 	def get_final_price(self):
 		if not self.price:
 			return 0
 		discount = self.get_discount
 
-		return self.price - (self.price * (discount/100))
+		return self.price - self.save_with_discount
 
 	@property
 	def output_display_final_price(self):

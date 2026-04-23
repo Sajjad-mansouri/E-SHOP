@@ -3,6 +3,7 @@ from django.db.models import Avg, Q
 from django.urls import reverse
 from cart.models import Cart
 from catalog.models import UserRating, Product, Category
+from stock.models import StockRecord
 from offer.models import OfferApplication
 
 register = template.Library()
@@ -62,7 +63,7 @@ def product_rating_count(context, product_id):
 def get_product_breadcrumb(context, product=None, category=None):
 
 		if product:
-			category = product.categories.first()
+			category = product.category
 		if category:
 			breadcrumb = category.get_ancestors()
 			breadcrumb = list(breadcrumb) + [category]
@@ -153,3 +154,11 @@ def get_offer_apps(offer_name):
 
 
 	return {"offer_apps":offer_apps, "offer_name":offer_name}
+
+
+
+@register.inclusion_tag("catalog/category/_category_products.html")
+def category_products(category):
+	q = Q(status="public") & Q(product__category=category) 
+	stocks = StockRecord.objects.filter(q)
+	return {"stocks":stocks[:5], "category":category}

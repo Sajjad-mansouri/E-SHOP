@@ -12,6 +12,8 @@
       --light: #f8f9fa;
       --border: #e0e0e0;
       --gray-800: #1f2937;
+      --offer-bg: #ff8c00;
+      --sale-bg: #e53935;
       --card-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.05);
       --hover-shadow: 0 12px 24px -8px rgba(239,64,86,0.15);
       --offer-gradient: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
@@ -24,6 +26,12 @@ body {
   color: var(--dark);
   line-height: 1.5;
 }
+
+    main {
+
+      margin-top: 24px 
+
+    }
 a {
   text-decoration: none;
 }
@@ -340,3 +348,134 @@ header {
   .dropdown { display: none !important; } /* simpler mobile fallback */
   .hero-content h1 { font-size: 2.2rem; }
 }
+
+
+/*    product card*/
+    /* Enhanced Product Card */
+    .product-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px 16px 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f1f1f1;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 28px rgba(0,0,0,0.1);
+    }
+
+    .product-img-wrapper {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .product-img {
+      height: 200px;
+      background: #f4f6f9;
+      border-radius: 16px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      background-color: #eef2f5;
+    }
+    /* Offer name badge (above img) */
+    .offer-badge {
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      background: var(--offer-bg);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 3;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      white-space: nowrap;
+    }
+    .discount-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--sale-bg);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      z-index: 2;
+    }
+    .product-category {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+    .product-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .product-description {
+      font-size: 0.8rem;
+      color: #5a5a5a;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .price-wrapper {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .current-price {
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #1e1e1e;
+    }
+    .old-price {
+      font-size: 0.9rem;
+      color: #9e9e9e;
+      text-decoration: line-through;
+    }
+    .discount-percent {
+      background: #fdeded;
+      color: var(--primary-dark);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      color: #fbbf24;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1000px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .category-hero h1 { font-size: 2.2rem; }
+    }
+    @media (max-width: 680px) {
+      .product-grid { grid-template-columns: 1fr; }
+      .header-container { flex-wrap: wrap; height: auto; padding: 12px 20px; gap: 12px; }
+      .search-box { order: 3; margin: 6px 0 0; max-width: 100%; width: 100%; }
+      .subcategory-nav { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 12px; scrollbar-width: thin; }
+      .group-title { font-size: 1.5rem; }
+    }

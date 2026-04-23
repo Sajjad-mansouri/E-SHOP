@@ -1,0 +1,185 @@
+       /* BREADCRUMB */
+    .breadcrumb-wrapper {
+      max-width: 1400px;
+      margin: 16px auto 0;
+      padding: 0 20px;
+    }
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #666;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 40px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .breadcrumb a { color: #444; text-decoration: none; }
+    .breadcrumb a:hover { color: var(--primary); text-decoration: underline; }
+    .breadcrumb .icon { color: #aaa; }
+
+    /* ===== MAIN CATEGORY PAGE ===== */
+    main {
+      max-width: 1400px;
+      margin: 24px auto 40px;
+      padding: 0 20px;
+    }
+
+/* Universal Category Hero */
+.category-hero {
+  border-radius: 32px;
+  padding: 48px 40px;
+  margin-bottom: 40px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  background: var(--category-bg, linear-gradient(135deg, #1e3c2c, #2a5a3a));
+}
+
+/* Add Icon Background */
+.category-hero::before {
+  content: attr(data-icon);
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  font-size: 140px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.category-hero-content { position: relative; z-index: 2; }
+
+.category-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.category-description {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin-bottom: 24px;
+}
+
+/* Stats */
+.category-stats {
+  display: flex;
+  gap: 32px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* --- Dynamic Background Themes --- */
+.category-hero[data-bg="green"] {
+  --category-bg: linear-gradient(135deg, #1e3c2c 0%, #2a5a3a 100%);
+}
+.category-hero[data-bg="blue"] {
+  --category-bg: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+.category-hero[data-bg="orange"] {
+  --category-bg: linear-gradient(135deg, #b45309 0%, #c2410c 100%);
+}
+.category-hero[data-bg="purple"] {
+  --category-bg: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+}
+.category-hero[data-bg="black"] {
+  --category-bg: linear-gradient(135deg, #0f0f0f 0%, #272727 100%);
+}
+
+
+    /* Subcategory Navigation (pill style) */
+    .subcategory-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      scroll-margin-top: 80px;
+    }
+    .subcategory-link {
+      padding: 10px 24px;
+      background: white;
+      border-radius: 40px;
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .subcategory-link:hover,
+    .subcategory-link.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Product Group Section */
+    .product-group {
+      margin-bottom: 56px;
+      scroll-margin-top: 90px;
+    }
+    .group-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .group-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .group-count {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--gray);
+      background: #f0f0f0;
+      padding: 4px 12px;
+      border-radius: 40px;
+    }
+    .group-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .group-link:hover { text-decoration: underline; opacity: 0.85; }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }

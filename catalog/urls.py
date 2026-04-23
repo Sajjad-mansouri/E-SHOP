@@ -12,5 +12,10 @@ urlpatterns = [
 	path("<slug:slug>/products/", views.CategoryProducts.as_view(), name="category_products"),
 	path("<slug:slug>/products/page/<int:page>/", views.CategoryProducts.as_view(), name="category_page"),
 
+	path("collection/<slug:slug>/", views.CollectionListView.as_view(), name="collection"),
+	path("category/<slug:slug>/", views.SubCategoryListView.as_view(), name="sub_categories"),
+
+
+
 
 ]

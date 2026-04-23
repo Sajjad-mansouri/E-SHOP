@@ -17,15 +17,7 @@
     <div class="offers-scroll">
       {%for offer_application in offer_apps|slice:":2"%}
 
-
-      <div class="offer-card">
-        <span class="offer-tag">⚡ FLASH SALE</span>
-        <div class="offer-img" style="background-image: url('{{offer_application.stock.get_product_image}}');"></div>
-        <div class="offer-title">{{offer_application.stock.product.title}}</div>
-        <div class="offer-desc">{{offer_application.stock.product.short_description}}</div>
-        <div class="offer-price"><span class="new-price">${{offer_application.stock.get_final_price}}</span><span class="old-price">${{offer_application.stock.price}}</span></div>
-      </div>
-
+        {%include 'catalog/category/_stock_card.html' with stock=offer_application.stock %}
       {%endfor%}
 
     </div>
