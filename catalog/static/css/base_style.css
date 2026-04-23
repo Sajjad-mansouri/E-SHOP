@@ -479,3 +479,38 @@ header {
       .subcategory-nav { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 12px; scrollbar-width: thin; }
       .group-title { font-size: 1.5rem; }
     }
+
+
+
+/*    search*/
+.search-results {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  display: none;
+  z-index: 999;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-item {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f2f2f2;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-item:hover {
+  background: #fafafa;
+}
+
+.search-item strong {
+  color: var(--primary);
+}

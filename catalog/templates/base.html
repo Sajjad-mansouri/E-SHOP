@@ -22,7 +22,8 @@
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" placeholder="Search for sneakers, laptops, deals..." />
+      <input id="search" type="text" placeholder="Search for sneakers, laptops, deals..." value="{%get_search_kwarg%}"/>
+      <div class="search-results"></div>
     </div>
 
     <div class="header-right">
@@ -95,6 +96,78 @@
     </footer>
 
 <script type="text/javascript">
+
+
+
+const input = document.querySelector('.search-box input');
+const resultsBox = document.querySelector('.search-results');
+
+input.addEventListener('input', async function () {
+  const query = this.value.trim().toLowerCase();
+  
+  if (!query) {
+    resultsBox.style.display = 'none';
+    resultsBox.innerHTML = "";
+    return;
+  }
+
+  try{
+
+    const data = await getSearchResult(query)
+    // Build list
+    
+    if (data.length === 0) {
+      resultsBox.innerHTML = `<div class="search-item">No results found</div>`;
+    } else {
+        const results = []
+        data.forEach(item=>{
+
+
+          results.push(`<div class="search-item" data-category='${item.category}' data-product='${item.title}' onclick='openSearchResult()'><strong>${item.title}</strong>${item.category}</div>`)
+        })
+        results.push(`<div class="search-item" onclick='openSearchResult()' data-product='${query}'><strong>All Category</strong></div>`)
+        resultsBox.innerHTML = results.join("")
+    }
+
+    resultsBox.style.display = 'block';
+  }catch(error){
+
+  }
+});
+
+
+
+function openSearchResult(){
+  const category = event.target.dataset.category
+  const product = event.target.dataset.product
+
+  let baseUrl = "{%url 'catalog:category_products' 'place_holder' %}"
+  let url = baseUrl.replace('place_holder', category)
+  if(category){
+    window.location.href = url + `?search=${product}`
+  }else{
+    url = "{%url 'catalog:search' %}"
+    window.location.href = url + `?search=${product}`
+  }
+}
+
+async function getSearchResult(query){
+  const response  = await fetch("{%url 'catalog:search'%}" + `?search=${query}`, {
+    method:"GET",
+    headers:{
+      "SEARCH":true
+    }
+  })
+  const data = await response.json()
+  return data
+}
+
+// Hide when clicking outside
+document.addEventListener('click', e => {
+  if (!document.querySelector('.search-box').contains(e.target)) {
+    resultsBox.style.display = 'none';
+  }
+});
 function logOut(){
   const form = document.getElementById("logout-form");
   form.submit()

@@ -21,7 +21,7 @@ from collection.models import CollectionList, ProductList
 from . import mixins
 from .utils import get_constant_attr_q
 
-CONSTANT_ATTR = ["price_min", "price_max", "availability", "rating", "brand", "color"]
+CONSTANT_ATTR = ["price_min", "price_max", "availability", "rating", "brand", "color", "search"]
 
 class HomePageView(TemplateResponseMixin, View):
 	template_name = "catalog/list/home2.html"
@@ -108,6 +108,7 @@ class CategoryProducts(mixins.AjaxSortingResponse, mixins.StockContexMixin, List
 		context['category'] = self.object
 		context['attributes'] = attributes
 		context['product_class'] = self.object.product_class
+
 
 
 		return context
@@ -358,3 +359,58 @@ class ProductGroupListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, 
 
 		return q_total
 
+
+
+
+class SearchView(mixins.AjaxSortingResponse, mixins.StockContexMixin, ListView):
+	model = StockRecord
+	template_name = "catalog/search/products.html"
+	AJAX_template_name = "catalog/search/_products.html"
+	paginate_by = 4
+
+
+
+	def get_queryset(self):
+		stocks = super().get_queryset()
+		stocks = stocks.filter(status="public")
+		stocks = self.get_stocks(stocks)
+		return stocks
+
+
+
+	def get_stocks(self, stocks):
+
+		stocks = self.apply_filter(stocks)
+		stocks = self.apply_sorting(stocks)
+		return stocks
+
+	def apply_filter(self, stocks):
+		q = self.get_filter()
+		stocks = stocks.filter(q)
+		return stocks
+
+	def get_filter(self):
+		q_total=Q()
+
+		for key, values in self.request.GET.lists():
+
+			if key  in CONSTANT_ATTR:
+					q_sub=Q()
+					for value in values:
+						q= get_constant_attr_q(key, value)
+						q_sub = q_sub|q
+					q_total = q_total & q_sub
+
+
+
+		return q_total
+
+	def render_to_response(self, *args, **kwargs):
+		if self.request.headers.get("SEARCH"):
+			return self.render_json_search()
+		return super().render_to_response(*args, **kwargs)
+
+	def render_json_search(self):
+
+		results = self.object_list.annotate(title=F("product__title"), category=F("product__category__name")).values("title", "category")[:3]
+		return JsonResponse(list(results), safe=False)

@@ -61,7 +61,7 @@ def product_rating_count(context, product_id):
 
 @register.inclusion_tag("catalog/partial/_breadcrumb.html",takes_context=True)
 def get_product_breadcrumb(context, product=None, category=None):
-
+		print('breadcrumb', category)
 		if product:
 			category = product.category
 		if category:
@@ -162,3 +162,8 @@ def category_products(category):
 	q = Q(status="public") & Q(product__category=category) 
 	stocks = StockRecord.objects.filter(q)
 	return {"stocks":stocks[:5], "category":category}
+
+@register.simple_tag(takes_context=True)
+def get_search_kwarg(context):
+	request = context["request"]
+	return request.GET.get("search", "")

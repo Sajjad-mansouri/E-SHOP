@@ -27,6 +27,9 @@ def get_constant_attr_q(key, value):
 
 	elif key == "color":
 		q = Q(product__color=value)
+
+	elif key == "search":
+		q = Q(product__title__icontains=value)|Q(product__brand__icontains=value)|Q(product__upc__icontains=value)|Q(sku__icontains=value)
 	else:
 		q= Q()
 
