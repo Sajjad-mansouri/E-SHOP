@@ -809,14 +809,7 @@
       align-items: center;
       gap: 12px;
     }
-    .offer-badge {
-      background: var(--primary);
-      color: white;
-      padding: 6px 18px;
-      border-radius: 40px;
-      font-size: 1rem;
-      font-weight: 500;
-    }
+
     .global-timer {
       background: rgba(0,0,0,0.06);
       padding: 10px 22px;

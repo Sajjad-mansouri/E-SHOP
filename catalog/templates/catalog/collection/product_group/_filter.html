@@ -1,0 +1,138 @@
+  <aside class="filter-sidebar">
+    <div class="filter-header">
+      <h2>Filters</h2>
+      <button class="clear-filters" id="clearFilters">Clear All</button>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title" data-filter="price">
+        <h3>Price Range</h3>
+        <svg class="icon filter-toggle" viewBox="0 0 24 24">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      <div class="filter-content" id="priceFilter">
+        <div class="price-inputs">
+          <input type="number" class="price-input" id="priceMin" placeholder="Min" min="0" max="5000" value="0">
+          <input type="number" class="price-input" id="priceMax" placeholder="Max" min="0" max="5000" value="5000">
+        </div>
+        <div class="price-slider" id="priceSlider">
+          <div class="price-slider-track" id="priceTrack"></div>
+          <div class="price-slider-handle" id="priceMinHandle"></div>
+          <div class="price-slider-handle" id="priceMaxHandle"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #666;">
+          <span>$<span id="priceMinValue">0</span></span>
+          <span>$<span id="priceMaxValue">5000</span></span>
+        </div>
+      </div>
+    </div>
+    {%for attribute,values in attributes.items%}
+    <div class="filter-section">
+      <div class="filter-title" data-filter="{{attribute}}">
+        <h3>{{attribute}}</h3>
+        <svg class="icon filter-toggle" viewBox="0 0 24 24">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      <div class="filter-content" id="{{attribute}}Filter">
+        {%for val in values%}
+        <div class="filter-option" data-value="{{val}}">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">{{val}}</span>
+
+        </div>
+        {%endfor%}
+      </div>
+    </div>
+    {%endfor%}
+
+
+    
+    <div class="filter-section">
+      <div class="filter-title" data-filter="rating">
+        <h3>Customer Rating</h3>
+        <svg class="icon filter-toggle" viewBox="0 0 24 24">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      <div class="filter-content" id="ratingFilter">
+        <div class="filter-option" data-value="4">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">4★ & above</span>
+          <span class="filter-count">(48)</span>
+        </div>
+        <div class="filter-option" data-value="3">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">3★ & above</span>
+          <span class="filter-count">(56)</span>
+        </div>
+        <div class="filter-option" data-value="2">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">2★ & above</span>
+          <span class="filter-count">(62)</span>
+        </div>
+      </div>
+    </div>
+        <!-- Brand -->
+        <div class="filter-section">
+          <div class="filter-title" data-filter="brand">
+            <h3>Brand</h3>
+            <svg class="icon filter-toggle" viewBox="0 0 24 24">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+          </div>
+          <div class="filter-content" id="brandFilter">
+            {%for brand in brands%}
+            <div class="filter-option" data-value="{{brand}}">
+              <div class="filter-checkbox"></div>
+              <span class="filter-label">{{brand}}</span>
+
+            </div>
+            {%endfor%}
+  
+          </div>
+        </div>
+
+        <!-- Color -->
+        <div class="filter-section">
+          <div class="filter-title" data-filter="color">
+            <h3>Color</h3>
+            <svg class="icon filter-toggle" viewBox="0 0 24 24">
+              <path d="M7 10l5 5 5-5z"/>
+            </svg>
+          </div>
+          <div class="filter-content" id="colorFilter">
+            {%for color in colors%}
+            <div class="filter-option" data-value="{{color}}">
+              <div class="filter-checkbox"></div>
+              <span class="filter-label">{{color}}</span>
+
+            </div>
+            {%endfor%}
+          </div>
+        </div>
+    <div class="filter-section">
+      <div class="filter-title" data-filter="availability">
+        <h3>Availability</h3>
+        <svg class="icon filter-toggle" viewBox="0 0 24 24">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      <div class="filter-content" id="availabilityFilter">
+        <div class="filter-option" data-value="1">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">Only Available</span>
+
+        </div>
+        <div class="filter-option" data-value="0">
+          <div class="filter-checkbox"></div>
+          <span class="filter-label">All</span>
+
+        </div>
+      </div>
+    </div>
+
+<div class="filter-actions">
+    <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
+</div>
+  </aside>

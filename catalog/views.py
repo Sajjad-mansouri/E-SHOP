@@ -17,7 +17,7 @@ from comment.forms import CommentForm
 from cart.forms import CartItemForm
 from offer.models import Offer,OfferApplication
 from comment.models import Comment
-from collection.models import CollectionList
+from collection.models import CollectionList, ProductList
 from . import mixins
 from .utils import get_constant_attr_q
 
@@ -96,7 +96,7 @@ class CategoryProducts(mixins.AjaxSortingResponse, mixins.StockContexMixin, List
 	model = StockRecord
 	template_name = "catalog/category/products.html"
 	AJAX_template_name = "catalog/category/_products.html"
-	paginate_by = 5
+	paginate_by = 1
 
 
 	def get_context_data(self, **kwargs):
@@ -308,3 +308,53 @@ class SubCategoryListView(DetailView):
 		context = super().get_context_data(**kwargs)
 		context["categories"] = self.object.get_children()
 		return context
+
+
+class ProductGroupListView(mixins.AjaxSortingResponse, mixins.StockContexMixin, ListView):
+	model = ProductList
+	template_name = "catalog/collection/product_group/products.html"
+	AJAX_template_name = "catalog/collection/product_group/_products.html"
+	paginate_by = 4
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context["object"] = self.object
+		return context
+	def get_queryset(self):
+		q = super().get_queryset()
+		slug = self.kwargs.get("slug")
+		self.object = get_object_or_404(q, slug=slug, status="active")
+		stocks = self.get_stocks()
+		return stocks
+
+
+
+	def get_stocks(self):
+		stocks = self.object.get_stocks
+		stocks = self.apply_filter(stocks)
+		stocks = self.apply_sorting(stocks)
+
+		return stocks
+
+	def apply_filter(self, stocks):
+		q = self.get_filter()
+		stocks = stocks.filter(q)
+		return stocks
+
+	def get_filter(self):
+		q_total=Q()
+
+		for key, values in self.request.GET.lists():
+
+			if key  in CONSTANT_ATTR:
+					q_sub=Q()
+					for value in values:
+						q= get_constant_attr_q(key, value)
+						q_sub = q_sub|q
+					q_total = q_total & q_sub
+
+
+
+		return q_total
+
