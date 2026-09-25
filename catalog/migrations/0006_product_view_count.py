@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0005_alter_product_slug_productimage'),
+        ("catalog", "0005_alter_product_slug_productimage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='view_count',
+            model_name="product",
+            name="view_count",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

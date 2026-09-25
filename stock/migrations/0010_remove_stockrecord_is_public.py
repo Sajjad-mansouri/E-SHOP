@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('stock', '0009_stockrecord_status'),
+        ("stock", "0009_stockrecord_status"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='stockrecord',
-            name='is_public',
+            model_name="stockrecord",
+            name="is_public",
         ),
     ]

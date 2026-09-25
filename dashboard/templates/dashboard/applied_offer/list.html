@@ -45,13 +45,13 @@
     <div class="search-wrapper">
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          class="search-input" 
-          id="searchInput" 
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
           placeholder="Search by product name or offer name..."
           autocomplete="off"
-          oninput="search()" 
+          oninput="search()"
         >
       </div>
       <div class="filter-group">
@@ -73,10 +73,10 @@
     <div class="table-header">
       <h2>Applied Offers List</h2>
     </div>
-    
+
       {%include 'dashboard/applied_offer/_list.html'%}
 
-  
+
     </div>
   </div>
 </main>
@@ -106,7 +106,7 @@
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const deleteModalMessage = document.getElementById('deleteModalMessage');
     const offerTableContainer = document.querySelector('.offers-table-container')
-    
+
     // Stats elements
     const totalActiveOffersEl = document.getElementById('totalActiveOffers');
 
@@ -152,14 +152,14 @@
     }
 
 
-    
+
     cancelDeleteBtn.addEventListener('click', () => {
       deleteModal.classList.remove('show');
       offerToDelete = null;
     });
-    
+
     confirmDeleteBtn.addEventListener('click', deleteOffer);
-    
+
     deleteModal.addEventListener('click', (e) => {
       if (e.target === deleteModal) {
         deleteModal.classList.remove('show');
@@ -249,10 +249,10 @@
 
   }
     return newURL
-  
+
   }
   async function getFetch(url){
-    
+
     const response = await fetch("{%url 'dashboard:applied_offers' %}" + url,{
       method:"GET",
       headers:{
@@ -272,7 +272,7 @@ function applyPagination(){
   function showError(message, message_class){
     const box = document.getElementById("messageBox");
     box.className = `message ${message_class}`;
-    
+
     box.innerHTML = message;
   }
 </script>

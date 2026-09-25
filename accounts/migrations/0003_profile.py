@@ -6,24 +6,54 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0002_user_user_type'),
+        ("accounts", "0002_user_user_type"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Profile',
+            name="Profile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('profile_image', models.ImageField(upload_to='users', verbose_name='Profile Image')),
-                ('birth_day', models.DateTimeField(blank=True, null=True, verbose_name='Birth Day')),
-                ('status', models.CharField(choices=[('normal', 'Normal'), ('vip', 'VIP')], default='normal', max_length=6, verbose_name='status')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "profile_image",
+                    models.ImageField(upload_to="users", verbose_name="Profile Image"),
+                ),
+                (
+                    "birth_day",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Birth Day"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("normal", "Normal"), ("vip", "VIP")],
+                        default="normal",
+                        max_length=6,
+                        verbose_name="status",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Profile',
-                'verbose_name_plural': 'Profiles',
+                "verbose_name": "Profile",
+                "verbose_name_plural": "Profiles",
             },
         ),
     ]

@@ -5,16 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('coupon', '0004_couponapplication_cart'),
-        ('order', '0004_alter_order_tax_rate'),
+        ("coupon", "0004_couponapplication_cart"),
+        ("order", "0004_alter_order_tax_rate"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='couponapplication',
-            name='order',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='order_coupon_applications', to='order.order', verbose_name='order'),
+            model_name="couponapplication",
+            name="order",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="order_coupon_applications",
+                to="order.order",
+                verbose_name="order",
+            ),
         ),
     ]

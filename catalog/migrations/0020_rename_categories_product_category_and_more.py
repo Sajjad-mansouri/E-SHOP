@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0019_remove_product_categories_product_categories'),
+        ("catalog", "0019_remove_product_categories_product_categories"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='product',
-            old_name='categories',
-            new_name='category',
+            model_name="product",
+            old_name="categories",
+            new_name="category",
         ),
         migrations.DeleteModel(
-            name='ProductCategory',
+            name="ProductCategory",
         ),
     ]

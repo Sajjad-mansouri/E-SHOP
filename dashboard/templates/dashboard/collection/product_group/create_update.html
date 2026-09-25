@@ -151,7 +151,7 @@ Click to add stock records
 		data-upc="{{stock.product.upc}}"
 		data-stock="{{stock.num_in_stock}}"
 		data-img="{{stock.get_product_image}}"
-		onclick="addRemove()" 
+		onclick="addRemove()"
 		>
 		{%if stock in object.stock_records.all%}
 		remove
@@ -262,7 +262,7 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 
 
 	formData.append("image", imageInput.files[0])
-	
+
 	try{
 
 		const data = await fetchPost("{{request.path}}", formData)
@@ -349,7 +349,7 @@ function addRemove(){
   function showError(message, message_class){
     const box = document.getElementById("messageBox");
     box.className = `message ${message_class}`;
-    
+
     box.innerHTML = message;
   }
 </script>

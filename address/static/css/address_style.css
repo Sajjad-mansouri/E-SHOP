@@ -693,15 +693,15 @@
       .address-form-section {
         padding: 24px;
       }
-      
+
       .form-header h2 {
         font-size: 1.5rem;
       }
-      
+
       .form-actions {
         flex-direction: column;
       }
-      
+
       .address-preview-sidebar {
         position: static;
       }

@@ -108,7 +108,7 @@ async function fetchPost(url, formData){
     const response = await fetch(url, {
         method:"POST",
         headers:{
-            "X-CSRFToken":csrfToken,   
+            "X-CSRFToken":csrfToken,
         },
         body:formData
 

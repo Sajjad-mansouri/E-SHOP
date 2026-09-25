@@ -133,7 +133,7 @@ async function updateStatus(url, newStatus){
     const response = await fetch(url, {
         method:"POST",
         headers:{
-            "X-CSRFToken":csrfToken,   
+            "X-CSRFToken":csrfToken,
         },
         body:formData
 
@@ -177,7 +177,7 @@ async function deleteReview(url){
     const response = await fetch(url, {
         method:"POST",
         headers:{
-            "X-CSRFToken":csrfToken,   
+            "X-CSRFToken":csrfToken,
         },
         body:formData
 
@@ -226,7 +226,7 @@ async function deleteConfirmed(){
 	const modal = document.getElementById("deleteModal")
 	const id = modal.dataset.id
 	const row = document.querySelector(`tr[data-id="${id}"]`)
-	
+
 	const baseUrl  = "{%url 'dashboard:review_delete' 0 %}"
 	const url = baseUrl.replace("0", id)
 	const data = await deleteReview(url)
@@ -246,7 +246,7 @@ async function filterReview(url){
     const response = await fetch(url, {
         method:"GET",
         headers:{
-            "AJAX":true,   
+            "AJAX":true,
         },
 
     })

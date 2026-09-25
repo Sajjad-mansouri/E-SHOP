@@ -5,23 +5,66 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('offer', '0002_alter_offerrange_slug'),
+        ("offer", "0002_alter_offerrange_slug"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OfferType',
+            name="OfferType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(blank=True, choices=[('Percentage', "Discount is a percentage off of the product's value"), ('Shipping percentage', 'Discount is a percentage off of the shipping cost'), ('Shipping fixed price', 'Get shipping for a fixed price')], max_length=100, verbose_name='Offer Type')),
-                ('value', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='Value')),
-                ('offer_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='offer.offerrange', verbose_name='Offer Range')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            (
+                                "Percentage",
+                                "Discount is a percentage off of the product's value",
+                            ),
+                            (
+                                "Shipping percentage",
+                                "Discount is a percentage off of the shipping cost",
+                            ),
+                            ("Shipping fixed price", "Get shipping for a fixed price"),
+                        ],
+                        max_length=100,
+                        verbose_name="Offer Type",
+                    ),
+                ),
+                (
+                    "value",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=10,
+                        null=True,
+                        verbose_name="Value",
+                    ),
+                ),
+                (
+                    "offer_range",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="offer.offerrange",
+                        verbose_name="Offer Range",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Offer Type',
-                'verbose_name_plural': 'Offer Types',
+                "verbose_name": "Offer Type",
+                "verbose_name_plural": "Offer Types",
             },
         ),
     ]

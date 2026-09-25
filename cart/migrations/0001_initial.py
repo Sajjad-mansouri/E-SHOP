@@ -6,34 +6,103 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('stock', '0003_remove_stockrecord_is_public'),
+        ("stock", "0003_remove_stockrecord_is_public"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Cart',
+            name="Cart",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
-                ('date_merged', models.DateTimeField(blank=True, null=True, verbose_name='Date merged')),
-                ('date_submitted', models.DateTimeField(blank=True, null=True, verbose_name='Date submitted')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='carts', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "date_created",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Date created"
+                    ),
+                ),
+                (
+                    "date_merged",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Date merged"
+                    ),
+                ),
+                (
+                    "date_submitted",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Date submitted"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="carts",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CartItem',
+            name="CartItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField(default=1, verbose_name='Quantity')),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Date Created')),
-                ('updated', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Date Updated')),
-                ('cart', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='cart.cart', verbose_name='cart')),
-                ('stock', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stock_carts', to='stock.stockrecord', verbose_name='stock')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "quantity",
+                    models.PositiveIntegerField(default=1, verbose_name="Quantity"),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        auto_now_add=True, db_index=True, verbose_name="Date Created"
+                    ),
+                ),
+                (
+                    "updated",
+                    models.DateTimeField(
+                        auto_now=True, db_index=True, verbose_name="Date Updated"
+                    ),
+                ),
+                (
+                    "cart",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="items",
+                        to="cart.cart",
+                        verbose_name="cart",
+                    ),
+                ),
+                (
+                    "stock",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="stock_carts",
+                        to="stock.stockrecord",
+                        verbose_name="stock",
+                    ),
+                ),
             ],
         ),
     ]

@@ -5,16 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('cart', '0003_cart_submited'),
-        ('coupon', '0003_couponapplication'),
+        ("cart", "0003_cart_submited"),
+        ("coupon", "0003_couponapplication"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='couponapplication',
-            name='cart',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='cart.cart', verbose_name='cart'),
+            model_name="couponapplication",
+            name="cart",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="cart.cart",
+                verbose_name="cart",
+            ),
         ),
     ]

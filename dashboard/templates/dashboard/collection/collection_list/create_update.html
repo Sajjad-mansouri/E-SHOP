@@ -148,7 +148,7 @@ Click to add Product Group
 		data-status="{{product_group.status}}"
 		data-products="-"
 		data-img="{%if product_group.image%}{{product_group.image.url}}{%endif%}"
-		onclick="addRemove()" 
+		onclick="addRemove()"
 		>
 		{%if product_group.image in object.product_lists.all%}
 		remove
@@ -258,7 +258,7 @@ document.getElementById("productGroupForm").addEventListener("submit", async fun
 
 
 	formData.append("image", imageInput.files[0])
-	
+
 	try{
 
 		const data = await fetchPost("{{request.path}}", formData)
@@ -346,7 +346,7 @@ function addRemove(){
   function showError(message, message_class){
     const box = document.getElementById("messageBox");
     box.className = `message ${message_class}`;
-    
+
     box.innerHTML = message;
   }
 </script>

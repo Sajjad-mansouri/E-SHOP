@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('cart', '0002_alter_cart_options_alter_cartitem_options'),
+        ("cart", "0002_alter_cart_options_alter_cartitem_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cart',
-            name='submited',
-            field=models.BooleanField(default=False, verbose_name='submited'),
+            model_name="cart",
+            name="submited",
+            field=models.BooleanField(default=False, verbose_name="submited"),
         ),
     ]

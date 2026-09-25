@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('stock', '0003_remove_stockrecord_is_public'),
+        ("stock", "0003_remove_stockrecord_is_public"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stockrecord',
-            name='is_public',
+            model_name="stockrecord",
+            name="is_public",
             field=models.BooleanField(default=True),
         ),
     ]

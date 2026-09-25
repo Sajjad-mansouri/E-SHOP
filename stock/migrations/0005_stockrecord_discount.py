@@ -5,15 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('stock', '0004_stockrecord_is_public'),
+        ("stock", "0004_stockrecord_is_public"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stockrecord',
-            name='discount',
-            field=models.IntegerField(default=0, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)], verbose_name='discount'),
+            model_name="stockrecord",
+            name="discount",
+            field=models.IntegerField(
+                default=0,
+                validators=[
+                    django.core.validators.MinValueValidator(0),
+                    django.core.validators.MaxValueValidator(100),
+                ],
+                verbose_name="discount",
+            ),
         ),
     ]

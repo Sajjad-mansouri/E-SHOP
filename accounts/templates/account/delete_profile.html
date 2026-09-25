@@ -20,7 +20,7 @@
 <div class="delete-box">
 
 <div class="warning">
-⚠ Warning: Deleting your account is permanent.  
+⚠ Warning: Deleting your account is permanent.
 All orders, wishlists, and personal information will be removed and cannot be recovered.
 </div>
 
@@ -33,7 +33,7 @@ All orders, wishlists, and personal information will be removed and cannot be re
   <form method="POST" id="delete-form">
     {%csrf_token%}
   <button class="btn btn-delete" onclick="deleteAccount()">Delete My Account</button>
-    
+
   </form>
 <button class="btn btn-cancel" onclick="history.back()">Cancel</button>
 </div>

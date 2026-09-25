@@ -14,31 +14,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
+
 from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
 urlpatterns = [
-    path('dashboard/',include('dashboard.urls')),
-    path('admin/', admin.site.urls),
-    path('', include('catalog.urls')),
-    path('comment/',include('comment.urls')),
-    path('account/',include('accounts.urls')),
-    path('cart/',include('cart.urls')),
-    path('coupon/',include('coupon.urls')),
-    path('wishlist/',include('wishlist.urls')),
-    path('address/',include('address.urls')),
-    path('order/',include('order.urls')),
-    path('payment/',include('payment.urls')),
-
-
-
-
-
-
-
-
+    path("dashboard/", include("dashboard.urls")),
+    path("admin/", admin.site.urls),
+    path("", include("catalog.urls")),
+    path("comment/", include("comment.urls")),
+    path("account/", include("accounts.urls")),
+    path("cart/", include("cart.urls")),
+    path("coupon/", include("coupon.urls")),
+    path("wishlist/", include("wishlist.urls")),
+    path("address/", include("address.urls")),
+    path("order/", include("order.urls")),
+    path("payment/", include("payment.urls")),
 ]
 
 if settings.DEBUG:

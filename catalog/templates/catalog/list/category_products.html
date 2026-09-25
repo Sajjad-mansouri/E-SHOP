@@ -15,7 +15,7 @@
       <h2>Filters</h2>
       <button class="clear-filters" id="clearFilters">Clear All</button>
     </div>
-    
+
     <div class="filter-section">
       <div class="filter-title" data-filter="price">
         <h3>Price Range</h3>
@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-section">
       <div class="filter-title" data-filter="brand">
         <h3>Brand</h3>
@@ -75,7 +75,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-section">
       <div class="filter-title" data-filter="type">
         <h3>Headphone Type</h3>
@@ -106,7 +106,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-section">
       <div class="filter-title" data-filter="rating">
         <h3>Customer Rating</h3>
@@ -132,7 +132,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="filter-section">
       <div class="filter-title" data-filter="availability">
         <h3>Availability</h3>
@@ -154,7 +154,7 @@
       </div>
     </div>
   </aside>
-  
+
   <!-- PRODUCTS SECTION -->
   <main class="products-section">
     <div class="products-header">
@@ -171,11 +171,11 @@
         </select>
       </div>
     </div>
-    
+
     <div class="products-grid" id="productsContainer">
       <!-- Products will be loaded here by JavaScript -->
     </div>
-    
+
     <!-- PAGINATION -->
     <div class="pagination">
       <button class="page-btn arrow disabled" id="prevPage">
@@ -403,7 +403,7 @@
   const productsPerPage = 8;
   let filteredProducts = [...products];
   let sortBy = 'featured';
-  
+
   // Filter state
   const filters = {
     price: { min: 0, max: 5000 },
@@ -448,7 +448,7 @@
         const filterId = title.getAttribute('data-filter');
         const content = document.getElementById(`${filterId}Filter`);
         const toggle = title.querySelector('.filter-toggle');
-        
+
         content.classList.toggle('expanded');
         toggle.classList.toggle('rotated');
       });
@@ -459,10 +459,10 @@
       option.addEventListener('click', () => {
         const checkbox = option.querySelector('.filter-checkbox');
         checkbox.classList.toggle('checked');
-        
+
         const filterType = option.closest('.filter-content').id.replace('Filter', '');
         const value = option.getAttribute('data-value');
-        
+
         if (checkbox.classList.contains('checked')) {
           if (!filters[filterType].includes(value)) {
             filters[filterType].push(value);
@@ -476,7 +476,7 @@
           }
         }
 
-        
+
         applyFilters();
       });
     });
@@ -530,26 +530,26 @@
     const sliderWidth = sliderRect.width;
     const minPrice = 0;
     const maxPrice = 5000;
-    
+
     // Update slider position
     function updateSlider() {
       const minPercent = (filters.price.min - minPrice) / (maxPrice - minPrice) * 100;
       const maxPercent = (filters.price.max - minPrice) / (maxPrice - minPrice) * 100;
-      
+
       priceMinHandle.style.left = `${minPercent}%`;
       priceMaxHandle.style.left = `${maxPercent}%`;
       priceTrack.style.left = `${minPercent}%`;
       priceTrack.style.width = `${maxPercent - minPercent}%`;
-      
+
       priceMinInput.value = filters.price.min;
       priceMaxInput.value = filters.price.max;
       priceMinValue.textContent = filters.price.min;
       priceMaxValue.textContent = filters.price.max;
     }
-    
+
     // Set initial position
     updateSlider();
-    
+
     // Handle mouse events for min handle
     priceMinHandle.addEventListener('mousedown', (e) => {
       isDraggingMin = true;
@@ -559,7 +559,7 @@
         document.removeEventListener('mousemove', handleMinDrag);
       });
     });
-    
+
     // Handle mouse events for max handle
     priceMaxHandle.addEventListener('mousedown', (e) => {
       isDraggingMax = true;
@@ -569,43 +569,43 @@
         document.removeEventListener('mousemove', handleMaxDrag);
       });
     });
-    
+
     // Handle min handle drag
     function handleMinDrag(e) {
       if (!isDraggingMin) return;
-      
+
       const rect = priceSlider.getBoundingClientRect();
       let x = e.clientX - rect.left;
       x = Math.max(0, Math.min(x, rect.width));
-      
+
       const percent = (x / rect.width) * 100;
       const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
-      
+
       if (newPrice < filters.price.max - 50) {
         filters.price.min = newPrice;
         updateSlider();
         applyFilters();
       }
     }
-    
+
     // Handle max handle drag
     function handleMaxDrag(e) {
       if (!isDraggingMax) return;
-      
+
       const rect = priceSlider.getBoundingClientRect();
       let x = e.clientX - rect.left;
       x = Math.max(0, Math.min(x, rect.width));
-      
+
       const percent = (x / rect.width) * 100;
       const newPrice = Math.round((percent / 100) * (maxPrice - minPrice) + minPrice);
-      
+
       if (newPrice > filters.price.min + 50) {
         filters.price.max = newPrice;
         updateSlider();
         applyFilters();
       }
     }
-    
+
     // Input change events
     priceMinInput.addEventListener('change', () => {
       let value = parseInt(priceMinInput.value);
@@ -615,7 +615,7 @@
       updateSlider();
       applyFilters();
     });
-    
+
     priceMaxInput.addEventListener('change', () => {
       let value = parseInt(priceMaxInput.value);
       if (isNaN(value)) value = maxPrice;
@@ -633,18 +633,18 @@
       if (product.price < filters.price.min || product.price > filters.price.max) {
         return false;
       }
-      
+
       // Brand filter
       if (filters.brand.length > 0 && !filters.brand.includes(product.brand)) {
         return false;
       }
-      
+
       // Type filter
       if (filters.type.length > 0) {
         const hasType = filters.type.some(type => product.type.includes(type));
         if (!hasType) return false;
       }
-      
+
       // Rating filter
       if (filters.rating.length > 0) {
         const meetsRating = filters.rating.some(rating => {
@@ -652,7 +652,7 @@
         });
         if (!meetsRating) return false;
       }
-      
+
       // Availability filter
       if (filters.availability.length > 0) {
         const availability = product.inStock ? 'in-stock' : 'out-of-stock';
@@ -660,16 +660,16 @@
           return false;
         }
       }
-      
+
       return true;
     });
-    
+
     // Apply sorting
     sortProducts();
-    
+
     // Reset to first page
     currentPage = 1;
-    
+
     // Update UI
     renderProducts();
     updatePagination();
@@ -706,7 +706,7 @@
           };
           const aPriority = badgePriority[a.badge] || 0;
           const bPriority = badgePriority[b.badge] || 0;
-          
+
           if (bPriority !== aPriority) {
             return bPriority - aPriority;
           }
@@ -723,24 +723,24 @@
     filters.type = [];
     filters.rating = [];
     filters.availability = ['in-stock'];
-    
+
     // Reset UI checkboxes
     document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
       checkbox.classList.remove('checked');
     });
-    
+
     // Check "In Stock" by default
     document.querySelector('.filter-option[data-value="in-stock"] .filter-checkbox').classList.add('checked');
-    
+
     // Reset price slider
     priceMinInput.value = 0;
     priceMaxInput.value = 5000;
     initPriceSlider();
-    
+
     // Reset sort
     sortSelect.value = 'featured';
     sortBy = 'featured';
-    
+
     // Apply filters
     applyFilters();
   }
@@ -750,14 +750,14 @@
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = startIndex + productsPerPage;
     const productsToShow = filteredProducts.slice(startIndex, endIndex);
-    
+
     productsContainer.innerHTML = '';
-    
+
     productsToShow.forEach(product => {
       const productCard = createProductCard(product);
       productsContainer.appendChild(productCard);
     });
-    
+
 
   }
 
@@ -765,12 +765,12 @@
   function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
-    
+
     // Generate star rating HTML
     const stars = Math.floor(product.rating);
     const hasHalfStar = product.rating % 1 >= 0.5;
     let starsHTML = '';
-    
+
     for (let i = 1; i <= 5; i++) {
       if (i <= stars) {
         starsHTML += '<svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
@@ -780,20 +780,20 @@
         starsHTML += '<svg class="icon" viewBox="0 0 24 24"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg>';
       }
     }
-    
+
     // Badge class
     const badgeClass = product.badge ? product.badge.toLowerCase().replace(' ', '-') : '';
-    
+
     // Discount display
-    const discountHTML = product.discount > 0 
+    const discountHTML = product.discount > 0
       ? `<span class="discount">-${product.discount}%</span>`
       : '';
-    
+
     // Original price display
     const originalPriceHTML = product.originalPrice > product.price
       ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>`
       : '';
-    
+
     card.innerHTML = `
       ${product.badge ? `<div class="product-badge ${badgeClass}">${product.badge}</div>` : ''}
       <div class="product-image">
@@ -827,14 +827,14 @@
         </div>
       </div>
     `;
-    
+
     return card;
   }
 
   // Update pagination
   function updatePagination() {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-    
+
     // Update page buttons
     pageBtns.forEach((btn, index) => {
       const pageNum = index + 1;
@@ -842,7 +842,7 @@
       btn.classList.toggle('active', pageNum === currentPage);
       btn.style.display = pageNum <= totalPages ? 'flex' : 'none';
     });
-    
+
     // Update prev/next buttons
     prevPageBtn.classList.toggle('disabled', currentPage === 1);
     nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
@@ -853,9 +853,8 @@
     const totalProducts = filteredProducts.length;
     const start = (currentPage - 1) * productsPerPage + 1;
     const end = Math.min(currentPage * productsPerPage, totalProducts);
-    
+
     productCount.textContent = `Showing ${start}-${end} of ${totalProducts} products`;
   }
 </script>
 {%endblock%}
-

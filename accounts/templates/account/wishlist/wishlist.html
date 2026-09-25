@@ -25,7 +25,7 @@
       <a href="{%url 'catalog:product_detail' object.stock_record.product.slug  object.stock_record.id%}">
         <img src="{{object.stock_record.product.images.all.0.image.url}}" class="product-img">
         <div class="product-name">{{object.stock_record.product.title}}</div>
-        
+
       </a>
 
   <div>
@@ -73,7 +73,7 @@
 {%endblock%}
 {%block script%}
 <script type="text/javascript">
-  
+
   // --- 1. ALERT/MESSAGE SYSTEM (Reused from Edit Profile) ---
 const alertContainer = document.getElementById('alertContainer');
 
@@ -86,9 +86,9 @@ function showMessage(message, type) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
     alertDiv.textContent = message;
-    
+
     alertContainer.appendChild(alertDiv);
-    
+
     // Show the alert box
     alertContainer.style.opacity = '1';
     alertContainer.style.transform = 'translateX(0)';
@@ -121,13 +121,13 @@ document.querySelectorAll('.btn-remove').forEach(button => {
         const card = this.closest('.wishlist-card');
         activeProductId = card.dataset.objectId;
         const productName = card.dataset.productName;
-        
+
         productNameToRemove.textContent = productName;
-        
+
         // Reset input and button state
         confirmRemoveInput.value = '';
         confirmRemoveButton.disabled = true;
-        
+
         // Show modal
         removeModal.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Prevent body scroll
@@ -163,7 +163,7 @@ async function removeFromWishlist(activeProductId){
 // Handle final confirmation click
 confirmRemoveButton.addEventListener('click', async function() {
     if (confirmRemoveInput.value.toUpperCase() === 'REMOVE' && activeProductId) {
-        
+
         // Find the card element and remove it from the DOM
         const cardToRemove = document.querySelector(`.wishlist-card[data-object-id="${activeProductId}"]`);
         const status = await removeFromWishlist(activeProductId)
@@ -171,12 +171,12 @@ confirmRemoveButton.addEventListener('click', async function() {
             cardToRemove.style.opacity = '0';
             cardToRemove.style.transition = 'opacity 0.3s, transform 0.3s';
             cardToRemove.style.transform = 'scale(0.9)';
-            
+
             setTimeout(() => {
                 cardToRemove.remove();
                 closeModal();
                 showMessage('Product successfully removed from Wish List.', 'success');
-                
+
                 // Check if grid is now empty
                 const grid = document.querySelector('.wishlist-grid');
                 if (grid && grid.children.length === 0) {
@@ -227,7 +227,7 @@ async function AddToCart(funcType, stockId, productName, btn){
       // Display success message
     btn.innerText = btnText;
     btn.setAttribute('data-action', nextAction)
-    showMessage(productName + message, 'success');  
+    showMessage(productName + message, 'success');
   }
 }
 document.querySelectorAll('.btn-add').forEach(button => {
@@ -237,11 +237,11 @@ document.querySelectorAll('.btn-add').forEach(button => {
         const productName = card.dataset.productName;
         const funcType = this.dataset.action
 
-        
+
         // --- SIMULATED BACKEND CALL ---
         AddToCart(funcType, stockId, productName, this)
 
-        
+
 
     });
 });

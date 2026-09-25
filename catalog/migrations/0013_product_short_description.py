@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0012_product_brand'),
+        ("catalog", "0012_product_brand"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='short_description',
-            field=models.TextField(blank=True, verbose_name='Short Description'),
+            model_name="product",
+            name="short_description",
+            field=models.TextField(blank=True, verbose_name="Short Description"),
         ),
     ]

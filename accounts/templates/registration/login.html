@@ -11,8 +11,8 @@
               {%if form.errors%}
 
                 <div class="alert error" id="errorAlert" style="display:block">Invalid email or password.</div>
-              
-              
+
+
               {%endif%}
                 <div class="alert success" id="successAlert">Login successful!</div>
 
@@ -86,7 +86,7 @@
         togglePasswordBtn.addEventListener('click', function() {
             const isPassword = passwordInput.getAttribute('type') === 'password';
             passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-            
+
             if (isPassword) {
                 eyeIcon.style.display = 'none';
                 eyeOffIcon.style.display = 'block';

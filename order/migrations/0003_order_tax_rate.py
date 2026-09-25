@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('order', '0002_order_shipping_method'),
+        ("order", "0002_order_shipping_method"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='tax_rate',
-            field=models.PositiveIntegerField(default=5, verbose_name='Tax Rate'),
+            model_name="order",
+            name="tax_rate",
+            field=models.PositiveIntegerField(default=5, verbose_name="Tax Rate"),
         ),
     ]

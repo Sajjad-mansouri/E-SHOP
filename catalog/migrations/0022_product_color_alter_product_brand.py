@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0021_remove_product_product_class_alter_product_category'),
+        ("catalog", "0021_remove_product_product_class_alter_product_category"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='color',
-            field=models.CharField(max_length=100, null=True, verbose_name='color'),
+            model_name="product",
+            name="color",
+            field=models.CharField(max_length=100, null=True, verbose_name="color"),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='brand',
-            field=models.CharField(max_length=100, null=True, verbose_name='Brand'),
+            model_name="product",
+            name="brand",
+            field=models.CharField(max_length=100, null=True, verbose_name="Brand"),
         ),
     ]

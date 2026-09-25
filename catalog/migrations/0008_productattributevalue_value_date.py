@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0007_alter_productattributevalue_product'),
+        ("catalog", "0007_alter_productattributevalue_product"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productattributevalue',
-            name='value_date',
-            field=models.DateField(blank=True, null=True, verbose_name='Datetime'),
+            model_name="productattributevalue",
+            name="value_date",
+            field=models.DateField(blank=True, null=True, verbose_name="Datetime"),
         ),
     ]

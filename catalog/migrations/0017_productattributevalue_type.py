@@ -4,15 +4,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0016_category_product_class'),
+        ("catalog", "0016_category_product_class"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productattribute',
-            name='type',
-            field=models.CharField(choices=[('text', 'Text'), ('decimal', 'Decimal'), ('integer', 'Integer'), ('boolean', 'True / False'), ('float', 'Float'), ('richtext', 'Rich Text'), ('date', 'Date'), ('datetime', 'Datetime'), ('file', 'File'), ('image', 'Image')], default='text', max_length=10, verbose_name='type'),
+            model_name="productattribute",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("text", "Text"),
+                    ("decimal", "Decimal"),
+                    ("integer", "Integer"),
+                    ("boolean", "True / False"),
+                    ("float", "Float"),
+                    ("richtext", "Rich Text"),
+                    ("date", "Date"),
+                    ("datetime", "Datetime"),
+                    ("file", "File"),
+                    ("image", "Image"),
+                ],
+                default="text",
+                max_length=10,
+                verbose_name="type",
+            ),
         ),
     ]

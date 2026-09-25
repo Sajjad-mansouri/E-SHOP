@@ -5,27 +5,90 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('order', '0002_order_shipping_method'),
+        ("order", "0002_order_shipping_method"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('transaction_id', models.CharField(blank=True, max_length=100, null=True, unique=True, verbose_name='Transaction ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Amount')),
-                ('currency', models.CharField(default='USD', max_length=3, verbose_name='Currency')),
-                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('SUCCESS', 'Success'), ('FAILED', 'Failed'), ('CANCELLED', 'Cancelled')], default='PENDING', max_length=20, verbose_name='Status')),
-                ('payment_method', models.CharField(choices=[('CREDIT_CARD', 'Credit Card'), ('PAYPAL', 'PayPal'), ('BANK_TRANSFER', 'Bank Transfer')], max_length=50, verbose_name='Payment method')),
-                ('gateway_response', models.JSONField(blank=True, null=True, verbose_name='Gateway Response')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to='order.order', verbose_name='order')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "transaction_id",
+                    models.CharField(
+                        blank=True,
+                        max_length=100,
+                        null=True,
+                        unique=True,
+                        verbose_name="Transaction ID",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="Amount"
+                    ),
+                ),
+                (
+                    "currency",
+                    models.CharField(
+                        default="USD", max_length=3, verbose_name="Currency"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pending"),
+                            ("SUCCESS", "Success"),
+                            ("FAILED", "Failed"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        default="PENDING",
+                        max_length=20,
+                        verbose_name="Status",
+                    ),
+                ),
+                (
+                    "payment_method",
+                    models.CharField(
+                        choices=[
+                            ("CREDIT_CARD", "Credit Card"),
+                            ("PAYPAL", "PayPal"),
+                            ("BANK_TRANSFER", "Bank Transfer"),
+                        ],
+                        max_length=50,
+                        verbose_name="Payment method",
+                    ),
+                ),
+                (
+                    "gateway_response",
+                    models.JSONField(
+                        blank=True, null=True, verbose_name="Gateway Response"
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="order.order",
+                        verbose_name="order",
+                    ),
+                ),
             ],
         ),
     ]

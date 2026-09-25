@@ -6,28 +6,54 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('comment', '0004_alter_comment_rating'),
+        ("comment", "0004_alter_comment_rating"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReviewLike',
+            name="ReviewLike",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('like', models.BooleanField(default=False, verbose_name='like')),
-                ('unlike', models.BooleanField(default=False, verbose_name='unlikne')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='review_like', to='comment.comment', verbose_name='review')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("like", models.BooleanField(default=False, verbose_name="like")),
+                ("unlike", models.BooleanField(default=False, verbose_name="unlikne")),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "review",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="review_like",
+                        to="comment.comment",
+                        verbose_name="review",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='comment',
-            name='likes',
-            field=models.ManyToManyField(through='comment.ReviewLike', to=settings.AUTH_USER_MODEL, verbose_name='likes'),
+            model_name="comment",
+            name="likes",
+            field=models.ManyToManyField(
+                through="comment.ReviewLike",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="likes",
+            ),
         ),
     ]

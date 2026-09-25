@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0017_productattributevalue_type'),
+        ("catalog", "0017_productattributevalue_type"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='short_description',
-            field=models.CharField(blank=True, max_length=250, verbose_name='Short Description'),
+            model_name="product",
+            name="short_description",
+            field=models.CharField(
+                blank=True, max_length=250, verbose_name="Short Description"
+            ),
         ),
     ]

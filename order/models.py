@@ -1,15 +1,17 @@
 import uuid
 from decimal import Decimal
-from django.db import models
+
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
-from stock.models import StockRecord
+from django.db import models
 from django.utils import timezone
-from cart.models import Cart
+from django.utils.translation import gettext_lazy as _
+
 from address.models import Address
+from cart.models import Cart
 from shipping.models import Shipping
 
 UserModel = get_user_model()
+
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -42,14 +44,23 @@ class Order(models.Model):
         verbose_name=_("Shipping Address"),
         on_delete=models.SET_NULL,
     )
-    shipping_method = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, verbose_name=_("Shipping Method"))
+    shipping_method = models.ForeignKey(
+        Shipping,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Shipping Method"),
+    )
     order_number = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    tax_rate = models.DecimalField(_("Tax Rate"), max_digits=10, decimal_places=2, default=0.0)
+    tax_rate = models.DecimalField(
+        _("Tax Rate"), max_digits=10, decimal_places=2, default=0.0
+    )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    total_cost = models.DecimalField(_("Total cost"), max_digits=10, decimal_places=2, null=True, blank=True)
+    total_cost = models.DecimalField(
+        _("Total cost"), max_digits=10, decimal_places=2, null=True, blank=True
+    )
 
     def __str__(self):
         return f"Order {self.order_number}"
@@ -83,7 +94,6 @@ class Order(models.Model):
             discount_prc = 0.0
         return Decimal(discount_prc)
 
-
     @property
     def calc_shipping_cost(self):
         if self.shipping_method.free_shipping:
@@ -96,13 +106,13 @@ class Order(models.Model):
     def calc_discount(self):
         items_price = self.calc_items_price
         discount_prc = self.get_percent_coupon_discount
-        discount = (discount_prc/100)*items_price
+        discount = (discount_prc / 100) * items_price
         return discount
 
     @property
     def calc_tax(self):
         items_price = self.calc_items_price
-        tax = items_price * Decimal((self.tax_rate/100))
+        tax = items_price * Decimal(self.tax_rate / 100)
         return tax
 
     @property
@@ -118,7 +128,6 @@ class Order(models.Model):
 
     @property
     def calc_total_cost(self):
-
         pure_price = self.pure_price
         shipping_cost = self.calc_shipping_cost
         tax = self.calc_tax
@@ -129,5 +138,3 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         self.total_cost = self.calc_total_cost
         super().save(*args, **kwargs)
-
-

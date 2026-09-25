@@ -5,34 +5,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('offer', '0010_offerapplication'),
-        ('stock', '0008_stockrecord_sold'),
+        ("offer", "0010_offerapplication"),
+        ("stock", "0008_stockrecord_sold"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='offerapplication',
-            options={'verbose_name': 'Offer Application', 'verbose_name_plural': 'Offer Applications'},
+            name="offerapplication",
+            options={
+                "verbose_name": "Offer Application",
+                "verbose_name_plural": "Offer Applications",
+            },
         ),
         migrations.AlterField(
-            model_name='offer',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('expired', 'Expired'), ('scheduled', 'Scheduled'), ('suspended', 'Suspended')], default='active', max_length=50, verbose_name='Status'),
+            model_name="offer",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("active", "Active"),
+                    ("expired", "Expired"),
+                    ("scheduled", "Scheduled"),
+                    ("suspended", "Suspended"),
+                ],
+                default="active",
+                max_length=50,
+                verbose_name="Status",
+            ),
         ),
         migrations.AlterField(
-            model_name='offerapplication',
-            name='offer',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='offer.offer', verbose_name='offer'),
+            model_name="offerapplication",
+            name="offer",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="offer.offer",
+                verbose_name="offer",
+            ),
         ),
         migrations.AlterField(
-            model_name='offerapplication',
-            name='stock',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='offer_apps', to='stock.stockrecord', verbose_name='Stock Record'),
+            model_name="offerapplication",
+            name="stock",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="offer_apps",
+                to="stock.stockrecord",
+                verbose_name="Stock Record",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='offerapplication',
-            unique_together={('offer', 'stock')},
+            name="offerapplication",
+            unique_together={("offer", "stock")},
         ),
     ]

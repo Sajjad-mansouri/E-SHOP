@@ -4,24 +4,33 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ProductClass',
+            name="ProductClass",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('slug', models.SlugField(blank=True, max_length=100, verbose_name='slug')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
+                (
+                    "slug",
+                    models.SlugField(blank=True, max_length=100, verbose_name="slug"),
+                ),
             ],
             options={
-                'verbose_name': 'Product class',
-                'verbose_name_plural': 'Product classes',
-                'ordering': ['-name'],
+                "verbose_name": "Product class",
+                "verbose_name_plural": "Product classes",
+                "ordering": ["-name"],
             },
         ),
     ]

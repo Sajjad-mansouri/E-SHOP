@@ -4,28 +4,61 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Shipping',
+            name="Shipping",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('shipping_type', models.CharField(choices=[('Standard', 'standard'), ('Express', 'express')], max_length=10, verbose_name='Shipping Type')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='price')),
-                ('free_shipping', models.BooleanField(default=False, verbose_name='Free Shipping')),
-                ('free_shipping_threshold', models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True, verbose_name='Free Shipping')),
-                ('delivery_time', models.CharField(max_length=250, verbose_name='Delivery time')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "shipping_type",
+                    models.CharField(
+                        choices=[("Standard", "standard"), ("Express", "express")],
+                        max_length=10,
+                        verbose_name="Shipping Type",
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="price"
+                    ),
+                ),
+                (
+                    "free_shipping",
+                    models.BooleanField(default=False, verbose_name="Free Shipping"),
+                ),
+                (
+                    "free_shipping_threshold",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=12,
+                        null=True,
+                        verbose_name="Free Shipping",
+                    ),
+                ),
+                (
+                    "delivery_time",
+                    models.CharField(max_length=250, verbose_name="Delivery time"),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'Shipping',
-                'verbose_name_plural': 'Shippings',
+                "verbose_name": "Shipping",
+                "verbose_name_plural": "Shippings",
             },
         ),
     ]

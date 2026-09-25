@@ -4,50 +4,68 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('address', '0001_initial'),
+        ("address", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='address',
-            name='address',
+            model_name="address",
+            name="address",
         ),
         migrations.RemoveField(
-            model_name='address',
-            name='first_name',
+            model_name="address",
+            name="first_name",
         ),
         migrations.RemoveField(
-            model_name='address',
-            name='last_name',
+            model_name="address",
+            name="last_name",
         ),
         migrations.AddField(
-            model_name='address',
-            name='address_type',
-            field=models.CharField(choices=[('Home', 'Home'), ('Work', 'Work'), ('Other', 'Other')], default='Work', max_length=20, verbose_name='Address Type'),
+            model_name="address",
+            name="address_type",
+            field=models.CharField(
+                choices=[("Home", "Home"), ("Work", "Work"), ("Other", "Other")],
+                default="Work",
+                max_length=20,
+                verbose_name="Address Type",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='address',
-            name='full_name',
-            field=models.CharField(blank=True, max_length=255, verbose_name='Full name'),
+            model_name="address",
+            name="full_name",
+            field=models.CharField(
+                blank=True, max_length=255, verbose_name="Full name"
+            ),
         ),
         migrations.AddField(
-            model_name='address',
-            name='line1',
-            field=models.CharField(default='Work', help_text='Street address, P.O. box, company name', max_length=255, verbose_name='First line of address'),
+            model_name="address",
+            name="line1",
+            field=models.CharField(
+                default="Work",
+                help_text="Street address, P.O. box, company name",
+                max_length=255,
+                verbose_name="First line of address",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='address',
-            name='line2',
-            field=models.CharField(blank=True, help_text='Apartment, suite, unit, building, floor, etc.', max_length=255, verbose_name='Second line of address'),
+            model_name="address",
+            name="line2",
+            field=models.CharField(
+                blank=True,
+                help_text="Apartment, suite, unit, building, floor, etc.",
+                max_length=255,
+                verbose_name="Second line of address",
+            ),
         ),
         migrations.AddField(
-            model_name='address',
-            name='phone_number',
-            field=models.CharField(default=11, max_length=15, verbose_name='Phone Number'),
+            model_name="address",
+            name="phone_number",
+            field=models.CharField(
+                default=11, max_length=15, verbose_name="Phone Number"
+            ),
             preserve_default=False,
         ),
     ]

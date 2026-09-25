@@ -6,33 +6,90 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('catalog', '0005_alter_product_slug_productimage'),
+        ("catalog", "0005_alter_product_slug_productimage"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='StockRecord',
+            name="StockRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sku', models.CharField(max_length=128, verbose_name='SKU')),
-                ('price_currency', models.CharField(default='USD', max_length=12, verbose_name='Currency')),
-                ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True, verbose_name='Price')),
-                ('num_in_stock', models.PositiveIntegerField(blank=True, null=True, verbose_name='Number in stock')),
-                ('low_stock_threshold', models.PositiveIntegerField(blank=True, null=True, verbose_name='Low Stock Threshold')),
-                ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Date updated')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stockrecords', to='catalog.product', verbose_name='Product')),
-                ('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stockrecords', to=settings.AUTH_USER_MODEL, verbose_name='seller')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sku", models.CharField(max_length=128, verbose_name="SKU")),
+                (
+                    "price_currency",
+                    models.CharField(
+                        default="USD", max_length=12, verbose_name="Currency"
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=12,
+                        null=True,
+                        verbose_name="Price",
+                    ),
+                ),
+                (
+                    "num_in_stock",
+                    models.PositiveIntegerField(
+                        blank=True, null=True, verbose_name="Number in stock"
+                    ),
+                ),
+                (
+                    "low_stock_threshold",
+                    models.PositiveIntegerField(
+                        blank=True, null=True, verbose_name="Low Stock Threshold"
+                    ),
+                ),
+                (
+                    "date_created",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Date created"
+                    ),
+                ),
+                (
+                    "date_updated",
+                    models.DateTimeField(
+                        auto_now=True, db_index=True, verbose_name="Date updated"
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="stockrecords",
+                        to="catalog.product",
+                        verbose_name="Product",
+                    ),
+                ),
+                (
+                    "seller",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="stockrecords",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="seller",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Stock record',
-                'verbose_name_plural': 'Stock records',
-                'unique_together': {('seller', 'sku')},
+                "verbose_name": "Stock record",
+                "verbose_name_plural": "Stock records",
+                "unique_together": {("seller", "sku")},
             },
         ),
     ]

@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('comment', '0002_comment_rating'),
+        ("comment", "0002_comment_rating"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment',
-            name='status',
-            field=models.CharField(choices=[('hidden', 'Hidden'), ('visible', 'Visible')], default='visible', max_length=7, verbose_name='status'),
+            model_name="comment",
+            name="status",
+            field=models.CharField(
+                choices=[("hidden", "Hidden"), ("visible", "Visible")],
+                default="visible",
+                max_length=7,
+                verbose_name="status",
+            ),
         ),
     ]

@@ -4,35 +4,107 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('catalog', '0008_productattributevalue_value_date'),
+        ("catalog", "0008_productattributevalue_value_date"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OfferRange',
+            name="OfferRange",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True, verbose_name='Name')),
-                ('slug', models.SlugField(max_length=100, unique=True, verbose_name='Slug')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('is_public', models.BooleanField(default=True, verbose_name='Is public?')),
-                ('includes_all_products', models.BooleanField(default=False, verbose_name='Includes all products?')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Date Created')),
-                ('updated', models.DateTimeField(auto_now=True, verbose_name='Date Updated')),
-                ('classes', models.ManyToManyField(blank=True, related_name='class_ranges', to='catalog.productclass', verbose_name='Product Types')),
-                ('excluded_categories', models.ManyToManyField(blank=True, related_name='exclude_category_ranges', to='catalog.category', verbose_name='Excluded Categories')),
-                ('excluded_products', models.ManyToManyField(blank=True, related_name='exclude_product_ranges', to='catalog.product', verbose_name='Excluded Products')),
-                ('included_categories', models.ManyToManyField(blank=True, related_name='category_ranges', to='catalog.category', verbose_name='Included Categories')),
-                ('included_products', models.ManyToManyField(blank=True, related_name='product_ranges', to='catalog.product', verbose_name='Included Products')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=100, unique=True, verbose_name="Name"),
+                ),
+                (
+                    "slug",
+                    models.SlugField(max_length=100, unique=True, verbose_name="Slug"),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="Description"),
+                ),
+                (
+                    "is_public",
+                    models.BooleanField(default=True, verbose_name="Is public?"),
+                ),
+                (
+                    "includes_all_products",
+                    models.BooleanField(
+                        default=False, verbose_name="Includes all products?"
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Date Created"
+                    ),
+                ),
+                (
+                    "updated",
+                    models.DateTimeField(auto_now=True, verbose_name="Date Updated"),
+                ),
+                (
+                    "classes",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="class_ranges",
+                        to="catalog.productclass",
+                        verbose_name="Product Types",
+                    ),
+                ),
+                (
+                    "excluded_categories",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="exclude_category_ranges",
+                        to="catalog.category",
+                        verbose_name="Excluded Categories",
+                    ),
+                ),
+                (
+                    "excluded_products",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="exclude_product_ranges",
+                        to="catalog.product",
+                        verbose_name="Excluded Products",
+                    ),
+                ),
+                (
+                    "included_categories",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="category_ranges",
+                        to="catalog.category",
+                        verbose_name="Included Categories",
+                    ),
+                ),
+                (
+                    "included_products",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="product_ranges",
+                        to="catalog.product",
+                        verbose_name="Included Products",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Range',
-                'verbose_name_plural': 'Ranges',
-                'ordering': ['name'],
+                "verbose_name": "Range",
+                "verbose_name_plural": "Ranges",
+                "ordering": ["name"],
             },
         ),
     ]

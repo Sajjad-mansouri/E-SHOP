@@ -5,19 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0018_alter_product_short_description'),
+        ("catalog", "0018_alter_product_short_description"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='product',
-            name='categories',
+            model_name="product",
+            name="categories",
         ),
         migrations.AddField(
-            model_name='product',
-            name='categories',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='catalog.category', verbose_name='categories'),
+            model_name="product",
+            name="categories",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="catalog.category",
+                verbose_name="categories",
+            ),
         ),
     ]

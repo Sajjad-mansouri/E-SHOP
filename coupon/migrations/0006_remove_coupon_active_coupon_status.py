@@ -4,19 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('coupon', '0005_couponapplication_order'),
+        ("coupon", "0005_couponapplication_order"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='coupon',
-            name='active',
+            model_name="coupon",
+            name="active",
         ),
         migrations.AddField(
-            model_name='coupon',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('expired', 'Expired'), ('suspended', 'Suspended')], default='active', max_length=50, verbose_name='Status'),
+            model_name="coupon",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("active", "Active"),
+                    ("expired", "Expired"),
+                    ("suspended", "Suspended"),
+                ],
+                default="active",
+                max_length=50,
+                verbose_name="Status",
+            ),
         ),
     ]

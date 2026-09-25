@@ -138,9 +138,9 @@
             margin-bottom: 1.5rem;
             font-size: 0.9rem;
 
-            background-color: #fee2e2; 
-            color: #991b1b; 
-            border: 1px solid #fca5a5; 
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
         }
 
         .alert.show {

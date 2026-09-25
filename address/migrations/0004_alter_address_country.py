@@ -4,15 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('address', '0003_address_user'),
+        ("address", "0003_address_user"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='address',
-            name='country',
-            field=models.CharField(blank=True, choices=[('IR', 'Iran'), ('US', 'United States'), ('CA', 'Canada'), ('UK', 'United Kingdom'), ('AU', 'Australia')], verbose_name='country'),
+            model_name="address",
+            name="country",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("IR", "Iran"),
+                    ("US", "United States"),
+                    ("CA", "Canada"),
+                    ("UK", "United Kingdom"),
+                    ("AU", "Australia"),
+                ],
+                verbose_name="country",
+            ),
         ),
     ]

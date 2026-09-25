@@ -43,7 +43,7 @@
             background-color: var(--secondary);
             box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.1);
         }
-        
+
         /* Error Theme */
         .error-theme .status-icon {
             background-color: var(--danger);

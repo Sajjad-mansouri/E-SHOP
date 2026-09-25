@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('stock', '0008_stockrecord_sold'),
+        ("stock", "0008_stockrecord_sold"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stockrecord',
-            name='status',
-            field=models.CharField(choices=[('public', 'Public'), ('private', 'Private')], default='public', max_length=10, verbose_name='status'),
+            model_name="stockrecord",
+            name="status",
+            field=models.CharField(
+                choices=[("public", "Public"), ("private", "Private")],
+                default="public",
+                max_length=10,
+                verbose_name="status",
+            ),
         ),
     ]

@@ -18,7 +18,7 @@
     </div>
     <div class="thumbnails">
         {%for image in product.images.all%}
-      
+
       <div class="thumb {%if forloop.first%}active{%endif%}" onclick="changeImage(this, '{{image.image.url}}')">
         <img src="{{image.image.url}}" alt="thumb1">
       </div>
@@ -36,7 +36,7 @@
       </div>
       <div>
       <span class="rating">{{product_ratings|floatformat:2}}</span> (<span class="rating-counts">{{product_ratings_count}}</span> reviews)
-        
+
       </div>
     </div>
 
@@ -74,7 +74,7 @@
     {%endif%}
     {%csrf_token%}
     <!-- action buttons: buy now, add to cart, and wishlist -->
-    
+
     <div class="cta-buttons">
       {%if user.is_authenticated%}
 
@@ -135,9 +135,9 @@
           </button>
       {%endif%}
     </div>
-    
 
-    
+
+
 
   </div>
 </div>
@@ -357,7 +357,7 @@
       }else if(responseType=="text"){
         data = await response.text()
       }
-      
+
     }catch(error){
 
       data = ""
@@ -393,7 +393,7 @@
     currentRating = 0;
     isEditing = false;
     currentReviewId = null;
-    
+
     // Reset stars
     const stars = document.querySelectorAll('#modalRating .icon');
     stars.forEach(star => {
@@ -407,7 +407,7 @@
     star.addEventListener('click', function() {
       const value = parseInt(this.getAttribute('data-value'));
       currentRating = value;
-      
+
       // Update star display
       modalStars.forEach((s, index) => {
         if (index < value) {
@@ -417,7 +417,7 @@
         }
       });
     });
-    
+
     // Hover effect
     star.addEventListener('mouseenter', function() {
       const value = parseInt(this.getAttribute('data-value'));
@@ -427,7 +427,7 @@
         }
       });
     });
-    
+
     star.addEventListener('mouseleave', function() {
       modalStars.forEach((s, index) => {
         if (!s.classList.contains('selected')) {
@@ -443,17 +443,17 @@
   // Edit review
   function editReview(reviewId) {
     const reviewItem = document.querySelector(`[data-review-id="${reviewId}"]`);
-    
+
     const text = reviewItem.querySelector('.comment-text').textContent;
     const stars = reviewItem.querySelectorAll('.comment-stars .icon').length;
-    
+
     // Fill modal with existing data
-    
+
     document.getElementById('reviewText').value = text;
     currentRating = stars;
     isEditing = true;
     currentReviewId = reviewId;
-    
+
     // Set stars
     modalStars.forEach((star, index) => {
       if (index < stars) {
@@ -462,7 +462,7 @@
         star.classList.remove('selected');
       }
     });
-    
+
     openModal();
   }
 
@@ -500,7 +500,7 @@
   async function submitReview() {
 
     const text = document.getElementById('reviewText').value.trim();
-    
+
     if (!text) {
       alert('Please enter your review text.');
       return;
@@ -536,7 +536,7 @@
         reviewItem.querySelector('.comment-text').textContent = text;
 
         rating.textContent = data.total_rating.toFixed(2)
-        
+
         // Update stars
         const starsContainer = reviewItem.querySelector('.comment-stars');
         starsContainer.innerHTML = '';
@@ -550,22 +550,22 @@
           starSvg.appendChild(path);
           starsContainer.appendChild(starSvg);
         }
-        
-        
+
+
       }
     } else if(data) {
       // Create new review
       const commentsList = document.querySelector('.comments-list h3');
 
-      
+
         commentsList.insertAdjacentHTML("afterend",data);
-      
+
         const commentCountSpan = document.querySelector('.comments-list .comment-count');
         commentCountSpan.innerText = Number(commentCountSpan.innerText) + 1;
     }else{
       showMessage("Faild to submit review", "error")
     }
-    
+
     closeModal();
   }
   function showMessage(text,type){
@@ -627,11 +627,11 @@
   document.addEventListener('click', function(event) {
     const reviewModal = document.getElementById('reviewModal');
     const deleteModal = document.getElementById('deleteModal');
-    
+
     if (event.target === reviewModal) {
       closeModal();
     }
-    
+
     if (event.target === deleteModal) {
       closeDeleteModal();
     }
@@ -642,11 +642,11 @@
     if (event.key === 'Escape') {
       const reviewModal = document.getElementById('reviewModal');
       const deleteModal = document.getElementById('deleteModal');
-      
+
       if (reviewModal.style.display === 'flex') {
         closeModal();
       }
-      
+
       if (deleteModal.style.display === 'flex') {
         closeDeleteModal();
       }

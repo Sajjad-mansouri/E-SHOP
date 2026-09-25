@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('address', '0004_alter_address_country'),
+        ("address", "0004_alter_address_country"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='address',
-            name='is_default_address',
-            field=models.BooleanField(default=False, verbose_name='Default'),
+            model_name="address",
+            name="is_default_address",
+            field=models.BooleanField(default=False, verbose_name="Default"),
         ),
     ]

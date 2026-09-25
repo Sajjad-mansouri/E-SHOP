@@ -6,28 +6,56 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('stock', '0005_stockrecord_discount'),
+        ("stock", "0005_stockrecord_discount"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WishList',
+            name="WishList",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('stock_record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stock.stockrecord', verbose_name='Stock Record')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='wishlists', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "stock_record",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="stock.stockrecord",
+                        verbose_name="Stock Record",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="wishlists",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Wishlist',
-                'verbose_name_plural': 'Wishlists',
-                'constraints': [models.UniqueConstraint(models.F('user'), models.F('stock_record'), name='user_stock_unique')],
+                "verbose_name": "Wishlist",
+                "verbose_name_plural": "Wishlists",
+                "constraints": [
+                    models.UniqueConstraint(
+                        models.F("user"),
+                        models.F("stock_record"),
+                        name="user_stock_unique",
+                    )
+                ],
             },
         ),
     ]

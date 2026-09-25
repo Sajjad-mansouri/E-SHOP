@@ -500,8 +500,8 @@
         width: 100%;
         position: static;
       }
-      .offer-categories { 
-        gap: 20px; 
+      .offer-categories {
+        gap: 20px;
         justify-content: center;
       }
     }

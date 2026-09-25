@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('stock', '0006_stockrecord_offer_discount'),
+        ("stock", "0006_stockrecord_offer_discount"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stockrecord',
-            name='rating',
-            field=models.FloatField(default=0.0, verbose_name='rating'),
+            model_name="stockrecord",
+            name="rating",
+            field=models.FloatField(default=0.0, verbose_name="rating"),
         ),
     ]

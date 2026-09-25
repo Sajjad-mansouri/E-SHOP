@@ -388,13 +388,13 @@
       color: #555;
     }
     .comment-footer .icon { margin-right: 5px; cursor: pointer; }
-    
+
     .comment-actions {
       margin-left: auto;
       display: flex;
       gap: 12px;
     }
-    
+
     .action-btn {
       background: none;
       border: none;
@@ -405,11 +405,11 @@
       align-items: center;
       gap: 4px;
     }
-    
+
     .action-btn:hover {
       color: var(--primary);
     }
-    
+
     .action-btn.delete:hover {
       color: #d32f2f;
     }
@@ -427,7 +427,7 @@
       align-items: center;
       z-index: 1000;
     }
-    
+
     .modal {
       background: white;
       border-radius: 24px;
@@ -436,19 +436,19 @@
       max-width: 500px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
-    
+
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
     }
-    
+
     .modal-title {
       font-size: 1.5rem;
       font-weight: 700;
     }
-    
+
     .close-modal {
       background: none;
       border: none;
@@ -456,30 +456,30 @@
       cursor: pointer;
       color: #666;
     }
-    
+
     .modal-rating {
       display: flex;
       gap: 8px;
       margin: 16px 0 24px;
     }
-    
+
     .modal-rating .icon {
       width: 2rem;
       height: 2rem;
       cursor: pointer;
       color: #ddd;
     }
-    
+
     .modal-rating .icon.selected {
       color: #f5b342;
     }
-    
+
     .modal-actions {
       display: flex;
       gap: 12px;
       margin-top: 24px;
     }
-    
+
     .modal-btn {
       flex: 1;
       padding: 12px;
@@ -488,26 +488,26 @@
       font-weight: 600;
       cursor: pointer;
     }
-    
+
     .modal-btn.primary {
       background: var(--primary);
       color: white;
     }
-    
+
     .modal-btn.secondary {
       background: #eaeef2;
       color: #333;
     }
-    
+
     /* Delete Confirmation Modal */
     .delete-modal .modal {
       max-width: 400px;
     }
-    
+
     .delete-modal .modal-title {
       color: #d32f2f;
     }
-    
+
     .delete-modal .modal-text {
       margin: 16px 0 24px;
       line-height: 1.5;

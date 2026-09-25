@@ -6,23 +6,58 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('offer', '0009_alter_offerrange_excluded_products_and_more'),
-        ('stock', '0008_stockrecord_sold'),
+        ("offer", "0009_alter_offerrange_excluded_products_and_more"),
+        ("stock", "0008_stockrecord_sold"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OfferApplication',
+            name="OfferApplication",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('offer_discount', models.IntegerField(default=0, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)], verbose_name='Offer Discount')),
-                ('is_accepted', models.BooleanField(default=False, verbose_name='Is Accepted')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('offer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='offer_apps', to='offer.offer', verbose_name='offer')),
-                ('stock', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stock.stockrecord', verbose_name='Stock Record')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "offer_discount",
+                    models.IntegerField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                        verbose_name="Offer Discount",
+                    ),
+                ),
+                (
+                    "is_accepted",
+                    models.BooleanField(default=False, verbose_name="Is Accepted"),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "offer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="offer_apps",
+                        to="offer.offer",
+                        verbose_name="offer",
+                    ),
+                ),
+                (
+                    "stock",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="stock.stockrecord",
+                        verbose_name="Stock Record",
+                    ),
+                ),
             ],
         ),
     ]

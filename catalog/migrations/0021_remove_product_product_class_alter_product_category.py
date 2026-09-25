@@ -5,19 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0020_rename_categories_product_category_and_more'),
+        ("catalog", "0020_rename_categories_product_category_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='product',
-            name='product_class',
+            model_name="product",
+            name="product_class",
         ),
         migrations.AlterField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='catalog.category', verbose_name='category'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="catalog.category",
+                verbose_name="category",
+            ),
         ),
     ]

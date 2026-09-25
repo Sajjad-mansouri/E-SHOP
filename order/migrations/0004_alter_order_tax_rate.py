@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('order', '0003_order_tax_rate'),
+        ("order", "0003_order_tax_rate"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='tax_rate',
-            field=models.DecimalField(decimal_places=2, default=0.0, max_digits=10, verbose_name='Tax Rate'),
+            model_name="order",
+            name="tax_rate",
+            field=models.DecimalField(
+                decimal_places=2, default=0.0, max_digits=10, verbose_name="Tax Rate"
+            ),
         ),
     ]

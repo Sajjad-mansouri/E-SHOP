@@ -10,7 +10,7 @@
 <div class="confirmation-header">
   <h1><i class="fa-solid fa-circle-check"></i> Order Confirmed!</h1>
   <p>Thank you for your purchase. Your order has been successfully placed.</p>
-  
+
   <!-- Checkout Steps -->
   <div class="confirmation-steps">
     <div class="step completed">
@@ -20,7 +20,7 @@
       <span class="step-label">Cart</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step completed">
       <div class="step-circle">
         <i class="fa-solid fa-check"></i>
@@ -28,7 +28,7 @@
       <span class="step-label">Details</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step completed">
       <div class="step-circle">
         <i class="fa-solid fa-check"></i>
@@ -36,7 +36,7 @@
       <span class="step-label">Payment</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step active">
       <div class="step-circle">4</div>
       <span class="step-label">Confirmation</span>
@@ -52,14 +52,14 @@
     </div>
     <h2>Thank You, {{request.user.get_full_name}}!</h2>
     <p>Your order has been confirmed and is being processed. We've sent a confirmation email to <strong>{{request.user.email}}</strong> with all the details.</p>
-    
+
     <div class="order-number">Order #{{order.order_number}}</div>
-    
+
   </div>
-  
 
 
-  
+
+
   <!-- Action Buttons -->
   <div class="action-buttons">
     <a href="order-details.html" class="btn btn-primary">
@@ -69,7 +69,7 @@
       <i class="fa-solid fa-bag-shopping"></i> Continue Shopping
     </a>
   </div>
-  
+
 </div>
 {%endblock%}
 

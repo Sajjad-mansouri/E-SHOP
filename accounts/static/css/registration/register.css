@@ -117,13 +117,13 @@
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
     /* ensure it's visible if the 'show' class is applied */
-    display: block; 
+    display: block;
 }
 
-.alert.error { 
-    background-color: #fee2e2; 
-    color: #991b1b; 
-    border: 1px solid #fca5a5; 
+.alert.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
 }
 
 /* Style the text inside the alert */

@@ -116,7 +116,7 @@
       let subtotal = 0;
       let originalTotal = 0;
       document.querySelectorAll('.cart-item').forEach(item => {
-        const price = parseFloat(item.querySelector('.discounted-price')?.textContent.replace('$', '') || 
+        const price = parseFloat(item.querySelector('.discounted-price')?.textContent.replace('$', '') ||
                                   item.querySelector('.price').textContent.replace('$', ''));
         const qty = parseInt(item.querySelector('.quantity-value').textContent);
         const total = price * qty;
@@ -177,7 +177,7 @@
       })
       const data = response.json()
       return data
-      
+
     }
     // Quantity controls
     document.querySelectorAll('.quantity-btn').forEach(btn => {
@@ -228,7 +228,7 @@
         return;
       }
       const formData = new FormData()
-      formData.append("coupon", code) 
+      formData.append("coupon", code)
       fetch("{%url 'coupon:apply_coupon'%}",{
         method:"POST",
         headers:{
@@ -265,7 +265,7 @@
 
     // Checkout
     function checkout() {
-      
+
       window.location.href = "{%url 'order:order'%}";
     }
 

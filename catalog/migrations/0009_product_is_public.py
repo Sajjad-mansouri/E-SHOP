@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0008_productattributevalue_value_date'),
+        ("catalog", "0008_productattributevalue_value_date"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='is_public',
+            model_name="product",
+            name="is_public",
             field=models.BooleanField(default=True),
         ),
     ]

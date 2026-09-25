@@ -39,15 +39,15 @@
           <!-- Search input -->
           <div class="search-input-wrapper">
             <span class="search-icon">🔍</span>
-            <input 
-              type="text" 
-              class="search-input" 
-              id="productSearchInput" 
+            <input
+              type="text"
+              class="search-input"
+              id="productSearchInput"
               placeholder="Search products by name, UPC, or category..."
               autocomplete="off"
             >
           </div>
-          
+
           <!-- Product dropdown list -->
           <div class="product-dropdown" id="productDropdown">
             <!-- Products will be dynamically populated here -->
@@ -98,7 +98,7 @@
     const applyForm = document.getElementById('applyOfferForm');
     const resetBtn = document.getElementById('resetFormBtn');
     const tableBody = document.getElementById('appliedOffersTableBody');
-    
+
     // Selected product display elements
     const selectedProductDisplay = document.getElementById('selectedProductDisplay');
     const selectedThumbnail = document.getElementById('selectedThumbnail');
@@ -126,7 +126,7 @@
     productDropdown.addEventListener('click', (e) => {
       const option = e.target.closest('.product-option');
       if (!option) return;
-      
+
       const productId = option.dataset.productId;
       selectedProduct = productId;
       productDropdown.classList.remove('show');

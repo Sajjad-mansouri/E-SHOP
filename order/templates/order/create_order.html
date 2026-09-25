@@ -9,7 +9,7 @@
 <div class="checkout-header">
   <h1><i class="fa-solid fa-cart-arrow-down"></i> Checkout</h1>
   <p>Complete your order with secure checkout</p>
-  
+
   <!-- Checkout Steps -->
   <div class="checkout-steps">
     <div class="step completed">
@@ -19,19 +19,19 @@
       <span class="step-label">Cart</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step active">
       <div class="step-circle">2</div>
       <span class="step-label">Details</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step">
       <div class="step-circle">3</div>
       <span class="step-label">Payment</span>
       <div class="step-line"></div>
     </div>
-    
+
     <div class="step">
       <div class="step-circle">4</div>
       <span class="step-label">Confirmation</span>
@@ -50,7 +50,7 @@
           <i class="fa-solid fa-pen"></i> Add New Address
         </a>
       </div>
-      
+
       <div class="address-list">
         {%for address in addresses%}
         <div class="address-card {%if address.is_default_address%}selected{%endif%}" data-address="{{address.id}}">
@@ -71,17 +71,17 @@
           </div>
         </div>
         {%endfor%}
-        
+
 
       </div>
     </section>
-    
+
     <!-- Shipping Method Section -->
     <section class="checkout-section">
       <div class="section-header">
         <h2><i class="fa-solid fa-shipping-fast"></i> Shipping Method</h2>
       </div>
-      
+
       <div class="shipping-methods">
         {%for shipping_method in shipping_methods%}
 
@@ -109,22 +109,22 @@
           {%endif%}
         </div>
         {%endfor%}
-        
+
 
       </div>
     </section>
-    
+
     <!-- Payment Method Section -->
     <section class="checkout-section">
       <div class="section-header">
         <h2><i class="fa-solid fa-credit-card"></i> Payment Method</h2>
       </div>
-      
+
       <div class="payment-methods-list">
         <h2>No Payment Method Now(Added in Real World Ecomm)</h2>
       </div>
     </section>
-    
+
     <!-- Order Items Preview -->
     <section class="checkout-section">
       <div class="section-header">
@@ -133,7 +133,7 @@
           <i class="fa-solid fa-pen"></i> Edit Cart
         </a>
       </div>
-      
+
       <div class="order-items">
         {%for item in items%}
         <div class="order-item">
@@ -149,33 +149,33 @@
       </div>
     </section>
   </div>
-  
+
   <!-- Order Summary Sidebar -->
   <div class="order-summary-sidebar">
     <h2>Order Summary</h2>
-    
+
     <div class="summary-row">
       <span>Subtotal ({{items|length}} items)</span>
       <span>${{cart.get_items_price}}</span>
     </div>
-    
+
     <div class="summary-row">
       <span>Shipping</span>
       <span id="shippingCost">-</span>
     </div>
-    
+
     {%if coupon_application%}
     <div class="summary-row discount">
       <span>Discount ({{coupon_application.coupon.code}})</span>
       <span>-%{{coupon_application.coupon.discount}}</span>
     </div>
     {%endif%}
-    
+
     <div class="summary-row total">
       <span>Total</span>
       <span id="orderTotal">${{final_price}} {{final_price}}</span>
     </div>
-    
+
     <div class="secure-checkout">
       <i class="fa-solid fa-shield-check"></i>
       <div class="secure-text">
@@ -187,11 +187,11 @@
     <button class="place-order-btn" id="placeOrderBtn">
       <i class="fa-solid fa-lock"></i> Place Order
     </button>
-    
+
     <a href="cart.html" class="back-to-cart">
       <i class="fa-solid fa-arrow-left"></i> Back to Cart
     </a>
-    
+
     <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
       <p style="color: #666; font-size: 0.9rem; text-align: center;">
         By placing your order, you agree to our <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.
@@ -213,21 +213,21 @@
     const shippingCostEl = document.getElementById('shippingCost');
     const orderTotalEl = document.getElementById('orderTotal');
     const continueShoppingBtn = document.getElementById('continueShoppingBtn');
-    
+
     // Order data
     let subtotal = Number("{{cart.get_items_price}}");
     let discount = Number("{{discount}}");
     let shippingCost = 0.00;
-    
+
     // Update order total display
     function updateOrderTotal() {
       const total = subtotal + shippingCost - discount;
       orderTotalEl.textContent = '$' + total.toFixed(2);
     }
-    
+
     // Initialize
     updateOrderTotal();
-    
+
     // Address selection
     addressCards.forEach(card => {
       card.addEventListener('click', function() {
@@ -235,13 +235,13 @@
         this.classList.add('selected');
       });
     });
-    
+
     // Shipping method selection
     shippingMethods.forEach(method => {
       method.addEventListener('click', function() {
         shippingMethods.forEach(m => m.classList.remove('selected'));
         this.classList.add('selected');
-        
+
         // Update shipping cost
 
         const shippingCostRaw = this.querySelector(".shipping-cost").innerText
@@ -253,11 +253,11 @@
         }else{
           shippingCost = Number(shippingCostRaw)
         }
-        
+
         updateOrderTotal();
       });
     });
-    
+
     // Payment method selection
     paymentMethods.forEach(method => {
       method.addEventListener('click', function() {
@@ -265,15 +265,15 @@
         this.classList.add('selected');
       });
     });
-    
-    
+
+
     // Place order button
     placeOrderBtn.addEventListener('click', function() {
       // Validate selections
       const selectedAddress = document.querySelector('.address-card.selected');
       const selectedShipping = document.querySelector('.payment-method[data-shipping].selected');
 
-      
+
       if (!selectedAddress || !selectedShipping ) {
         alert('Please complete all checkout steps before placing your order.');
         return;
@@ -298,10 +298,10 @@
           window.location.href="{%url 'payment:checkout'%}"
         }
       })
-      
+
 
     });
-    
+
 
   });
 </script>

@@ -219,25 +219,25 @@
 
 
 @media (max-width: 992px) {
-      .header-container { 
-        flex-wrap: wrap; 
-        height: auto; 
-        padding: 15px 20px; 
+      .header-container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 15px 20px;
       }
-      
-      .logo { 
-        order: 1; 
+
+      .logo {
+        order: 1;
       }
-      
-      .header-right { 
-        order: 2; 
+
+      .header-right {
+        order: 2;
         margin-left: auto; /* Keeps the accounts/cart aligned to the right */
       }
-      
-      .search-box { 
+
+      .search-box {
         order: 3; /* Forces search below */
         flex: 0 0 100%; /* Makes search box span the entire width */
-        max-width: 100%; 
+        max-width: 100%;
         margin: 15px 0 0 0; /* Adds spacing between the top row and the search row */
       }
   .main-categories { overflow-x: auto; gap: 20px; }
@@ -333,7 +333,3 @@
       background-repeat: no-repeat;
       background-position: center;
     }
-
-
-
-

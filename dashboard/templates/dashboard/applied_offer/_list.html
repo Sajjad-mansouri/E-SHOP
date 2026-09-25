@@ -35,7 +35,7 @@
           {%with time_until_expire=applied_offer.offer.get_time_until_expire%}
         <td>
           <span class="expiry-date {% get_expire_class time_until_expire %}">{{applied_offer.offer.end_datetime}}</span>
-          
+
       {%if time_until_expire < 72  %}<br><small style="color: #f57c00;">Expiring soon</small>{%endif%}
         </td>
         {%endwith%}
@@ -50,19 +50,19 @@
           </tbody>
   </table>
 </div>
-    
+
 
 {%if page_obj%}
 <!-- PAGINATION -->
 <div class="pagination" id="pagination">
-  
+
   <button class="page-btn" id="prevPage" {% if page_obj.has_previous %}data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%}>←</button>
-  
+
   {%for page in paginator.page_range%}
   <button class="page-btn {%if page_obj.number == page%}active {%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
   {%endfor%}
-  
+
   <button class="page-btn" id="nextPage" {%if page_obj.has_next%}data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%} >→</button>
- 
+
 </div>
 {%endif%}

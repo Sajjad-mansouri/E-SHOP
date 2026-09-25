@@ -54,7 +54,7 @@
               {%for field in form.hidden_fields%}
               {{field}}
               {%endfor%}
-        
+
         </div>
         {%endfor%}
     </div>
@@ -95,8 +95,8 @@ function addAttribute(){
     const row=document.createElement("div")
     let attrRows = container.querySelectorAll(".attr-row");
     let index = attrRows.length
-    let cloneSelectForm = selectForm.replace(/__prefix__/g, index) 
-    let cloneNameForm = attrNameForm.replace(/__prefix__/g, index) 
+    let cloneSelectForm = selectForm.replace(/__prefix__/g, index)
+    let cloneNameForm = attrNameForm.replace(/__prefix__/g, index)
 
     row.className = "attr-row"
     row.innerHTML=`

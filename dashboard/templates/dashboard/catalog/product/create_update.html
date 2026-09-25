@@ -24,7 +24,7 @@
         <li><a href="#details" class="active">Product Details</a></li>
         {%if product_class.has_attributes%}
         <li><a href="#attributes">Product Attributes</a></li>
-        
+
         {%endif%}
         <li><a href="#images">Images</a></li>
         <li><a href="#stock">Stock & Pricing</a></li>
@@ -35,7 +35,7 @@
     <!-- RIGHT CONTENT -->
     <form class="content" id="create_update_product_form" method="POST" enctype="multipart/form-data" novalidate>
         {%csrf_token%}
-        <div id="form-errors" class="error-box" 
+        <div id="form-errors" class="error-box"
         {%if not product_form.errors and not product_category_form.errors and not stock_record_form.errors and not simg_formset %}
         style="display:none;"
         {%endif%}
@@ -240,7 +240,7 @@ function addImageField(){
 
   const list=document.getElementById('imageList');
   const index = list.children.length
-  
+
   const li=document.createElement('li');
   li.className='image-item';
   li.innerHTML=`

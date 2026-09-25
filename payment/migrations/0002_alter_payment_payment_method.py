@@ -4,15 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('payment', '0001_initial'),
+        ("payment", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='payment',
-            name='payment_method',
-            field=models.CharField(choices=[('CREDIT_CARD', 'Credit Card'), ('PAYPAL', 'PayPal'), ('BANK_TRANSFER', 'Bank Transfer'), ('Test', 'Test')], default='Test', max_length=50, verbose_name='Payment method'),
+            model_name="payment",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    ("CREDIT_CARD", "Credit Card"),
+                    ("PAYPAL", "PayPal"),
+                    ("BANK_TRANSFER", "Bank Transfer"),
+                    ("Test", "Test"),
+                ],
+                default="Test",
+                max_length=50,
+                verbose_name="Payment method",
+            ),
         ),
     ]

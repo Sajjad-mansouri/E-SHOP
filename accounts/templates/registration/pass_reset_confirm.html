@@ -27,12 +27,12 @@
                         {% endfor %}
                     {% endfor %}
                 </div>
-            {% endif %}       
+            {% endif %}
 
 
             <form id="resetPasswordForm"  method="POST">
                 {% csrf_token %}
-                
+
                 <div class="form-group">
                     <label class="form-label" for="password">New Password</label>
                     <input class="form-control" type="password" id="password" name="new_password1" required minlength="8">
@@ -58,7 +58,7 @@
             </div>
             <h1>Invalid Reset Link</h1>
             <p>This password reset link is invalid or has already been used. Please request a new password reset link.</p>
-            
+
             <a href="{%url 'account:password_reset'%}" class="btn btn-primary">Request New Reset Link</a>
         </div>
         {%endif%}

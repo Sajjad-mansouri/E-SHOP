@@ -4,15 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('comment', '0003_comment_status'),
+        ("comment", "0003_comment_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='rating',
-            field=models.CharField(choices=[('0', ''), ('1', '*'), ('2', '**'), ('3', '***'), ('4', '****'), ('5', '*****')], default='', max_length=1, verbose_name='rating'),
+            model_name="comment",
+            name="rating",
+            field=models.CharField(
+                choices=[
+                    ("0", ""),
+                    ("1", "*"),
+                    ("2", "**"),
+                    ("3", "***"),
+                    ("4", "****"),
+                    ("5", "*****"),
+                ],
+                default="",
+                max_length=1,
+                verbose_name="rating",
+            ),
         ),
     ]

@@ -109,7 +109,7 @@
 <div class="status-group">
 	{%csrf_token%}
 		{{form}}
-	
+
 
 
 	<button class="update-btn" onclick="updateStatus()">Update Status</button>
@@ -134,7 +134,7 @@ async function updateStatus(){
 	    const response = await fetch("{%url 'dashboard:order_detail' object.id%}", {
 	        method:"POST",
 	        headers:{
-	            "X-CSRFToken":csrfToken,   
+	            "X-CSRFToken":csrfToken,
 	        },
 	        body:formData
 

@@ -4,20 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('collection', '0002_alter_collectionlist_categories_and_more'),
+        ("collection", "0002_alter_collectionlist_categories_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='collectionlist',
-            name='short_description',
-            field=models.CharField(blank=True, max_length=250, verbose_name='short description'),
+            model_name="collectionlist",
+            name="short_description",
+            field=models.CharField(
+                blank=True, max_length=250, verbose_name="short description"
+            ),
         ),
         migrations.AddField(
-            model_name='productlist',
-            name='short_description',
-            field=models.CharField(blank=True, max_length=250, verbose_name='short description'),
+            model_name="productlist",
+            name="short_description",
+            field=models.CharField(
+                blank=True, max_length=250, verbose_name="short description"
+            ),
         ),
     ]

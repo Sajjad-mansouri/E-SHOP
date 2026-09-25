@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('offer', '0005_alter_offer_slug'),
+        ("offer", "0005_alter_offer_slug"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='offer',
-            name='desc_header',
-            field=models.CharField(blank=True, max_length=100, verbose_name='Description Header'),
+            model_name="offer",
+            name="desc_header",
+            field=models.CharField(
+                blank=True, max_length=100, verbose_name="Description Header"
+            ),
         ),
     ]

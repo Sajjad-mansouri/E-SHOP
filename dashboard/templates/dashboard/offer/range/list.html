@@ -70,7 +70,7 @@
     const confirmDeleteBtn = document.getElementById('confirmDelete');
     const modalMessage = document.getElementById('modalMessage');
     const dataTableContainer = document.querySelector('.data-table-container')
-    
+
 
     let objectToDelete = null;
 
@@ -108,14 +108,14 @@
     }
 
 
-    
+
     cancelDeleteBtn.addEventListener('click', () => {
       deleteModal.classList.remove('show');
       objectToDelete = null;
     });
-    
+
     confirmDeleteBtn.addEventListener('click', deleteObject);
-    
+
     deleteModal.addEventListener('click', (e) => {
       if (e.target === deleteModal) {
         deleteModal.classList.remove('show');
@@ -192,10 +192,10 @@
 
   }
     return newURL
-  
+
   }
   async function getFetch(url){
-    
+
     const response = await fetch(objectsUrl + url,{
       method:"GET",
       headers:{
@@ -215,17 +215,17 @@ function applyPagination(){
   function showError(message, message_class){
     const box = document.getElementById("messageBox");
     box.className = `message ${message_class}`;
-    
+
     box.innerHTML = message;
   }
 
   function update(id){
-    
+
     const url = baseUpdateUrl.replace(0, id)
     window.location.href = url
   }
   function createNew(){
-    
+
     window.location.href = baseCreateurl
 
   }

@@ -38,7 +38,7 @@
         <form method="POST">
         {% csrf_token %}
 
-          
+
         </form>
 
         <!-- navigation buttons (prev/next) plus final create -->
@@ -128,7 +128,7 @@
       const response = await fetch(create_form_url, {
         method:"POST",
         headers:{
-        "X-CSRFToken":csrfToken,    
+        "X-CSRFToken":csrfToken,
         },
         body:offerForm
         })
@@ -154,7 +154,7 @@
         }
       })
 
-        
+
 
       }
     });
@@ -168,8 +168,8 @@
         }
       })
 
-      
-      
+
+
     });
 
     // initial state
