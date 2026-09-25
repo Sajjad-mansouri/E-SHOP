@@ -25,15 +25,25 @@ from coupon.models import Coupon
 from order.models import Order
 from comment.models import Comment
 from collection.models import ProductList, CollectionList
-from . import mixins
+from .mixins  import (
+				DeleteMixin,
+				StockRecordContexMixin,
+				FormHandlerMixin,
+				FilterQuerySetMixin,
+				AjaxMixin,
+				AjaxQuerysetMixin,
+				collectionMixin,
+				IsSellerMixin,
+	)
 
 
 UserModel = get_user_model()
 
 # Create your views here.
-class DashboardOverView(TemplateView):
+class DashboardOverView(IsSellerMixin,TemplateView):
 	template_name = "dashboard/overview/overview.html"
 	def get_context_data(self, **kwargs):
+
 		context = super().get_context_data(**kwargs)
 		customers = self.get_customers()
 		stock_records = self.get_stock_products()
@@ -79,7 +89,7 @@ class DashboardOverView(TemplateView):
 		return earns
 
 
-class ProductListView(mixins.AjaxQuerysetMixin, ListView):
+class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	template_name = "dashboard/catalog/product/list.html"
 	model = StockRecord
 	Ajax_template = "dashboard/catalog/product/_list.html"
@@ -112,7 +122,7 @@ class ProductListView(mixins.AjaxQuerysetMixin, ListView):
 
 
 
-class CreateUpdateProductView(TemplateResponseMixin, View):
+class CreateUpdateProductView(IsSellerMixin, TemplateResponseMixin, View):
 	template_name = "dashboard/catalog/product/create_update.html"
 
 	def dispatch(self, request, *args, **kwargs):
@@ -214,14 +224,14 @@ class CreateUpdateProductView(TemplateResponseMixin, View):
 
 
 
-class DeleteProductView(mixins.DeleteMixin, DeleteView):
+class DeleteProductView(IsSellerMixin, DeleteMixin, DeleteView):
 	template_name = "dashboard/delete_product.html"
 	model = Product
 	
 
 
 
-class ProductTypeView(mixins.AjaxQuerysetMixin, ListView):
+class ProductTypeView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	model = ProductClass
 	template_name = "dashboard/catalog/product_type/list.html"
 	Ajax_template = "dashboard/catalog/product_type/_list.html"
@@ -236,7 +246,7 @@ class ProductTypeView(mixins.AjaxQuerysetMixin, ListView):
 
 		return qs.filter(query)
 
-class ProductTypeCreateUpdateView(UpdateView):
+class ProductTypeCreateUpdateView(IsSellerMixin, UpdateView):
 	model = ProductClass
 	form_class = forms.ProductTypeForm
 	template_name = "dashboard/catalog/product_type/create_update.html"
@@ -292,12 +302,12 @@ class ProductTypeCreateUpdateView(UpdateView):
 		return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
 
-class ProductTypeDeleteView(mixins.DeleteMixin, DeleteView):
+class ProductTypeDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = ProductClass
 
 
 
-class CategoryListView(mixins.AjaxQuerysetMixin, ListView):
+class CategoryListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	template_name = "dashboard/catalog/category/categories.html"
 	Ajax_template = "dashboard/catalog/product_type/_list.html"
 	model = Category
@@ -312,31 +322,31 @@ class CategoryListView(mixins.AjaxQuerysetMixin, ListView):
 			query = Q(name__icontains=search)
 
 		return qs.filter(query)
-class SubCategoryView(DetailView):
+class SubCategoryView(IsSellerMixin, DetailView):
 	template_name = "dashboard/catalog/category/categories.html"
 	model = Category
 
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(IsSellerMixin, CreateView):
 	template_name = "dashboard/catalog/category/create_update.html"
 	model = Category
 	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(IsSellerMixin, UpdateView):
 	template_name = "dashboard/catalog/category/create_update.html"
 	model = Category
 	form_class = forms.CategoryForm
 	success_url = reverse_lazy("dashboard:categories")
 
 
-class CategoryDeleteView(mixins.DeleteMixin, DeleteView):
+class CategoryDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	template_name = "dashboard/category/category_delete.html"
 	model = Category
 	success_url = reverse_lazy("dashboard:categories")
 
 
-class OfferRangeListView(mixins.AjaxQuerysetMixin,ListView):
+class OfferRangeListView(IsSellerMixin, AjaxQuerysetMixin,ListView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/list.html"
 	Ajax_template = "dashboard/offer/range/_list.html"
@@ -352,13 +362,13 @@ class OfferRangeListView(mixins.AjaxQuerysetMixin,ListView):
 
 		return qs.filter(query)
 
-class OfferRangeCreateView(CreateView):
+class OfferRangeCreateView(IsSellerMixin, CreateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
 	form_class = forms.OfferRangeForm
 	success_url = reverse_lazy("dashboard:offer_range")
 
-class OfferRangeUpdateView(UpdateView):
+class OfferRangeUpdateView(IsSellerMixin, UpdateView):
 	model = OfferRange
 	template_name = "dashboard/offer/range/create_update.html"
 	form_class = forms.OfferRangeForm
@@ -366,12 +376,12 @@ class OfferRangeUpdateView(UpdateView):
 	search_template_name = "dashboard/offer/range/test.html"
 
 
-class OfferRangeDeleteView(mixins.DeleteMixin, DeleteView):
+class OfferRangeDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = OfferRange
 
 
 
-class OfferListView(mixins.AjaxQuerysetMixin, ListView):
+class OfferListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	model = Offer
 	template_name = "dashboard/offer/offer/list.html"
 	Ajax_template = "dashboard/offer/offer/_list.html"
@@ -394,12 +404,12 @@ class OfferListView(mixins.AjaxQuerysetMixin, ListView):
 			query = Q(status=status)
 		return qs.filter(query)
 
-class CreateOfferView(OfferWizardStepView):
+class CreateOfferView(IsSellerMixin, OfferWizardStepView):
 
 	template_name = "dashboard/offer/offer/create_update.html"
 
 
-class OfferStepView(View):
+class OfferStepView(IsSellerMixin, View):
 	def get(self, request, *args, **kwargs):
 		offer_step = kwargs.get("offer_step")
 		offer_pk = kwargs.get('offer_pk')
@@ -423,7 +433,7 @@ class OfferStepView(View):
 class UpdateOfferView(CreateOfferView):
 	update = True
 
-class DeleteOfferView(mixins.DeleteMixin, DeleteView):
+class DeleteOfferView(IsSellerMixin, DeleteMixin, DeleteView):
 	template_name = "dashboard/offer/offer/delete.html"
 	model = Offer
 	success_url = reverse_lazy("dashboard:offer_list")
@@ -431,7 +441,7 @@ class DeleteOfferView(mixins.DeleteMixin, DeleteView):
 
 
 
-class CouponListView(mixins.AjaxQuerysetMixin, ListView):
+class CouponListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	model = Coupon
 	template_name = "dashboard/offer/coupon/list.html"
 	Ajax_template = "dashboard/offer/coupon/_list.html"
@@ -453,19 +463,19 @@ class CouponListView(mixins.AjaxQuerysetMixin, ListView):
 
 			query = Q(status=status)
 		return qs.filter(query)
-class CouponCreateView(CreateView):
+class CouponCreateView(IsSellerMixin, CreateView):
 	model = Coupon
 	form_class = forms.CouponForm
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
 
-class CouponUpdateView(UpdateView):
+class CouponUpdateView(IsSellerMixin, UpdateView):
 	model = Coupon
 	form_class = forms.CouponForm
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/create_update.html"
 
-class CouponDeleteView(mixins.DeleteMixin, DeleteView):
+class CouponDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = Coupon
 	success_url = reverse_lazy("dashboard:coupon_list")
 	template_name = "dashboard/offer/coupon/delete.html"
@@ -474,7 +484,7 @@ class CouponDeleteView(mixins.DeleteMixin, DeleteView):
 
 
 
-class OderListView(mixins.AjaxQuerysetMixin, ListView):
+class OderListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
 	model = Order
 	template_name = "dashboard/fulfilment/order/list.html"
 	Ajax_template = "dashboard/fulfilment/order/_list.html"
@@ -496,7 +506,7 @@ class OderListView(mixins.AjaxQuerysetMixin, ListView):
 
 			query = Q(status=status)
 		return qs.filter(query)
-class OderDetailView(UpdateView):
+class OderDetailView(IsSellerMixin, UpdateView):
 	model = Order
 	form_class = forms.OrderStatusForm
 	template_name = "dashboard/fulfilment/order/order_detail.html"
@@ -509,11 +519,11 @@ class OderDetailView(UpdateView):
 
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
-class OrderDeleteView(mixins.DeleteMixin, DeleteView):
+class OrderDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = Order
 
 
-class FulfilmentStatistic(TemplateView):
+class FulfilmentStatistic(IsSellerMixin, TemplateView):
 	template_name = "dashboard/fulfilment/statistics.html"
 
 
@@ -607,7 +617,7 @@ class FulfilmentStatistic(TemplateView):
 			return total, processing, shipped, delivered, cancelled
 
 
-class CustomerListView(ListView):
+class CustomerListView(IsSellerMixin, ListView):
 	template_name = "dashboard/customer/customers.html"
 	queryset = UserModel.objects.filter(user_type="customer")
 
@@ -666,7 +676,7 @@ class CustomerListView(ListView):
 			self.template_name = "dashboard/customer/_customers.html"
 		return super().render_to_response(context, **response_kwargs)
 
-class CustomerDetailView(DetailView):
+class CustomerDetailView(IsSellerMixin, DetailView):
 	template_name = "dashboard/customer/customer.html"
 	queryset = UserModel.objects.filter(user_type="customer")
 
@@ -683,7 +693,7 @@ class CustomerDetailView(DetailView):
 
 		return context
 
-class AddressListView(DetailView):
+class AddressListView(IsSellerMixin, DetailView):
 	template_name = "dashboard/customer/addresses.html"
 	queryset = UserModel.objects.filter(user_type="customer")
 
@@ -693,7 +703,7 @@ class AddressListView(DetailView):
 		return context
 
 
-class SalesReport(ListView):
+class SalesReport(IsSellerMixin, ListView):
 		template_name = "dashboard/report/sales_report.html"
 		model = Order
 
@@ -777,7 +787,7 @@ class SalesReport(ListView):
 			return super().render_to_response(context, **response_kwargs)
 
 
-class ReviewListView(ListView):
+class ReviewListView(IsSellerMixin, ListView):
 	model = Comment
 	template_name = "dashboard/review/reviews.html"
 	context_object_name = "reviews"
@@ -840,7 +850,7 @@ class ReviewListView(ListView):
 			date = timezone.make_aware(naive_date, tz)
 			return date
 
-class ReviewStatusUpdateView(UpdateView):
+class ReviewStatusUpdateView(IsSellerMixin, UpdateView):
 	model = Comment
 	form_class = forms.CommentStatusForm
 	def form_valid(self, form):
@@ -851,13 +861,13 @@ class ReviewStatusUpdateView(UpdateView):
 	def form_invalid(self, form):
 		return JsonResponse({"status":False})
 
-class ReviewDeletView(mixins.DeleteMixin, DeleteView):
+class ReviewDeletView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = Comment
 
 
 
 
-class AppliedOfferListView(ListView):
+class AppliedOfferListView(IsSellerMixin, ListView):
 	model = OfferApplication
 	template_name = "dashboard/applied_offer/list.html"
 	paginate_by = 1
@@ -926,7 +936,7 @@ class AppliedOfferListView(ListView):
 
 		return super().render_to_response(*args, **kwargs)
 
-class AppliedOfferCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, CreateView):
+class AppliedOfferCreateView(IsSellerMixin, StockRecordContexMixin , FormHandlerMixin, CreateView):
 	model = OfferApplication
 	template_name = "dashboard/applied_offer/create.html"
 	form_class = forms.AppliedOfferForm
@@ -935,12 +945,12 @@ class AppliedOfferCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerM
 
 
 
-class AppliedOfferDeleteView(mixins.DeleteMixin, DeleteView):
+class AppliedOfferDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = OfferApplication
 
 
 
-class ProductGroupListView(mixins.collectionMixin, ListView):
+class ProductGroupListView(IsSellerMixin, collectionMixin, ListView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/list.html"
 	paginate_by = 1
@@ -957,7 +967,7 @@ class ProductGroupListView(mixins.collectionMixin, ListView):
 
 
 
-class ProductGroupCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, CreateView):
+class ProductGroupCreateView(IsSellerMixin, StockRecordContexMixin , FormHandlerMixin, CreateView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/create_update.html"
 	form_class = forms.ProductGroupForm
@@ -965,17 +975,17 @@ class ProductGroupCreateView(mixins.StockRecordContexMixin , mixins.FormHandlerM
 
 
 
-class ProductGroupUpdateView(mixins.StockRecordContexMixin , mixins.FormHandlerMixin, UpdateView):
+class ProductGroupUpdateView(IsSellerMixin, StockRecordContexMixin , FormHandlerMixin, UpdateView):
 	model = ProductList
 	template_name = "dashboard/collection/product_group/create_update.html"
 	form_class = forms.ProductGroupForm
 
-class ProductGroupDeleteView(mixins.DeleteMixin, DeleteView):
+class ProductGroupDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = ProductList
 
 
 
-class CollectionListView(mixins.collectionMixin, ListView):
+class CollectionListView(IsSellerMixin, collectionMixin, ListView):
 	model = CollectionList
 	template_name = "dashboard/collection/collection_list/list.html"
 	paginate_by = 1
@@ -987,10 +997,10 @@ class CollectionListView(mixins.collectionMixin, ListView):
 
 		return super().render_to_response(*args, **kwargs)
 
-class CollectionListDeleteView(mixins.DeleteMixin, DeleteView):
+class CollectionListDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 	model = CollectionList
 
-class CollectionListCreateView( mixins.FormHandlerMixin, CreateView):
+class CollectionListCreateView(IsSellerMixin,  FormHandlerMixin, CreateView):
 	model = CollectionList
 	template_name = "dashboard/collection/collection_list/create_update.html"
 	form_class = forms.CollectionListForm
@@ -1001,7 +1011,7 @@ class CollectionListCreateView( mixins.FormHandlerMixin, CreateView):
 		return context
 
 
-class CollectionListUpdateView( mixins.FormHandlerMixin, UpdateView):
+class CollectionListUpdateView(IsSellerMixin,  FormHandlerMixin, UpdateView):
 	model = CollectionList
 	template_name = "dashboard/collection/collection_list/create_update.html"
 	form_class = forms.CollectionListForm

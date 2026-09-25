@@ -12,7 +12,6 @@ from django.views.decorators.cache import never_cache
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
-from django.contrib.auth import views as auth_views
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 from django.contrib.auth import update_session_auth_hash
@@ -149,7 +148,7 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
             context.update(
                 {
 
-                    "title": _("Password reset unsuccessful"),
+                    "title": _("Confirm Registration unsuccessful"),
                     "validlink": False,
                 }
             )
