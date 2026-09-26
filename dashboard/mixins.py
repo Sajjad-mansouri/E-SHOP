@@ -70,7 +70,7 @@ class AjaxQuerysetMixin(FilterQuerySetMixin, AjaxMixin):
     pass
 
 
-class collectionMixin(FilterQuerySetMixin):
+class CollectionMixin(FilterQuerySetMixin):
     def apply_filter(self, qs):
         status = self.request.GET.get("status")
         query = Q()

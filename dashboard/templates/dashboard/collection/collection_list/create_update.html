@@ -1,354 +1,1009 @@
+{% extends 'dashboard/_dashboard_base.html' %}
+{% load static %}
 
-{%extends 'dashboard/_dashboard_base.html'%}
-{%load static%}
+{% block style %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'css/dashboard/general_create.css' %}"
+>
 
-{%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/general_create.css'%}">
-{%endblock%}
+<style>
+    #selectedProductLists img,
+    #productModal img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+    }
 
-{%block title%}
-{%endblock%}
+    .product-image-placeholder {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f1f1;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #777;
+    }
 
-{%block content%}
+    .remove-btn {
+        cursor: pointer;
+    }
+
+    .toggle-btn {
+        cursor: pointer;
+    }
+
+    .message {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+
+{% block title %}
+{% endblock %}
+
+
+{% block content %}
 <main class="main">
 
-<div class="card">
-<h2>{%if object%}Update{%else%}Create{%endif%} Collection</h2>
+    <div class="card">
 
-<!-- ERROR MESSAGE BOX -->
-<div id="messageBox" class="message"></div>
-
-<form id="productGroupForm">
-{%csrf_token%}
-<div class="form-group">
-<label>Name</label>
-{{form.name}}
-
-</div>
-
-<div class="form-group">
-<label>Slug</label>
-{{form.slug}}
-
-</div>
-
-<div class="form-group">
-<label>Description</label>
-{{form.description}}
-
-</div>
-
-<div class="form-group">
-<label>Image</label>
-{{form.image}}
-
-</div>
-
-<div class="form-group">
-<label>Status</label>
-{{form.status}}
-</div>
-
-<div class="form-group">
-<label>Product Class</label>
-{{form.product_classes}}
-</div>
-
-<div class="form-group">
-<label>Categories</label>
-{{form.categories}}
-</div>
-
-<div class="form-group">
-<label>Product Groups</label>
-
-<div class="object-selector" onclick="openModal()">
-Click to add Product Group
-</div>
-
-<div class="selected-objects">
-
-<table id="selectedProductListsTable">
-
-<thead>
-<tr>
-<th>Image</th>
-<th>Name</th>
-<th>products</th>
-<th>status</th>
-
-<th></th>
-</tr>
-</thead>
-
-<tbody id="selectedProductLists">
-	{%for product_group in object.product_lists.all%}
-	<tr data-item="{{product_group.id}}">
-		<td><img src="{%if product_group.image%}{{product_group.image}}{%endif%}"></td>
-		<td>{{product_group.name}}</td>
-		<td>-</td>
-		<td>{{product_group.status}}</td>
-
-		<td>
-		<button class="btn remove-btn" onclick="removeSelected()">Remove</button>
-		</td>
-
-	</tr>
-	{%endfor%}
-</tbody>
-
-</table>
-
-</div>
+        <h2>
+            {% if object %}
+                Update
+            {% else %}
+                Create
+            {% endif %}
+            Collection
+        </h2>
 
 
-</div>
+        <!-- ERROR MESSAGE BOX -->
+        <div id="messageBox" class="message"></div>
 
-<button type="submit" class="btn">{%if object%}Update{%else%}Create{%endif%} Collection</button>
 
-</form>
-</div>
+        <form id="productGroupForm">
+            {% csrf_token %}
+
+
+            <!-- NAME -->
+            <div class="form-group">
+                <label for="id_name">Name</label>
+                {{ form.name }}
+            </div>
+
+
+            <!-- SLUG -->
+            <div class="form-group">
+                <label for="id_slug">Slug</label>
+                {{ form.slug }}
+            </div>
+
+
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+                <label for="id_description">Description</label>
+                {{ form.description }}
+            </div>
+
+
+            <!-- IMAGE -->
+            <div class="form-group">
+                <label for="id_image">Image</label>
+                {{ form.image }}
+            </div>
+
+
+            <!-- STATUS -->
+            <div class="form-group">
+                <label for="id_status">Status</label>
+                {{ form.status }}
+            </div>
+
+
+            <!-- CATEGORIES -->
+            <div class="form-group">
+                <label for="id_categories">Categories</label>
+                {{ form.categories }}
+            </div>
+
+
+            <!-- PRODUCT GROUPS -->
+            <div class="form-group">
+
+                <label>Product Groups</label>
+
+                <div
+                    class="object-selector"
+                    onclick="openModal()"
+                >
+                    Click to add Product Group
+                </div>
+
+
+                <div class="selected-objects">
+
+                    <table id="selectedProductListsTable">
+
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Products</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="selectedProductLists">
+
+                            {% for product_group in object.product_lists.all %}
+
+                                <tr data-item="{{ product_group.id }}">
+
+                                    <td>
+                                        {% if product_group.image %}
+                                            <img
+                                                src="{{ product_group.image.url }}"
+                                                alt="{{ product_group.name }}"
+                                            >
+                                        {% else %}
+                                            <div class="product-image-placeholder">
+                                                No image
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+
+                                    <td>
+                                        {{ product_group.name }}
+                                    </td>
+
+
+                                    <td>
+                                        -
+                                    </td>
+
+
+                                    <td>
+                                        {{ product_group.status }}
+                                    </td>
+
+
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="btn remove-btn"
+                                            onclick="removeSelected(event)"
+                                        >
+                                            Remove
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+                            {% empty %}
+
+                                <tr id="noSelectedProductLists">
+                                    <td colspan="5">
+                                        No product groups selected.
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+            <button
+                type="submit"
+                class="btn"
+                id="submitButton"
+            >
+                {% if object %}
+                    Update
+                {% else %}
+                    Create
+                {% endif %}
+                Collection
+            </button>
+
+        </form>
+
+    </div>
 
 </main>
 
-<!-- MODAL -->
 
-<div class="modal" id="productModal">
+<!-- ========================================================= -->
+<!-- PRODUCT GROUP MODAL -->
+<!-- ========================================================= -->
 
-<div class="modal-content">
+<div
+    class="modal"
+    id="productModal"
+>
 
-<h3>Select Products</h3>
+    <div class="modal-content">
 
-<input class="search-box" type="text" placeholder="Search product...">
+        <h3>Select Product Groups</h3>
 
-<table>
 
-<thead>
-<tr>
-<th>Image</th>
-<th>Name</th>
-<th>products</th>
-<th>status</th>
-<th></th>
-</tr>
-</thead>
+        <!-- SEARCH -->
+        <input
+            id="productGroupSearch"
+            class="search-box"
+            type="text"
+            placeholder="Search product group..."
+        >
 
-<tbody>
-{%for product_group in product_groups%}
-<tr>
-	<td><img src="{%if product_group.image%}{{product_group.image.url}}{%endif%}"></td>
-	<td>{{product_group.name}}</td>
-	<td>-</td>
-	<td>{{product_group.status}}</td>
 
-	<td>
-		<button class="btn toggle-btn"
-		data-id="{{product_group.id}}"
-		data-name="{{product_group.name}}"
-		data-status="{{product_group.status}}"
-		data-products="-"
-		data-img="{%if product_group.image%}{{product_group.image.url}}{%endif%}"
-		onclick="addRemove()"
-		>
-		{%if product_group.image in object.product_lists.all%}
-		remove
-		{%else%}
-		Add
-		{%endif%}
-		</button>
-	</td>
+        <table>
 
-</tr>
-{%endfor%}
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Products</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
 
-</tbody>
 
-</table>
+            <tbody id="productGroupModalBody">
 
-<br>
+                {% for product_group in product_groups %}
 
-<button class="btn" onclick="closeModal()">Close</button>
+                    <tr
+                        class="product-group-row"
+                        data-name="{{ product_group.name|lower }}"
+                    >
+
+                        <!-- IMAGE -->
+                        <td>
+
+                            {% if product_group.image %}
+
+                                <img
+                                    src="{{ product_group.image.url }}"
+                                    alt="{{ product_group.name }}"
+                                >
+
+                            {% else %}
+
+                                <div class="product-image-placeholder">
+                                    No image
+                                </div>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- NAME -->
+                        <td>
+                            {{ product_group.name }}
+                        </td>
+
+
+                        <!-- PRODUCTS -->
+                        <td>
+                            -
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>
+                            {{ product_group.status }}
+                        </td>
+
+
+                        <!-- ACTION -->
+                        <td>
+
+                            <button
+                                type="button"
+                                class="btn toggle-btn"
+                                data-id="{{ product_group.id }}"
+                                data-name="{{ product_group.name }}"
+                                data-status="{{ product_group.status }}"
+                                data-products="-"
+                                data-img="{% if product_group.image %}{{ product_group.image.url }}{% endif %}"
+                                onclick="addRemove(event)"
+                            >
+
+                                {% if object and product_group in object.product_lists.all %}
+                                    Remove
+                                {% else %}
+                                    Add
+                                {% endif %}
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="5">
+                            No product groups available.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        <br>
+
+
+        <button
+            type="button"
+            class="btn"
+            onclick="closeModal()"
+        >
+            Close
+        </button>
+
+    </div>
 
 </div>
 
-</div>
-{%endblock%}
 
-{%block script%}
+{% endblock %}
+
+
+{% block script %}
 
 <script>
-let productListIDs = []
-document.querySelectorAll("#selectedProductLists  tr").forEach(tr=>{
-	productListIDs.push(tr.dataset.item)
-})
+
+"use strict";
 
 
-/* ---------- MODAL CONTROL ---------- */
+/* =========================================================
+   SELECTED PRODUCT GROUP IDS
+   ========================================================= */
 
-function openModal(){
-	document.getElementById("productModal").style.display="flex";
+let productListIDs = [];
+
+
+document
+    .querySelectorAll("#selectedProductLists tr[data-item]")
+    .forEach((tr) => {
+
+        productListIDs.push(String(tr.dataset.item));
+
+    });
+
+
+/* =========================================================
+   MODAL CONTROL
+   ========================================================= */
+
+function openModal() {
+
+    document.getElementById("productModal").style.display = "flex";
+
 }
 
-function closeModal(){
-	document.getElementById("productModal").style.display="none";
+
+function closeModal() {
+
+    document.getElementById("productModal").style.display = "none";
+
 }
 
 
-
-/* ---------- ERROR HANDLING SYSTEM ---------- */
+/* =========================================================
+   ERROR HANDLING
+   ========================================================= */
 
 function clearErrors() {
-	document.getElementById("messageBox").style.display = "none";
-	document.getElementById("messageBox").innerHTML = "";
 
-	document.querySelectorAll(".error").forEach(el => {
-	el.classList.remove("error");
-	});
+    const box = document.getElementById("messageBox");
+
+    box.style.display = "none";
+    box.innerHTML = "";
+    box.className = "message";
+
+
+    document
+        .querySelectorAll(".error")
+        .forEach((element) => {
+
+            element.classList.remove("error");
+
+        });
+
 }
+
 
 function showErrors(errors) {
-		    const box = document.getElementById("messageBox");
-		    box.className = "message error";
 
-		    let html = "<ul>";
-
-		    Object.entries(errors).forEach(([field, msgs]) => {
-		      console.log(field, msgs)
-		        msgs.forEach(msg => {
-		            if (field === "__all__") {
-		              console.log(msg)
-		                html += `<li>${msg.message}</li>`;
-		            } else {
-		                html += `<li><strong>${field}</strong>: ${msg.message}</li>`;
-		            }
-		        });
-		    });
-
-		    html += "</ul>";
-		    box.innerHTML = html;
-}
-
-/* ---------- FORM SUBMIT ---------- */
-
-document.getElementById("productGroupForm").addEventListener("submit", async function(e){
-	e.preventDefault();
-	const categories = document.getElementById("id_categories")
-
-
-	const productClasses = document.getElementById("id_product_classes")
-
-
-
-	const status = document.getElementById("id_status").value
-	const imageInput = document.getElementById("id_image")
-	const name = document.getElementById("id_name").value
-	const slug = document.getElementById("id_slug").value
-	const description = document.getElementById("id_description").value
-
-	let formData = new FormData()
-
-	formData.append("name", name)
-	formData.append("slug", slug)
-	formData.append("description", description)
-	formData.append("status", status)
-	formData = getMultipleSelectValues(categories, formData, "categories")
-	productListIDs.forEach(value=>{
-		formData.append("product_lists", value)
-	})
-
-
-	formData.append("image", imageInput.files[0])
-
-	try{
-
-		const data = await fetchPost("{{request.path}}", formData)
-		if (data.status){
-			window.location.href = "{%url 'dashboard:collection_list'%}"
-		}else{
-
-			const errors = data.errors
-			showErrors(errors);
-		}
-	}catch(error){
-		showError("An unexpected error occurred. Please try again later.", "error")
-	}
-
-});
-
-function getMultipleSelectValues(multipeInput, formData, field){
-	Array.from(multipeInput.selectedOptions).forEach(option => {
-		formData.append(field, option.value)
-	})
-	return formData
-}
-
-
-/* --------- PRODUCT TOGGLE SYSTEM -------- */
-
-function addRemove(){
-	btn = event.target
-	const id = btn.dataset.id
-	productListIDs.push(id)
-	const name = btn.dataset.name
-	const status = btn.dataset.status
-	const products = btn.dataset.proudcts
-
-	const img = btn.dataset.img
-
-
-	const table = document.getElementById("selectedProductLists")
-	const existing = table.querySelector(`[data-item="${id}"]`)
-
-	if(!existing){
-
-		const row = document.createElement("tr")
-		row.dataset.item = id
-
-		row.innerHTML = `
-		<td><img src="${img}"></td>
-		<td>${name}</td>
-		<td>${products}</td>
-		<td>${status}</td>
-		<td>
-		<button class="btn remove-btn" onclick="removeSelected()">Remove</button>
-		</td>
-		`
-
-		table.appendChild(row)
-
-		btn.textContent="Remove"
-		btn.style.background="gray"
-
-		/* remove button in selected table */
-
-
-
-	}else{
-		productListIDs = productListIDs.filter(item=>item!==id)
-		existing.remove()
-		btn.textContent="Add"
-		btn.style.background=""
-
-	}
-
-	}
-
-	function removeSelected(){
-		event.preventDefault()
-		const btn = event.target
-		const row = btn.closest("tr")
-		const id = row.dataset.item
-		productListIDs = productListIDs.filter(item=>item!==id)
-		row.remove()
-		btn.textContent="Add"
-		btn.style.background=""
-	}
-  function showError(message, message_class){
     const box = document.getElementById("messageBox");
-    box.className = `message ${message_class}`;
 
-    box.innerHTML = message;
-  }
+    box.className = "message error";
+    box.style.display = "block";
+
+
+    let html = "<ul>";
+
+
+    Object.entries(errors).forEach(([field, messages]) => {
+
+        messages.forEach((message) => {
+
+            if (field === "__all__") {
+
+                html += `<li>${message.message}</li>`;
+
+            } else {
+
+                html += `
+                    <li>
+                        <strong>${field}</strong>:
+                        ${message.message}
+                    </li>
+                `;
+
+            }
+
+        });
+
+    });
+
+
+    html += "</ul>";
+
+    box.innerHTML = html;
+
+}
+
+
+/* =========================================================
+   FORM SUBMIT
+   ========================================================= */
+
+document
+    .getElementById("productGroupForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        clearErrors();
+
+
+        const categories =
+            document.getElementById("id_categories");
+
+        const status =
+            document.getElementById("id_status").value;
+
+        const imageInput =
+            document.getElementById("id_image");
+
+        const name =
+            document.getElementById("id_name").value;
+
+        const slug =
+            document.getElementById("id_slug").value;
+
+        const description =
+            document.getElementById("id_description").value;
+
+
+        const formData = new FormData();
+
+
+        /* ---------- BASIC FIELDS ---------- */
+
+        formData.append("name", name);
+        formData.append("slug", slug);
+        formData.append("description", description);
+        formData.append("status", status);
+
+
+        /* ---------- CATEGORIES ---------- */
+
+        getMultipleSelectValues(
+            categories,
+            formData,
+            "categories"
+        );
+
+
+        /* ---------- PRODUCT LISTS ---------- */
+
+        productListIDs.forEach((id) => {
+
+            formData.append(
+                "product_lists",
+                id
+            );
+
+        });
+
+
+        /* ---------- IMAGE ---------- */
+
+        if (imageInput.files.length > 0) {
+
+            formData.append(
+                "image",
+                imageInput.files[0]
+            );
+
+        }
+
+
+        /* ---------- SUBMIT ---------- */
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+
+        submitButton.disabled = true;
+
+
+        try {
+
+            const data = await fetchPost(
+                "{{ request.path }}",
+                formData
+            );
+
+
+            if (data.status) {
+
+                window.location.href =
+                    "{% url 'dashboard:collection_list' %}";
+
+                return;
+
+            }
+
+
+            if (data.errors) {
+
+                showErrors(data.errors);
+
+            } else {
+
+                showError(
+                    "Unable to save the collection.",
+                    "error"
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            showError(
+                "An unexpected error occurred. Please try again later.",
+                "error"
+            );
+
+        } finally {
+
+            submitButton.disabled = false;
+
+        }
+
+    });
+
+
+/* =========================================================
+   MULTIPLE SELECT VALUES
+   ========================================================= */
+
+function getMultipleSelectValues(
+    multipleInput,
+    formData,
+    field
+) {
+
+    Array
+        .from(multipleInput.selectedOptions)
+        .forEach((option) => {
+
+            formData.append(
+                field,
+                option.value
+            );
+
+        });
+
+
+    return formData;
+
+}
+
+
+/* =========================================================
+   ADD / REMOVE PRODUCT GROUP
+   ========================================================= */
+
+function addRemove(event) {
+
+    event.preventDefault();
+
+
+    const btn =
+        event.currentTarget;
+
+
+    const id =
+        String(btn.dataset.id);
+
+    const name =
+        btn.dataset.name;
+
+    const status =
+        btn.dataset.status;
+
+    const products =
+        btn.dataset.products;
+
+    const img =
+        btn.dataset.img;
+
+
+    const table =
+        document.getElementById(
+            "selectedProductLists"
+        );
+
+
+    const existing =
+        table.querySelector(
+            `[data-item="${id}"]`
+        );
+
+
+    /* -----------------------------------------------------
+       REMOVE PRODUCT GROUP
+       ----------------------------------------------------- */
+
+    if (existing) {
+
+        productListIDs =
+            productListIDs.filter(
+                (item) => item !== id
+            );
+
+
+        existing.remove();
+
+
+        btn.textContent = "Add";
+        btn.style.background = "";
+
+
+        updateEmptySelectedMessage();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       ADD PRODUCT GROUP
+       ----------------------------------------------------- */
+
+    if (!productListIDs.includes(id)) {
+
+        productListIDs.push(id);
+
+    }
+
+
+    removeEmptySelectedMessage();
+
+
+    const row =
+        document.createElement("tr");
+
+
+    row.dataset.item = id;
+
+
+    const imageHTML = img
+        ? `
+            <img
+                src="${img}"
+                alt="${name}"
+            >
+        `
+        : `
+            <div class="product-image-placeholder">
+                No image
+            </div>
+        `;
+
+
+    row.innerHTML = `
+
+        <td>
+            ${imageHTML}
+        </td>
+
+        <td>
+            ${name}
+        </td>
+
+        <td>
+            ${products}
+        </td>
+
+        <td>
+            ${status}
+        </td>
+
+        <td>
+            <button
+                type="button"
+                class="btn remove-btn"
+            >
+                Remove
+            </button>
+        </td>
+
+    `;
+
+
+    table.appendChild(row);
+
+
+    /* -----------------------------------------------------
+       CONNECT REMOVE BUTTON
+       ----------------------------------------------------- */
+
+    const removeButton =
+        row.querySelector(".remove-btn");
+
+
+    removeButton.addEventListener(
+        "click",
+        removeSelected
+    );
+
+
+    /* -----------------------------------------------------
+       UPDATE MODAL BUTTON
+       ----------------------------------------------------- */
+
+    btn.textContent = "Remove";
+    btn.style.background = "gray";
+
+}
+
+
+/* =========================================================
+   REMOVE SELECTED PRODUCT GROUP
+   ========================================================= */
+
+function removeSelected(event) {
+
+    event.preventDefault();
+
+
+    const btn =
+        event.currentTarget;
+
+
+    const row =
+        btn.closest("tr");
+
+
+    if (!row) {
+        return;
+    }
+
+
+    const id =
+        String(row.dataset.item);
+
+
+    productListIDs =
+        productListIDs.filter(
+            (item) => item !== id
+        );
+
+
+    row.remove();
+
+
+    /* -----------------------------------------------------
+       RESET MODAL BUTTON
+       ----------------------------------------------------- */
+
+    const modalButton =
+        document.querySelector(
+            `.toggle-btn[data-id="${id}"]`
+        );
+
+
+    if (modalButton) {
+
+        modalButton.textContent = "Add";
+        modalButton.style.background = "";
+
+    }
+
+
+    updateEmptySelectedMessage();
+
+}
+
+
+/* =========================================================
+   EMPTY SELECTED MESSAGE
+   ========================================================= */
+
+function updateEmptySelectedMessage() {
+
+    const table =
+        document.getElementById(
+            "selectedProductLists"
+        );
+
+
+    const rows =
+        table.querySelectorAll(
+            "tr[data-item]"
+        );
+
+
+    if (rows.length === 0) {
+
+        if (
+            !document.getElementById(
+                "noSelectedProductLists"
+            )
+        ) {
+
+            const row =
+                document.createElement("tr");
+
+
+            row.id =
+                "noSelectedProductLists";
+
+
+            row.innerHTML = `
+                <td colspan="5">
+                    No product groups selected.
+                </td>
+            `;
+
+
+            table.appendChild(row);
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   REMOVE EMPTY MESSAGE
+   ========================================================= */
+
+function removeEmptySelectedMessage() {
+
+    const emptyRow =
+        document.getElementById(
+            "noSelectedProductLists"
+        );
+
+
+    if (emptyRow) {
+
+        emptyRow.remove();
+
+    }
+
+}
+
+
+/* =========================================================
+   PRODUCT GROUP SEARCH
+   ========================================================= */
+
+document
+    .getElementById("productGroupSearch")
+    .addEventListener("input", function () {
+
+        const search =
+            this.value
+                .trim()
+                .toLowerCase();
+
+
+        document
+            .querySelectorAll(".product-group-row")
+            .forEach((row) => {
+
+                const name =
+                    row.dataset.name;
+
+
+                if (
+                    !search ||
+                    name.includes(search)
+                ) {
+
+                    row.style.display = "";
+
+                } else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+    });
+
+
+/* =========================================================
+   GENERIC ERROR MESSAGE
+   ========================================================= */
+
+function showError(
+    message,
+    messageClass
+) {
+
+    const box =
+        document.getElementById(
+            "messageBox"
+        );
+
+
+    box.className =
+        `message ${messageClass}`;
+
+
+    box.style.display =
+        "block";
+
+
+    box.innerHTML =
+        message;
+
+}
+
+
+/* =========================================================
+   INITIALIZE EMPTY STATE
+   ========================================================= */
+
+updateEmptySelectedMessage();
+
 </script>
 
-{%endblock%}
+{% endblock %}

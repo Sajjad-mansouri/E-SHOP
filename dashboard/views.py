@@ -27,11 +27,11 @@ from stock.models import StockRecord
 from . import forms
 from .mixins import (
     AjaxQuerysetMixin,
+    CollectionMixin,
     DeleteMixin,
     FormHandlerMixin,
     IsSellerMixin,
     StockRecordContextMixin,
-    collectionMixin,
 )
 from .wizard_views import OfferWizardStepView
 
@@ -1797,12 +1797,27 @@ class AppliedOfferDeleteView(
         )
 
 
-class ProductGroupListView(IsSellerMixin, collectionMixin, ListView):
+class ProductGroupListView(
+    IsSellerMixin,
+    CollectionMixin,
+    ListView,
+):
     model = ProductList
     template_name = "dashboard/collection/product_group/list.html"
-    paginate_by = 1
+    paginate_by = 10
     filterable = True
     searchable = True
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related(
+                "categories",
+                "product_classes",
+                "stock_records",
+            )
+        )
 
     def render_to_response(self, *args, **kwargs):
         if self.request.headers.get("AJAX"):
@@ -1812,7 +1827,10 @@ class ProductGroupListView(IsSellerMixin, collectionMixin, ListView):
 
 
 class ProductGroupCreateView(
-    IsSellerMixin, StockRecordContextMixin, FormHandlerMixin, CreateView
+    IsSellerMixin,
+    StockRecordContextMixin,
+    FormHandlerMixin,
+    CreateView,
 ):
     model = ProductList
     template_name = "dashboard/collection/product_group/create_update.html"
@@ -1820,7 +1838,10 @@ class ProductGroupCreateView(
 
 
 class ProductGroupUpdateView(
-    IsSellerMixin, StockRecordContextMixin, FormHandlerMixin, UpdateView
+    IsSellerMixin,
+    StockRecordContextMixin,
+    FormHandlerMixin,
+    UpdateView,
 ):
     model = ProductList
     template_name = "dashboard/collection/product_group/create_update.html"
@@ -1831,15 +1852,51 @@ class ProductGroupDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
     model = ProductList
 
 
-class CollectionListView(IsSellerMixin, collectionMixin, ListView):
+class CollectionListView(
+    IsSellerMixin,
+    CollectionMixin,
+    ListView,
+):
     model = CollectionList
     template_name = "dashboard/collection/collection_list/list.html"
-    paginate_by = 1
+    paginate_by = 10
     filterable = True
     searchable = True
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related(
+                "product_lists",
+                "product_lists__categories",
+                "product_lists__product_classes",
+                "product_lists__stock_records",
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        for collection in context["object_list"]:
+            product_groups = collection.product_lists.all()
+
+            product_ids = set()
+
+            for product_group in product_groups:
+                product_ids.update(
+                    product_group.get_stocks.values_list(
+                        "product_id",
+                        flat=True,
+                    )
+                )
+
+            collection.product_count = len(product_ids)
+
+        return context
+
     def render_to_response(self, *args, **kwargs):
-        if self.request.headers.get("AJAX"):
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             self.template_name = "dashboard/collection/collection_list/_list.html"
 
         return super().render_to_response(*args, **kwargs)

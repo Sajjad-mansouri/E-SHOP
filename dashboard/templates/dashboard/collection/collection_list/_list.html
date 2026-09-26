@@ -1,68 +1,237 @@
-{%load dashboard_tags%}
+{% load dashboard_tags %}
+
 <div class="table-header">
-  <h2 id="tableTitle">Items</h2>
-  <span class="result-count" id="resultCount">{{paginator.count}} results</span>
+    <h2 id="tableTitle">Collections</h2>
+
+    <span class="result-count" id="resultCount">
+        {{ paginator.count }} results
+    </span>
 </div>
+
+
 <div style="overflow-x: auto;">
-  <table id="dataTable">
-    <thead id="tableHeader">
-      <tr>
-        <th>collection</th>
-        <th>Product Groups</th>
-        <th>Products</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      {%for collection in object_list%}
-      <tr>
-        <td>
-          <div class="group-cell">
-            <img class="img-preview" src="{%if collection.image%}{{collection.image.url}}{%endif%}" alt="{{collection.name}}">
-            <div class="item-info">
-                <h4>{{collection.name}}</h4>
 
-            </div>
-          </div>
-        </td>
-        <td>-</td>
+    <table id="dataTable">
 
-        <td>-</td>
-        <td>
-          <span class="badge badge-{%if collection.status == 'active' %}active{%else%}expired{%endif%}">{{collection.status}}</span>
-        </td>
+        <thead id="tableHeader">
+            <tr>
+                <th>Collection</th>
+                <th>Product Groups</th>
+                <th>Products</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
 
-        <td>
-          <button class="action-btn edit-btn"  onclick="update('{{collection.id}}')">✏️ Edit</button>
-          <button class="action-btn delete-btn" data-id="{{collection.id}}" onclick="openDeleteModal('{{collection.id}}', '{{collection.name}}')">🗑️ Remove</button>
-        </td>
-      </tr>
-      {%endfor%}
-    </tbody>
-  </table>
+        <tbody id="tableBody">
+
+            {% for collection in object_list %}
+
+                <tr>
+
+                    <!-- COLLECTION -->
+                    <td>
+                        <div class="group-cell">
+
+                            {% if collection.image %}
+
+                                <img
+                                    class="img-preview"
+                                    src="{{ collection.image.url }}"
+                                    alt="{{ collection.name }}"
+                                >
+
+                            {% else %}
+
+                                <div class="img-preview image-placeholder">
+                                    🖼️
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="item-info">
+                                <h4>
+                                    {{ collection.name }}
+                                </h4>
+                            </div>
+
+                        </div>
+                    </td>
+
+
+                    <!-- PRODUCT GROUPS -->
+                    <td>
+                        {{ collection.product_lists.count }}
+                    </td>
+
+
+                    <!-- PRODUCTS -->
+                    <td>
+                        {{ collection.product_count }}
+                    </td>
+
+
+                    <!-- STATUS -->
+                    <td>
+
+                        <span
+                            class="badge badge-{% if collection.status == 'active' %}active{% else %}expired{% endif %}"
+                        >
+                            {{ collection.status }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+                    <td>
+
+                        <button
+                            type="button"
+                            class="action-btn edit-btn"
+                            onclick="update('{{ collection.id }}')"
+                        >
+                            ✏️ Edit
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="action-btn delete-btn"
+                            data-id="{{ collection.id }}"
+                            onclick="openDeleteModal(
+                                '{{ collection.id }}',
+                                '{{ collection.name|escapejs }}'
+                            )"
+                        >
+                            🗑️ Remove
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+                    <td colspan="5">
+                        No collections found.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
 </div>
-<div id="noResultsMessage" class="no-results" style="display: none;">
-  <div class="no-results-icon">🖼️</div>
-  <h3>No items found</h3>
-  <p>Try adjusting filters or create new</p>
-  <button class="empty-state-btn" id="emptyStateActionBtn">Create new</button>
+
+
+<!-- NO RESULTS -->
+<div
+    id="noResultsMessage"
+    class="no-results"
+    style="display: none;"
+>
+
+    <div class="no-results-icon">
+        🖼️
+    </div>
+
+    <h3>
+        No collections found
+    </h3>
+
+    <p>
+        Try adjusting filters or create a new collection.
+    </p>
+
+    <button
+        type="button"
+        class="empty-state-btn"
+        id="emptyStateActionBtn"
+    >
+        Create new
+    </button>
+
 </div>
 
 
+{% if page_obj %}
 
-{%if page_obj%}
-<!-- PAGINATION -->
-<div class="pagination" id="pagination">
+    <!-- PAGINATION -->
+    <div
+        class="pagination"
+        id="pagination"
+    >
 
-  <button class="page-btn" id="prevPage" {% if page_obj.has_previous %}data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%}>←</button>
+        <!-- PREVIOUS -->
+        <button
+            type="button"
+            class="page-btn"
+            id="prevPage"
 
-  {%for page in paginator.page_range%}
-  <button class="page-btn {%if page_obj.number == page%}active {%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
-  {%endfor%}
+            {% if page_obj.has_previous %}
 
-  <button class="page-btn" id="nextPage" {%if page_obj.has_next%}data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%} >→</button>
+                data-next-number="{{ page_obj.previous_page_number }}"
+                onclick="applyPagination(this)"
 
-</div>
-{%endif%}
+            {% else %}
+
+                disabled
+
+            {% endif %}
+        >
+            ←
+        </button>
+
+
+        <!-- PAGE NUMBERS -->
+        {% for page in paginator.page_range %}
+
+            <button
+                type="button"
+                class="page-btn
+                    {% if page_obj.number == page %}
+                        active
+                    {% endif %}
+                "
+
+                data-next-number="{{ page }}"
+
+                {% if page_obj.number != page %}
+                    onclick="applyPagination(this)"
+                {% endif %}
+            >
+                {{ page }}
+            </button>
+
+        {% endfor %}
+
+
+        <!-- NEXT -->
+        <button
+            type="button"
+            class="page-btn"
+            id="nextPage"
+
+            {% if page_obj.has_next %}
+
+                data-next-number="{{ page_obj.next_page_number }}"
+                onclick="applyPagination(this)"
+
+            {% else %}
+
+                disabled
+
+            {% endif %}
+        >
+            →
+        </button>
+
+    </div>
+
+{% endif %}
