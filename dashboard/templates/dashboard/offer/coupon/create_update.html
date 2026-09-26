@@ -1,77 +1,196 @@
-{%extends 'dashboard/_dashboard_base.html'%}
-{%load static%}
-{%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/create_coupon.css'%}">
-{%endblock%}
+{% extends 'dashboard/_dashboard_base.html' %}
+{% load static %}
 
-{%block content%}
+{% block style %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'css/dashboard/create_coupon.css' %}"
+>
+{% endblock %}
+
+{% block content %}
 
 <main class="main">
 
-  <a class="back-link" href="{%url 'dashboard:coupon_list'%}">← Back to Coupons</a>
+    <a class="back-link" href="{% url 'dashboard:coupon_list' %}">
+        ← Back to Coupons
+    </a>
 
-  <div id="errorBox" class="error-box"></div>
+    {% if form.non_field_errors %}
+        <div class="error-box">
+            <div class="error-title">Please correct the following errors:</div>
 
-  <form id="couponForm" method="POST">
-    {%csrf_token%}
+            {% for error in form.non_field_errors %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-    <!-- COUPON INFO -->
+    <form id="couponForm" method="POST">
+        {% csrf_token %}
 
-    <div class="card">
+        <!-- COUPON INFO -->
 
-    <div class="section-title">Coupon Details</div>
+        <div class="card">
 
-    <div class="form-group">
-    <label>Code</label>
-    {{form.code}}
-    </div>
+            <div class="section-title">Coupon Details</div>
 
-    <div class="form-group">
-    <label>Description</label>
-    {{form.description}}
-    </div>
+            <div class="form-group {% if form.code.errors %}has-error{% endif %}">
+                <label for="{{ form.code.id_for_label }}">
+                    Code
+                </label>
 
-    <div class="grid">
+                {{ form.code }}
 
-    <div class="form-group">
-    <label>Valid From</label>
-    {{form.valid_from}}
-    </div>
+                {% if form.code.errors %}
+                    <div class="field-errors">
+                        {% for error in form.code.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
 
-    <div class="form-group">
-    <label>Valid To</label>
-    {{form.valid_to}}
-    </div>
+            <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+                <label for="{{ form.description.id_for_label }}">
+                    Description
+                </label>
 
-    </div>
+                {{ form.description }}
 
-    <div class="grid">
+                {% if form.description.errors %}
+                    <div class="field-errors">
+                        {% for error in form.description.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
 
-    <div class="form-group">
-    <label>Discount</label>
-    {{form.discount}}
-    </div>
+            <div class="grid">
 
-    <div class="form-group">
-    <label>Usage</label>
-    {{form.usage}}
-    </div>
+                <div class="form-group {% if form.valid_from.errors %}has-error{% endif %}">
+                    <label for="{{ form.valid_from.id_for_label }}">
+                        Valid From
+                    </label>
 
-    </div>
+                    {{ form.valid_from }}
 
-    <div class="checkbox">
-    {{form.active}}
-    <label>Active</label>
-    </div>
+                    {% if form.valid_from.errors %}
+                        <div class="field-errors">
+                            {% for error in form.valid_from.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-    </div>
+                <div class="form-group {% if form.valid_to.errors %}has-error{% endif %}">
+                    <label for="{{ form.valid_to.id_for_label }}">
+                        Valid To
+                    </label>
 
-    <div class="actions">
-    <button class="save-btn" type="submit">Create Coupon</button>
-    <a class="cancel-btn"  href="{%url 'dashboard:coupon_list'%}">Cancel</a>
-    </div>
+                    {{ form.valid_to }}
 
-  </form>
+                    {% if form.valid_to.errors %}
+                        <div class="field-errors">
+                            {% for error in form.valid_to.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="grid">
+
+                <div class="form-group {% if form.discount.errors %}has-error{% endif %}">
+                    <label for="{{ form.discount.id_for_label }}">
+                        Discount
+                    </label>
+
+                    {{ form.discount }}
+
+                    {% if form.discount.errors %}
+                        <div class="field-errors">
+                            {% for error in form.discount.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group {% if form.usage.errors %}has-error{% endif %}">
+                    <label for="{{ form.usage.id_for_label }}">
+                        Usage
+                    </label>
+
+                    {{ form.usage }}
+
+                    {% if form.usage.errors %}
+                        <div class="field-errors">
+                            {% for error in form.usage.errors %}
+                                <div class="field-error">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="checkbox {% if form.status.errors %}has-error{% endif %}">
+                {{ form.status }}
+
+                <label for="{{ form.status.id_for_label }}">
+                    Status
+                </label>
+
+                {% if form.status.errors %}
+                    <div class="field-errors">
+                        {% for error in form.status.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <button class="save-btn" type="submit">
+                {% if object %}Update{% else %}Create{% endif %} Coupon
+            </button>
+
+            <a
+                class="cancel-btn"
+                href="{% url 'dashboard:coupon_list' %}"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
 
 </main>
-{%endblock%}
+
+{% endblock %}

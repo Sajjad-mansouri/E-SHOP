@@ -552,6 +552,10 @@ class CouponCreateView(IsSellerMixin, CreateView):
     success_url = reverse_lazy("dashboard:coupon_list")
     template_name = "dashboard/offer/coupon/create_update.html"
 
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
+
 
 class CouponUpdateView(IsSellerMixin, UpdateView):
     model = Coupon

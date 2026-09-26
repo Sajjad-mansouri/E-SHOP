@@ -8,7 +8,7 @@
 {%block content%}
 <main class="main">
 
-	<div class="page-title">Create Offer Range</div>
+	<div class="page-title">{%if object%}Update{%else%}Create{%endif%} Offer Range</div>
 
 	<form method="POST">
 		{%csrf_token%}
@@ -67,7 +67,12 @@
 	</div>
 
 	<div class="actions">
-	<button  class="save-btn" type="submit">Create Offer Range</button>
+		{%if object%}
+				<button  class="save-btn" type="submit">Update Offer Range</button>
+
+		{%else%}
+				<button  class="save-btn" type="submit">Create Offer Range</button>
+		{%endif%}
 	</div>
 
 	</div>

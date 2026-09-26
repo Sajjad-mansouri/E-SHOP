@@ -116,17 +116,7 @@ border-radius:10px;
 cursor:pointer;
 }
 
-/* ERROR BOX */
 
-.error-box{
-background:#fdecec;
-color:#c93737;
-padding:12px 16px;
-border-radius:10px;
-margin-bottom:20px;
-display:none;
-font-size:0.9rem;
-}
 
 .checkbox{
 display:flex;
@@ -137,4 +127,56 @@ margin-top:10px;
 
 .checkbox input{
 width:auto;
+}
+
+/* =========================
+   Form Errors
+   ========================= */
+
+.error-box {
+    margin-bottom: 24px;
+    padding: 14px 16px;
+    border: 1px solid #f1b5b5;
+    border-radius: 8px;
+    background: #fff5f5;
+    color: #b42318;
+}
+
+.error-title {
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.error-message {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+.form-group.has-error input,
+.form-group.has-error textarea,
+.form-group.has-error select {
+    border-color: #dc3545;
+}
+
+.form-group.has-error input:focus,
+.form-group.has-error textarea:focus,
+.form-group.has-error select:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+    outline: none;
+}
+
+.field-errors {
+    margin-top: 6px;
+}
+
+.field-error {
+    color: #dc3545;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.field-error::before {
+    content: "⚠ ";
+    font-size: 12px;
 }
