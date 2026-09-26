@@ -907,48 +907,108 @@ class FulfilmentStatistic(IsSellerMixin, TemplateView):
 
 class CustomerListView(IsSellerMixin, ListView):
     template_name = "dashboard/customer/customers.html"
-    queryset = UserModel.objects.filter(user_type="customer")
+    queryset = UserModel.objects.filter(
+        user_type="customer",
+    )
 
     def dispatch(self, request, *args, **kwargs):
-        self.is_ajax = request.headers.get("AJAX")
+        self.is_ajax = request.headers.get("AJAX") == "true"
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_queryset(self):
         users = (
-            self.queryset.filter(~Q(orders__status="cancelled"))
-            .annotate(
-                last_order=Max("orders__created_at"),
-                order_count=Count("orders"),
-                total_spent=Sum("orders__total_cost"),
+            super()
+            .get_queryset()
+            .filter(
+                orders__items__stock__product__seller=self.request.user,
             )
-            .prefetch_related("orders")
+            .filter(
+                orders__status__in=[
+                    "pending",
+                    "processing",
+                    "shipped",
+                    "delivered",
+                ],
+            )
+            .annotate(
+                last_order=Max(
+                    "orders__created_at",
+                    filter=Q(
+                        orders__items__stock__product__seller=self.request.user,
+                        orders__status__in=[
+                            "pending",
+                            "processing",
+                            "shipped",
+                            "delivered",
+                        ],
+                    ),
+                ),
+                order_count=Count(
+                    "orders",
+                    filter=Q(
+                        orders__items__stock__product__seller=self.request.user,
+                        orders__status__in=[
+                            "pending",
+                            "processing",
+                            "shipped",
+                            "delivered",
+                        ],
+                    ),
+                    distinct=True,
+                ),
+                total_spent=Sum(
+                    "orders__total_amount",
+                    filter=Q(
+                        orders__items__stock__product__seller=self.request.user,
+                        orders__status__in=[
+                            "pending",
+                            "processing",
+                            "shipped",
+                            "delivered",
+                        ],
+                    ),
+                    distinct=True,
+                ),
+            )
+            .distinct()
         )
+
         if self.is_ajax:
             users = self.filter_search(users)
             users = self.filter_status(users)
             users = self.sort_users(users)
-        context["object_list"] = users
 
+        return users
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_list"] = self.get_queryset()
         return context
 
     def filter_search(self, users):
-        search = self.request.GET.get("search")
-        if search:
-            return users.filter(
-                Q(first_name__icontains=search) | Q(email__icontains=search)
-            )
-        return users
+        search = self.request.GET.get("search", "").strip()
+
+        if not search:
+            return users
+
+        return users.filter(
+            Q(first_name__icontains=search)
+            | Q(last_name__icontains=search)
+            | Q(email__icontains=search)
+        )
 
     def filter_status(self, users):
         status = self.request.GET.get("status")
-        if status:
-            return users.filter(Q(profile__status=status))
-        return users
+
+        if not status:
+            return users
+
+        return users.filter(profile__status=status)
 
     def sort_users(self, users):
         ordering = self.request.GET.get("ordering")
-        ordering_options = [
+
+        ordering_options = {
             "date_joined",
             "-date_joined",
             "first_name",
@@ -957,34 +1017,59 @@ class CustomerListView(IsSellerMixin, ListView):
             "-total_spent",
             "order_count",
             "-order_count",
-        ]
-        if ordering and ordering in ordering_options:
+        }
+
+        if ordering in ordering_options:
             return users.order_by(ordering)
+
         return users
 
     def render_to_response(self, context, **response_kwargs):
-        is_ajax = self.request.headers.get("AJAX")
-        if is_ajax == "true":
+        if self.is_ajax:
             self.template_name = "dashboard/customer/_customers.html"
-        return super().render_to_response(context, **response_kwargs)
+
+        return super().render_to_response(
+            context,
+            **response_kwargs,
+        )
 
 
 class CustomerDetailView(IsSellerMixin, DetailView):
     template_name = "dashboard/customer/customer.html"
-    queryset = UserModel.objects.filter(user_type="customer")
+    queryset = UserModel.objects.filter(
+        user_type="customer",
+    )
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                orders__items__stock__product__seller=self.request.user,
+            )
+            .distinct()
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        aggregate = self.object.orders.aggregate(
-            total_spent=Sum("total_cost"),
+
+        seller_orders = self.object.orders.filter(
+            items__stock__product__seller=self.request.user,
+        ).distinct()
+
+        aggregate = seller_orders.aggregate(
+            total_spent=Sum("total_amount"),
             last_order=Max("created_at"),
         )
+
         context["total_spent"] = aggregate["total_spent"]
         context["last_order"] = aggregate["last_order"]
+
         context["default_addresses"] = self.object.addresses.filter(
-            is_default_address=True
+            is_default_address=True,
         )
-        context["orders"] = self.object.orders.all()
+
+        context["orders"] = seller_orders
 
         return context
 
