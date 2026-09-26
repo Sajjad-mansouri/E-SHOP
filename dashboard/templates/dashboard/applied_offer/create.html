@@ -1,209 +1,363 @@
+{% extends 'dashboard/_dashboard_base.html' %}
+{% load static %}
 
+{% block style %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'css/dashboard/applied_offer/create.css' %}"
+>
+{% endblock %}
 
-{%extends 'dashboard/_dashboard_base.html'%}
-{%load static%}
+{% block title %}
+Apply Offer
+{% endblock %}
 
-{%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/dashboard/applied_offer/create.css'%}">
-{%endblock%}
-
-{%block title%}
-{%endblock%}
-{%block content%}
+{% block content %}
 <main class="main">
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <h1>Apply offer to product</h1>
-    <div class="subtitle">Catalog · Offers — assign a specific offer to selected products</div>
-  </div>
-
-  <!-- MAIN CARD: Apply Offer Form -->
-  <div class="card">
-    <form class="apply-form" id="applyOfferForm" method="POST">
-      {%csrf_token%}
-      <div id="messageBox" class="message"></div>
-      <!-- ROW 1: Select Offer -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Select offer <span class="required">*</span></label>
-          {{form.offer}}
-          <div class="hint" id="offerCategoryHint">Applies to category: —</div>
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1>Apply offer to product</h1>
+        <div class="subtitle">
+            Catalog · Offers — assign a specific offer to a selected product
         </div>
-      </div>
+    </div>
 
+    <!-- MAIN CARD -->
+    <div class="card">
+        <form
+            class="apply-form"
+            id="applyOfferForm"
+            method="post"
+            novalidate
+        >
+            {% csrf_token %}
 
-      <!-- ROW 2: Search and Select Product -->
-      <div class="form-group">
-        <label>Select product <span class="required">*</span></label>
-        <div class="product-selector">
-          <!-- Search input -->
-          <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
-            <input
-              type="text"
-              class="search-input"
-              id="productSearchInput"
-              placeholder="Search products by name, UPC, or category..."
-              autocomplete="off"
-            >
-          </div>
+            <div id="messageBox" class="message"></div>
 
-          <!-- Product dropdown list -->
-          <div class="product-dropdown" id="productDropdown">
-            <!-- Products will be dynamically populated here -->
-            {%include 'dashboard/applied_offer/_products.html'%}
-          </div>
-        </div>
-        <div class="hint" id="productHint">Search and select a product from the list</div>
-      </div>
+            <!-- OFFER -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.offer.id_for_label }}">
+                        Select offer <span class="required">*</span>
+                    </label>
 
+                    {{ form.offer }}
 
+                    {% if form.offer.errors %}
+                        <div class="field-error">
+                            {{ form.offer.errors }}
+                        </div>
+                    {% endif %}
 
-      <!-- ROW 3: Offer Discount + Summary -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Offer discount (%) <span class="required">*</span></label>
-          <div class="discount-wrapper">
-            <input type="number" id="discountInput" min="1" max="99" step="1" value="5" placeholder="e.g. 5" required>
-            <span class="discount-unit">%</span>
-          </div>
-          <div class="hint">Set the discount percentage</div>
-        </div>
+                    <div class="hint" id="offerCategoryHint">
+                        Select an offer
+                    </div>
+                </div>
+            </div>
 
+            <!-- PRODUCT -->
+            <div class="form-group">
+                <label for="productSearchInput">
+                    Select product <span class="required">*</span>
+                </label>
 
-      </div>
+                <div class="product-selector">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
 
-      <!-- FORM ACTIONS -->
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary" onclick="submitForm()">Apply Offer to Product</button>
-      </div>
-    </form>
-  </div>
+                        <input
+                            type="text"
+                            class="search-input"
+                            id="productSearchInput"
+                            placeholder="Search products by name, UPC, or category..."
+                            autocomplete="off"
+                            aria-label="Search products"
+                        >
+                    </div>
 
+                    <div
+                        class="product-dropdown"
+                        id="productDropdown"
+                    >
+                        {% include 'dashboard/applied_offer/_products.html' %}
+                    </div>
+                </div>
 
+                <div class="hint" id="productHint">
+                    Search and select a product from the list
+                </div>
+
+                {% if form.stock.errors %}
+                    <div class="field-error">
+                        {{ form.stock.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- DISCOUNT -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="discountInput">
+                        Offer discount (%) <span class="required">*</span>
+                    </label>
+
+                    <div class="discount-wrapper">
+                        <input
+                            type="number"
+                            id="discountInput"
+                            name="offer_discount"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value="{{ form.offer_discount.value|default:'' }}"
+                            placeholder="e.g. 5"
+                            required
+                        >
+
+                        <span class="discount-unit">%</span>
+                    </div>
+
+                    <div class="hint">
+                        Set the discount percentage
+                    </div>
+
+                    {% if form.offer_discount.errors %}
+                        <div class="field-error">
+                            {{ form.offer_discount.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="form-actions">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="submitOfferBtn"
+                >
+                    Apply Offer to Product
+                </button>
+            </div>
+        </form>
+    </div>
 </main>
-{%endblock%}
-{%block script%}
+{% endblock %}
+
+{% block script %}
 <script>
-
-
-    // DOM elements
-    const offerSelect = document.getElementById('offerSelect');
-    const productSearchInput = document.getElementById('productSearchInput');
-    const productDropdown = document.getElementById('productDropdown');
-    const offerCategoryHint = document.getElementById('offerCategoryHint');
-    const selectedOfferNameSpan = document.getElementById('selectedOfferName');
-    const categoryTagSpan = document.getElementById('categoryTag');
-    const productCompatibilityMsg = document.getElementById('productCompatibilityMsg');
-    const applyForm = document.getElementById('applyOfferForm');
-    const resetBtn = document.getElementById('resetFormBtn');
-    const tableBody = document.getElementById('appliedOffersTableBody');
-
-    // Selected product display elements
-    const selectedProductDisplay = document.getElementById('selectedProductDisplay');
-    const selectedThumbnail = document.getElementById('selectedThumbnail');
-    const selectedTitle = document.getElementById('selectedTitle');
-    const selectedUPC = document.getElementById('selectedUPC');
-    const selectedPrice = document.getElementById('selectedPrice');
-    const selectedStock = document.getElementById('selectedStock');
-    const selectedStockBadge = document.getElementById('selectedStockBadge');
-    const selectedCategory = document.getElementById('selectedCategory');
+    const applyForm = document.getElementById("applyOfferForm");
+    const offerSelect = document.getElementById("id_offer");
+    const productSearchInput = document.getElementById(
+        "productSearchInput"
+    );
+    const productDropdown = document.getElementById("productDropdown");
+    const productHint = document.getElementById("productHint");
+    const discountInput = document.getElementById("discountInput");
+    const messageBox = document.getElementById("messageBox");
+    const submitButton = document.getElementById("submitOfferBtn");
 
     let selectedProduct = null;
 
-    // Event: Search input
-    productSearchInput.addEventListener('input', () => {
-
-      productDropdown.classList.add('show');
+    /*
+     * Open product dropdown when searching.
+     */
+    productSearchInput.addEventListener("focus", () => {
+        productDropdown.classList.add("show");
     });
 
-    productSearchInput.addEventListener('focus', () => {
+    productSearchInput.addEventListener("input", () => {
+        const searchTerm = productSearchInput.value.trim().toLowerCase();
+        const options = productDropdown.querySelectorAll(".product-option");
 
-      productDropdown.classList.add('show');
+        productDropdown.classList.add("show");
+
+        options.forEach((option) => {
+            const text = option.textContent.toLowerCase();
+
+            option.style.display = text.includes(searchTerm)
+                ? ""
+                : "none";
+        });
     });
 
-    // Event: Select product from dropdown
-    productDropdown.addEventListener('click', (e) => {
-      const option = e.target.closest('.product-option');
-      if (!option) return;
+    /*
+     * Select a product.
+     */
+    productDropdown.addEventListener("click", (event) => {
+        const option = event.target.closest(".product-option");
 
-      const productId = option.dataset.productId;
-      selectedProduct = productId;
-      productDropdown.classList.remove('show');
+        if (!option) {
+            return;
+        }
 
+        selectedProduct = option.dataset.productId;
 
+        productSearchInput.value = option.dataset.productName
+            || option.textContent.trim();
+
+        productHint.textContent = "Product selected.";
+        productDropdown.classList.remove("show");
+
+        clearMessage();
     });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.product-selector')) {
-        productDropdown.classList.remove('show');
-      }
+    /*
+     * Close dropdown when clicking outside.
+     */
+    document.addEventListener("click", (event) => {
+        if (!event.target.closest(".product-selector")) {
+            productDropdown.classList.remove("show");
+        }
     });
 
+    /*
+     * Submit form.
+     */
+    applyForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    function submitForm(){
-      event.preventDefault()
+        clearMessage();
 
+        if (!offerSelect.value) {
+            showMessage("Please select an offer.");
+            offerSelect.focus();
+            return;
+        }
 
-      const discountInput = document.getElementById('discountInput');
-      const formData = new FormData()
-      const csrf = document.querySelector("input[name='csrfmiddlewaretoken']").value
-      const offer = document.getElementById("id_offer").value
-      formData.append("offer", offer)
-      formData.append("stock", selectedProduct)
-      formData.append("offer_discount", discountInput.value)
-      formData.append('csrfmiddlewaretoken', csrf);
-      postFetch(formData)
+        if (!selectedProduct) {
+            showMessage("Please select a product.");
+            productSearchInput.focus();
+            return;
+        }
 
+        const discount = discountInput.value.trim();
+
+        if (discount === "") {
+            showMessage("Please enter an offer discount.");
+            discountInput.focus();
+            return;
+        }
+
+        const discountValue = Number(discount);
+
+        if (
+            !Number.isInteger(discountValue)
+            || discountValue < 0
+            || discountValue > 100
+        ) {
+            showMessage(
+                "Offer discount must be an integer between 0 and 100."
+            );
+            discountInput.focus();
+            return;
+        }
+
+        const formData = new FormData(applyForm);
+
+        /*
+         * The stock field is selected through the custom product selector,
+         * so add its value manually.
+         */
+        formData.set("stock", selectedProduct);
+        formData.set("offer", offerSelect.value);
+        formData.set("offer_discount", discountValue);
+
+        await submitForm(formData);
+    });
+
+    async function submitForm(formData) {
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch(
+                "{% url 'dashboard:apply_offer' %}",
+                {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.status) {
+                showFormErrors(data.errors);
+                return;
+            }
+
+            window.location.href =
+                "{% url 'dashboard:applied_offers' %}";
+        } catch (error) {
+            showMessage(
+                "An unexpected error occurred. Please try again later."
+            );
+        } finally {
+            submitButton.disabled = false;
+        }
     }
 
-  async function postFetch(url, formData){
-    try{
+    function showFormErrors(errors) {
+        if (!errors) {
+            showMessage(
+                "Unable to apply the offer. Please check your input."
+            );
+            return;
+        }
 
-      const response = await fetch("{%url 'dashboard:apply_offer'%}", {
-        method : "POST",
-        body : formData
-      })
-      const data = await response.json()
-      if (!data.status){
-        showFormErrors(data.errors)
-      }
-      else{
-        window.location.href = "{%url 'dashboard:applied_offers'%}"
-      }
-    }catch(error){
-      showError()
+        const messages = [];
+
+        Object.entries(errors).forEach(([field, fieldErrors]) => {
+            fieldErrors.forEach((error) => {
+                const message = error.message || String(error);
+
+                if (field === "__all__") {
+                    messages.push(message);
+                } else {
+                    messages.push(
+                        `${formatFieldName(field)}: ${message}`
+                    );
+                }
+            });
+        });
+
+        if (!messages.length) {
+            showMessage(
+                "Unable to apply the offer. Please check your input."
+            );
+            return;
+        }
+
+        messageBox.className = "message error";
+
+        const list = document.createElement("ul");
+
+        messages.forEach((message) => {
+            const item = document.createElement("li");
+            item.textContent = message;
+            list.appendChild(item);
+        });
+
+        messageBox.replaceChildren(list);
     }
 
-  }
-  function showError(){
-    const box = document.getElementById("messageBox");
-    box.className = "message error";
-    message = "An unexpected error occurred. Please try again later."
-    box.innerHTML = message;
-  }
-  function showFormErrors(errors) {
-      const box = document.getElementById("messageBox");
-      box.className = "message error";
+    function showMessage(message) {
+        messageBox.className = "message error";
+        messageBox.textContent = message;
+    }
 
-      let html = "<ul>";
+    function clearMessage() {
+        messageBox.className = "message";
+        messageBox.replaceChildren();
+    }
 
-      Object.entries(errors).forEach(([field, msgs]) => {
-
-          msgs.forEach(msg => {
-              if (field === "__all__") {
-                console.log(msg)
-                  html += `<li>${msg.message}</li>`;
-              } else {
-                  html += `<li><strong>${field}</strong>: ${msg.message}</li>`;
-              }
-          });
-      });
-
-      html += "</ul>";
-      box.innerHTML = html;
-  }
-
+    function formatFieldName(field) {
+        return field
+            .replaceAll("_", " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
 </script>
-{%endblock%}
+{% endblock %}

@@ -30,7 +30,7 @@ from .mixins import (
     DeleteMixin,
     FormHandlerMixin,
     IsSellerMixin,
-    StockRecordContexMixin,
+    StockRecordContextMixin,
     collectionMixin,
 )
 from .wizard_views import OfferWizardStepView
@@ -1628,85 +1628,173 @@ class ReviewDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 class AppliedOfferListView(IsSellerMixin, ListView):
     model = OfferApplication
     template_name = "dashboard/applied_offer/list.html"
-    paginate_by = 1
+    context_object_name = "offer_applications"
+    paginate_by = 10
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(stock__seller=self.request.user)
+        qs = (
+            super()
+            .get_queryset()
+            .filter(
+                stock__product__seller=self.request.user,
+            )
+            .select_related(
+                "offer",
+                "stock",
+                "stock__product",
+            )
+        )
+
         qs = self.filter_by_offer_status(qs)
         qs = self.search(qs)
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_active_offers"] = self.get_total_active_offers
-        context["products_with_offer"] = self.get_product_with_offer
-        context["expiring_offer_products"] = self.get_expired_offers_products
+
+        active_offers = self.get_active_offers()
+
+        context["total_active_offers"] = self.calc_products_count(
+            active_offers,
+        )
+
+        context["products_with_offer"] = self.calc_products_count(
+            active_offers,
+        )
+
+        context["expiring_offer_products"] = self.calc_products_count(
+            self.get_expiring_offers(active_offers),
+        )
 
         return context
 
-    @property
-    def get_total_active_offers(self):
-        return self.model.objects.filter(offer__status="active")
+    def get_active_offers(self):
+        return OfferApplication.objects.filter(
+            stock__product__seller=self.request.user,
+            offer__status="active",
+        ).select_related(
+            "offer",
+            "stock",
+            "stock__product",
+        )
 
-    @property
-    def get_product_with_offer(self):
-        total_active_offers = self.get_total_active_offers
-        return self.calc_products_count(total_active_offers)
+    def calc_products_count(self, applications):
+        return applications.aggregate(
+            total_product=Count(
+                "stock",
+                distinct=True,
+            ),
+        )["total_product"]
 
-    def calc_products_count(self, offers):
-        if offers:
-            return offers.aggregate(total_product=Count("stock", distinct=True))
-        else:
-            return {"total_product": 0}
+    def get_expiring_offers(self, applications, hours=72):
+        now = timezone.now()
+        expiration = now + timedelta(hours=hours)
 
-    @property
-    def get_expired_offers_products(self):
-        near_to_expire_offers = self.get_expiring_offer()
-        return self.calc_products_count(near_to_expire_offers)
-
-    def get_expiring_offer(self, hours=72):
-        return self.get_total_active_offers.filter(
-            offer__end_datetime__lte=timezone.now() + timedelta(hours=hours)
+        return applications.filter(
+            offer__end_datetime__gt=now,
+            offer__end_datetime__lte=expiration,
         )
 
     def filter_by_offer_status(self, qs):
-        status = self.request.GET.get("offer")
-        query = Q(offer__status=status)
-        if status == "all" or not status:
-            query = Q()
-        return qs.filter(query)
+        status = self.request.GET.get("offer", "").strip()
+
+        if not status or status == "all":
+            return qs
+
+        return qs.filter(
+            offer__status=status,
+        )
 
     def search(self, qs):
-        search = self.request.GET.get("search")
+        search = self.request.GET.get("search", "").strip()
 
-        if search:
-            query = Q(offer__name__icontains=search) | Q(
-                stock__product__title__icontains=search
-            )
-        else:
-            query = Q()
+        if not search:
+            return qs
 
-        return qs.filter(query)
+        return qs.filter(
+            Q(offer__name__icontains=search)
+            | Q(stock__product__title__icontains=search)
+        )
 
-    def render_to_response(self, *args, **kwargs):
-        if self.request.headers.get("AJAX"):
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("AJAX") == "true":
             self.template_name = "dashboard/applied_offer/_list.html"
 
-        return super().render_to_response(*args, **kwargs)
+        return super().render_to_response(
+            context,
+            **response_kwargs,
+        )
 
 
 class AppliedOfferCreateView(
-    IsSellerMixin, StockRecordContexMixin, FormHandlerMixin, CreateView
+    IsSellerMixin,
+    StockRecordContextMixin,
+    FormHandlerMixin,
+    CreateView,
 ):
     model = OfferApplication
     template_name = "dashboard/applied_offer/create.html"
     form_class = forms.AppliedOfferForm
     success_url = reverse_lazy("dashboard:applied_offers")
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                stock__product__seller=self.request.user,
+            )
+        )
 
-class AppliedOfferDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
+    def form_valid(self, form):
+        stock = form.cleaned_data.get("stock")
+
+        if stock is None or stock.product.seller_id != self.request.user.id:
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+
+class AppliedOfferDeleteView(
+    IsSellerMixin,
+    DeleteMixin,
+    DeleteView,
+):
     model = OfferApplication
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                stock__product__seller=self.request.user,
+            )
+        )
+
+    def form_valid(self, form):
+        self.object.delete()
+
+        return JsonResponse(
+            {
+                "status": True,
+                "message": "Applied offer deleted successfully.",
+            }
+        )
+
+    def form_invalid(self, form):
+        return JsonResponse(
+            {
+                "status": False,
+                "message": "Unable to delete applied offer.",
+            },
+            status=400,
+        )
 
 
 class ProductGroupListView(IsSellerMixin, collectionMixin, ListView):
@@ -1724,7 +1812,7 @@ class ProductGroupListView(IsSellerMixin, collectionMixin, ListView):
 
 
 class ProductGroupCreateView(
-    IsSellerMixin, StockRecordContexMixin, FormHandlerMixin, CreateView
+    IsSellerMixin, StockRecordContextMixin, FormHandlerMixin, CreateView
 ):
     model = ProductList
     template_name = "dashboard/collection/product_group/create_update.html"
@@ -1732,7 +1820,7 @@ class ProductGroupCreateView(
 
 
 class ProductGroupUpdateView(
-    IsSellerMixin, StockRecordContexMixin, FormHandlerMixin, UpdateView
+    IsSellerMixin, StockRecordContextMixin, FormHandlerMixin, UpdateView
 ):
     model = ProductList
     template_name = "dashboard/collection/product_group/create_update.html"

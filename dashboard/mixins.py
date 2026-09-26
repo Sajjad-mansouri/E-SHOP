@@ -14,25 +14,38 @@ class DeleteMixin:
         return JsonResponse({"status": False})
 
 
-class StockRecordContexMixin:
+class StockRecordContextMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["stock_records"] = StockRecord.objects.filter(seller=self.request.user)
+
+        context["stock_records"] = StockRecord.objects.filter(
+            product__seller=self.request.user,
+        ).select_related("product")
+
         return context
 
 
 class FormHandlerMixin:
     def form_valid(self, form):
-        form.save()
-        return JsonResponse({"status": True})
+        self.object = form.save()
+
+        return JsonResponse(
+            {
+                "status": True,
+            }
+        )
 
     def form_invalid(self, form):
-        errors = self.serialize_errors(form)
-        return JsonResponse({"status": False, "errors": errors})
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": self.serialize_errors(form),
+            },
+            status=400,
+        )
 
     def serialize_errors(self, form):
-        errors = form.errors.get_json_data()
-        return errors
+        return form.errors.get_json_data()
 
 
 class FilterQuerySetMixin:

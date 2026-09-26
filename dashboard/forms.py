@@ -483,6 +483,13 @@ class AppliedOfferForm(forms.ModelForm):
         fields = ["offer", "stock", "offer_discount"]
         widgets = {"stock": OfferProductApplySelect()}
 
+    def __init__(self, *args, request=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["stock"].queryset = StockRecord.objects.filter(
+            product__seller=request.user,
+        )
+
 
 class ProductGroupForm(forms.ModelForm):
     class Meta:
