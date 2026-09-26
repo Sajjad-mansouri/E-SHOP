@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.http import JsonResponse
 from django.views.generic.edit import CreateView
 
@@ -9,6 +7,7 @@ from shipping.models import Shipping
 
 from .forms import OrderForm
 from .models import Order
+from .services import OrderCheckoutService
 
 
 class OrderCreateView(CreateView):
@@ -18,75 +17,80 @@ class OrderCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["addresses"] = self.request.user.addresses.all()
         context["shipping_methods"] = Shipping.objects.all()
+
         try:
             cart = self.get_user_cart()
-            context["cart"] = cart
-            context["items"] = cart.items.all()
-            coupon_application = self.get_user_application_coupon(cart)
         except Cart.DoesNotExist:
-            context["cart"] = []
+            context["cart"] = None
             context["items"] = []
-            coupon_application = None
+            context["coupon_application"] = None
+            context["final_price"] = 0
+            context["discount"] = 0
+            return context
+
+        context["cart"] = cart
+        context["items"] = cart.items.select_related("stock")
+
+        coupon_application = self.get_user_application_coupon(cart)
 
         context["coupon_application"] = coupon_application
-        discount_prc = coupon_application.coupon.discount
-        pre_coupon_discount_price = cart.get_items_price
-        discount = Decimal(discount_prc / 100) * pre_coupon_discount_price
 
-        final_price = pre_coupon_discount_price - discount
-        print(final_price)
-        context["final_price"] = final_price
+        subtotal = cart.get_items_price
+
+        if coupon_application:
+            discount_percent = coupon_application.coupon.discount
+            discount = subtotal * discount_percent / 100
+        else:
+            discount = 0
+
         context["discount"] = discount
+        context["final_price"] = subtotal - discount
 
         return context
 
     def form_valid(self, form):
         cart = self.get_user_cart()
 
-        Order.objects.filter(
-            user=self.request.user, cart=cart, status="pending"
-        ).delete()
-
-        order = form.save(commit=False)
-        order.user = self.request.user
-        cost = self.calc_cost(form, cart)
-        order.total_amount = cost
-        order.cart = cart
-        order.save()
-        return JsonResponse({"status": True})
-
-    def get_user_cart(self):
-        cart = Cart.objects.get(user=self.request.user, submited=False)
-        return cart
-
-    def get_user_application_coupon(self, cart):
-        coupon_application = CouponApplication.objects.get(
-            user=self.request.user, cart=cart
-        )
-        return coupon_application
-
-    def calc_cost(self, form, cart):
-        tax = 0
         coupon_application = self.get_user_application_coupon(cart)
 
-        discount_prc = coupon_application.coupon.discount
-        pre_coupon_discount_price = cart.get_items_price
-        shipping_cost = self.get_shipping_cost(form, pre_coupon_discount_price)
-        discount = Decimal(discount_prc / 100) * pre_coupon_discount_price
+        order = OrderCheckoutService.create_order(
+            user=self.request.user,
+            cart=cart,
+            shipping_address=form.cleaned_data["shipping_address"],
+            shipping_method=form.cleaned_data["shipping_method"],
+            coupon_application=coupon_application,
+        )
 
-        final_cost = pre_coupon_discount_price - discount + tax + shipping_cost
-        return final_cost
+        return JsonResponse(
+            {
+                "status": True,
+                "order_number": str(order.order_number),
+            }
+        )
 
-    def get_shipping_cost(self, form, pre_coupon_discount_price):
-        shipping = form.cleaned_data["shipping_method"]
+    def get_user_cart(self):
+        return Cart.objects.get(
+            user=self.request.user,
+            submited=False,
+        )
 
-        if shipping.free_shipping:
-            if pre_coupon_discount_price > shipping.free_shipping_threshold:
-                return 0
-
-        return shipping.price
+    def get_user_application_coupon(self, cart):
+        try:
+            return CouponApplication.objects.get(
+                user=self.request.user,
+                cart=cart,
+            )
+        except CouponApplication.DoesNotExist:
+            return None
 
     def form_invalid(self, form):
-        print(form.errors)
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": form.errors,
+            },
+            status=400,
+        )
