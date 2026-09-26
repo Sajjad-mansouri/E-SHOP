@@ -688,100 +688,221 @@ class FulfilmentStatistic(IsSellerMixin, TemplateView):
     template_name = "dashboard/fulfilment/statistics.html"
 
     def get(self, request, *args, **kwargs):
-        self.is_filter = self.request.GET.get("filter")
-        if self.is_filter == "true":
-            orders = self.get_filtered_objects()
-            total, processing, shipped, delivered, cancelled = self.get_count_by_status(
-                orders
-            )
-            return JsonResponse(
-                {
-                    "total": total,
-                    "processing": processing,
-                    "shipped": shipped,
-                    "delivered": delivered,
-                    "cancelled": cancelled,
-                }
-            )
+        if request.GET.get("filter") == "true":
+            return self.get_statistics_response()
 
-        else:
-            context = self.get_context_data(**kwargs)
-            return self.render_to_response(context)
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         orders = self.get_filtered_objects()
-        total, processing, shipped, delivered, cancelled = self.get_count_by_status(
-            orders
-        )
-        context["total"] = total
-        context["processing"] = processing
-        context["shipped"] = shipped
-        context["delivered"] = delivered
-        context["cancelled"] = cancelled
-        context["order"] = orders
+        statistics = self.get_count_by_status(orders)
+
+        context.update(statistics)
+
         return context
 
+    def get_statistics_response(self):
+        orders = self.get_filtered_objects()
+        statistics = self.get_count_by_status(orders)
+
+        return JsonResponse(statistics)
+
     def get_filtered_objects(self):
+        """
+        Return only orders that contain at least one product belonging
+        to the currently authenticated seller.
+        """
+        orders = Order.objects.filter(
+            items__stock__product__seller=self.request.user,
+        ).distinct()
+
         period = self.request.GET.get("period")
-        is_range = self.request.GET.get("is_range")
-        is_range = self.request.GET.get("is_range")
-        range_start = self.request.GET.get("range_start")
-        range_end = self.request.GET.get("range_end")
-        if self.is_filter == "true" and period != "total":
-            filter_q = self.get_filter_by_period(
-                period, is_range, range_start, range_end
-            )
-            orders = Order.objects.filter(filter_q)
-        else:
-            orders = Order.objects.all()
+        is_range = self.request.GET.get("is_range") == "true"
+
+        if is_range:
+            filter_query = self.get_filter_by_range()
+            return orders.filter(filter_query)
+
+        if period and period != "total":
+            filter_query = self.get_filter_by_period(period)
+
+            if filter_query is not None:
+                return orders.filter(filter_query)
 
         return orders
 
-    def get_filter_by_period(
-        self, period=None, is_range=None, range_start=None, range_end=None
-    ):
-        now = timezone.now()
+    def get_filter_by_period(self, period):
+        """
+        Return a date filter for the requested period.
+
+        The range uses [start, end), meaning the end timestamp is
+        exclusive. This avoids overlap between consecutive periods.
+        """
+        now = timezone.localtime()
+
         if period == "today":
-            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            start = now.replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
             end = start + timedelta(days=1)
 
         elif period == "week":
-            start_of_week = now - timedelta(days=now.weekday())
-            start = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+            start = (now - timedelta(days=now.weekday())).replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
             end = start + timedelta(days=7)
 
         elif period == "month":
-            start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            start = now.replace(
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+
             if start.month == 12:
-                end = start.replace(year=start.year + 1, month=1)
+                end = start.replace(
+                    year=start.year + 1,
+                    month=1,
+                )
             else:
-                end = start.replace(month=start.month + 1)
+                end = start.replace(
+                    month=start.month + 1,
+                )
 
         elif period == "year":
             start = now.replace(
-                month=1, day=1, hour=0, minute=0, second=0, microsecond=0
+                month=1,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
             )
-            end = start.replace(year=start.year + 1)
+            end = start.replace(
+                year=start.year + 1,
+            )
 
-        elif is_range:
-            timezone_str = self.request.GET.get("timezone")
-            tz = zoneinfo.ZoneInfo(timezone_str)
-            start_naive = datetime.strptime(range_start, "%Y-%m-%d")
-            end_naive = datetime.strptime(range_end, "%Y-%m-%d")
+        else:
+            return None
 
-            start = timezone.make_aware(start_naive, tz)
-            end = timezone.make_aware(end_naive, tz)
+        return Q(
+            created_at__gte=start,
+            created_at__lt=end,
+        )
 
-        return Q(created_at__gte=start) & Q(created_at__lte=end)
+    def get_filter_by_range(self):
+        """
+        Build a timezone-aware date range.
+
+        The selected end date is inclusive. For example:
+
+        2026-09-01 → 2026-09-10
+
+        includes all orders created on September 10.
+        """
+        range_start = self.request.GET.get("range_start")
+        range_end = self.request.GET.get("range_end")
+        timezone_name = self.request.GET.get("timezone")
+
+        if not range_start or not range_end:
+            return Q(pk__in=[])
+
+        try:
+            start_date = datetime.strptime(
+                range_start,
+                "%Y-%m-%d",
+            ).date()
+
+            end_date = datetime.strptime(
+                range_end,
+                "%Y-%m-%d",
+            ).date()
+        except ValueError:
+            return Q(pk__in=[])
+
+        if start_date > end_date:
+            return Q(pk__in=[])
+
+        try:
+            tz = (
+                zoneinfo.ZoneInfo(timezone_name)
+                if timezone_name
+                else timezone.get_current_timezone()
+            )
+        except zoneinfo.ZoneInfoNotFoundError:
+            tz = timezone.get_current_timezone()
+
+        start_naive = datetime.combine(
+            start_date,
+            datetime.min.time(),
+        )
+
+        # End date is inclusive, so move to the beginning of
+        # the following day and use __lt.
+        end_naive = datetime.combine(
+            end_date + timedelta(days=1),
+            datetime.min.time(),
+        )
+
+        start = timezone.make_aware(
+            start_naive,
+            tz,
+        )
+
+        end = timezone.make_aware(
+            end_naive,
+            tz,
+        )
+
+        return Q(
+            created_at__gte=start,
+            created_at__lt=end,
+        )
 
     def get_count_by_status(self, orders):
-        total = orders.count()
-        processing = orders.filter(status="processing").count()
-        shipped = orders.filter(status="shipped").count()
-        delivered = orders.filter(status="delivered").count()
-        cancelled = orders.filter(status="cancelled").count()
-        return total, processing, shipped, delivered, cancelled
+        """
+        Calculate all status counts with one database query.
+        """
+        print(
+            orders,
+            Order.objects.filter(items__stock__product__seller=self.request.user),
+        )
+        statistics = orders.aggregate(
+            total=Count("pk", distinct=True),
+            processing=Count(
+                "pk",
+                filter=Q(status=Order.STATUS_PROCESSING),
+                distinct=True,
+            ),
+            shipped=Count(
+                "pk",
+                filter=Q(status=Order.STATUS_SHIPPED),
+                distinct=True,
+            ),
+            delivered=Count(
+                "pk",
+                filter=Q(status=Order.STATUS_DELIVERED),
+                distinct=True,
+            ),
+            cancelled=Count(
+                "pk",
+                filter=Q(status=Order.STATUS_CANCELLED),
+                distinct=True,
+            ),
+        )
+
+        return statistics
 
 
 class CustomerListView(IsSellerMixin, ListView):
