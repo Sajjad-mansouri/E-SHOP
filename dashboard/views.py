@@ -6,7 +6,7 @@ from django import forms as dj_forms
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Avg, Count, Max, Q, Sum
+from django.db.models import Avg, Count, Max, Prefetch, Q, Sum
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -21,7 +21,7 @@ from collection.models import CollectionList, ProductList
 from comment.models import Comment
 from coupon.models import Coupon
 from offer.models import Offer, OfferApplication, OfferRange
-from order.models import Order
+from order.models import Order, OrderItem
 from stock.models import StockRecord
 
 from . import forms
@@ -570,49 +570,118 @@ class CouponDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
     template_name = "dashboard/offer/coupon/delete.html"
 
 
-class OderListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
+class OrderListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     model = Order
     template_name = "dashboard/fulfilment/order/list.html"
     Ajax_template = "dashboard/fulfilment/order/_list.html"
 
-    paginate_by = 1
+    paginate_by = 10
     filterable = True
     searchable = True
 
-    def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(order_number__icontains=search) | Q(
-                shipping_address__full_name__icontains=search
-            )
+    def get_queryset(self):
+        seller_items = OrderItem.objects.filter(
+            stock__product__seller=self.request.user,
+        ).select_related(
+            "stock__product",
+        )
 
-        return qs.filter(query)
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                items__stock__product__seller=self.request.user,
+            )
+            .select_related(
+                "user",
+                "shipping_address",
+                "shipping_method",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "items",
+                    queryset=seller_items,
+                    to_attr="seller_items",
+                ),
+            )
+            .distinct()
+        )
+
+    def search(self, qs):
+        search = self.request.GET.get("search", "").strip()
+
+        if not search:
+            return qs
+
+        return qs.filter(
+            Q(order_number__icontains=search)
+            | Q(
+                shipping_address__full_name__icontains=search,
+            )
+            | Q(
+                items__product_name__icontains=search,
+            )
+            | Q(
+                items__sku__icontains=search,
+            )
+        ).distinct()
 
     def apply_filter(self, qs):
         status = self.request.GET.get("status")
-        query = Q()
-        if status != "all" and status:
-            query = Q(status=status)
-        return qs.filter(query)
+
+        if status and status != "all":
+            qs = qs.filter(status=status)
+
+        return qs
 
 
-class OderDetailView(IsSellerMixin, UpdateView):
+class OrderDetailView(IsSellerMixin, UpdateView):
     model = Order
     form_class = forms.OrderStatusForm
     template_name = "dashboard/fulfilment/order/order_detail.html"
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                items__stock__product__seller=self.request.user,
+            )
+            .distinct()
+        )
+
     def form_valid(self, form):
         form.save()
 
-        return JsonResponse({"status": True})
+        return JsonResponse(
+            {
+                "status": True,
+                "message": "Order status updated successfully.",
+            }
+        )
 
     def form_invalid(self, form):
-        return JsonResponse({"status": False})
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": form.errors.get_json_data(),
+            },
+            status=400,
+        )
 
 
 class OrderDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
     model = Order
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                items__stock__product__seller=self.request.user,
+            )
+            .distinct()
+        )
 
 
 class FulfilmentStatistic(IsSellerMixin, TemplateView):

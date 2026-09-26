@@ -133,10 +133,10 @@ urlpatterns = [
         views.CouponDeleteView.as_view(),
         name="coupon_delete",
     ),
-    path("fulfilment/orders/", views.OderListView.as_view(), name="order_list"),
+    path("fulfilment/orders/", views.OrderListView.as_view(), name="order_list"),
     path(
         "fulfilment/order/<int:pk>/",
-        views.OderDetailView.as_view(),
+        views.OrderDetailView.as_view(),
         name="order_detail",
     ),
     path(
