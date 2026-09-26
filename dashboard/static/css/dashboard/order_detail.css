@@ -37,6 +37,7 @@ color:#444;
 .table-container{
 margin-bottom:25px;
 overflow:auto;
+text-align: center;
 }
 
 table{

@@ -1,9 +1,12 @@
 from django.contrib import admin
 
-from .models import Order
+from .models import Order, OrderItem
 
 
 # Register your models here.
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["user", "status", "created_at", "order_number"]
+
+
+admin.site.register(OrderItem)

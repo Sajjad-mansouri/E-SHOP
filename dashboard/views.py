@@ -982,6 +982,21 @@ class CustomerListView(IsSellerMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        print(
+            "users",
+            self.get_queryset(),
+            "qs",
+            UserModel.objects.filter(
+                orders__items__stock__product__seller=self.request.user,
+            ).filter(
+                orders__status__in=[
+                    "pending",
+                    "processing",
+                    "shipped",
+                    "delivered",
+                ],
+            ),
+        )
         context["object_list"] = self.get_queryset()
         return context
 
@@ -1076,11 +1091,25 @@ class CustomerDetailView(IsSellerMixin, DetailView):
 
 class AddressListView(IsSellerMixin, DetailView):
     template_name = "dashboard/customer/addresses.html"
-    queryset = UserModel.objects.filter(user_type="customer")
+    queryset = UserModel.objects.filter(
+        user_type="customer",
+    )
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                orders__items__stock__product__seller=self.request.user,
+            )
+            .distinct()
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["addresses"] = self.object.addresses.all()
+
         return context
 
 

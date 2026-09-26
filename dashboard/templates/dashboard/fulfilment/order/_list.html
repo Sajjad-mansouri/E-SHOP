@@ -1,64 +1,174 @@
-{%load dashboard_tags%}
+{% load dashboard_tags %}
+
 <div class="table-header">
-  <h2 id="tableTitle">Items</h2>
-  <span class="result-count" id="resultCount">{{paginator.count}} results</span>
+    <h2 id="tableTitle">Orders</h2>
+
+
+<span class="result-count" id="resultCount">
+    {{ paginator.count }} results
+</span>
+
+
 </div>
-<div style="overflow-x: auto;">
-  <table id="dataTable">
-    <thead id="tableHeader">
-      <tr>
-        <th>Order Number</th>
-        <th>Full Name</th>
-        <th>Items Cost</th>
-        <th>Coupon Discount</th>
-        <th>Shipping Cost</th>
-        <th>Tax</th>
-        <th>Cost</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
+
+<div class="table-container">
+    <table id="dataTable">
+        <thead id="tableHeader">
+            <tr>
+                <th>Order Number</th>
+                <th>Full Name</th>
+                <th>Items Cost</th>
+                <th>Coupon Discount</th>
+                <th>Shipping Cost</th>
+                <th>Tax</th>
+                <th>Total Cost</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+
     <tbody id="tableBody">
-      {%for order in object_list%}
-      <tr>
-        <td>{{order.order_number|truncatechars:10}}</td>
-        <td>{{order.shipping_address.full_name}}</td>
-        <td>{{order.calc_items_price}}</td>
-        <td>{{order.calc_discount}}</td>
-        <td>{{order.calc_shipping_cost}}</td>
-        <td>{{order.calc_tax}}</td>
-        <td>{{order.calc_total_cost}}</td>
-        <td>{{order.status}}</td>
+        {% for order in object_list %}
+            <tr>
+                <td>
+                    {{ order.order_number|truncatechars:10 }}
+                </td>
 
-        <td>
-          <button class="action-btn edit-btn"  onclick="update('{{order.id}}')">✏️ Edit</button>
-          <button class="action-btn delete-btn" data-id="{{order.id}}" onclick="openDeleteModal('{{order.id}}', '{{order.order_number}}')">🗑️ Remove</button>
-        </td>
-      </tr>
-      {%endfor%}
+                <td>
+                    {% if order.shipping_address %}
+                        {{ order.shipping_address.full_name|default:"—" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+
+                <td>
+                    {{ order.subtotal|floatformat:2 }}
+                </td>
+
+                <td>
+                    {{ order.discount_amount|floatformat:2 }}
+                </td>
+
+                <td>
+                    {{ order.shipping_amount|floatformat:2 }}
+                </td>
+
+                <td>
+                    {{ order.tax_amount|floatformat:2 }}
+                </td>
+
+                <td>
+                    {{ order.total_amount|floatformat:2 }}
+                </td>
+
+                <td>
+                    {{ order.get_status_display }}
+                </td>
+
+                <td>
+                    <button
+                        type="button"
+                        class="action-btn edit-btn"
+                        data-id="{{ order.pk }}"
+                        onclick="update('{{ order.pk }}')"
+                    >
+                        ✏️ Edit
+                    </button>
+
+                    <button
+                        type="button"
+                        class="action-btn delete-btn"
+                        data-id="{{ order.pk }}"
+                        onclick="openDeleteModal(
+                            '{{ order.pk }}',
+                            '{{ order.order_number }}'
+                        )"
+                    >
+                        🗑️ Remove
+                    </button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="9" class="table-empty">
+                    No orders found.
+                </td>
+            </tr>
+        {% endfor %}
     </tbody>
-  </table>
-</div>
-<div id="noResultsMessage" class="no-results" style="display: none;">
-  <div class="no-results-icon">🖼️</div>
-  <h3>No items found</h3>
-  <p>Try adjusting filters or create new</p>
-  <button class="empty-state-btn" id="emptyStateActionBtn">Create new</button>
+</table>
+
+
 </div>
 
+<div
+    id="noResultsMessage"
+    class="no-results"
+    style="display: none;"
+>
+    <div class="no-results-icon">🛒</div>
 
 
-{%if page_obj%}
-<!-- PAGINATION -->
-<div class="pagination" id="pagination">
+<h3>No orders found</h3>
 
-  <button class="page-btn" id="prevPage" {% if page_obj.has_previous %}data-next-number="{{page_obj.previous_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%}>←</button>
+<p>
+    Try adjusting your filters or search criteria.
+</p>
 
-  {%for page in paginator.page_range%}
-  <button class="page-btn {%if page_obj.number == page%}active {%endif%}" data-next-number="{{page}}" onclick="applyPagination()">{{page}}</button>
-  {%endfor%}
-
-  <button class="page-btn" id="nextPage" {%if page_obj.has_next%}data-next-number="{{page_obj.next_page_number}}" onclick="applyPagination()"{%else%} disabled {%endif%} >→</button>
 
 </div>
-{%endif%}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %} <div
+     class="pagination"
+     id="pagination"
+     aria-label="Order pagination"
+ >
+<button
+type="button"
+class="page-btn"
+id="prevPage"
+{% if page_obj.has_previous %}
+data-next-number="{{ page_obj.previous_page_number }}"
+onclick="applyPagination()"
+{% else %}
+disabled
+{% endif %}
+aria-label="Previous page"
+>
+← </button>
+
+
+    {% for page in paginator.page_range %}
+        <button
+            type="button"
+            class="page-btn {% if page_obj.number == page %}active{% endif %}"
+            data-next-number="{{ page }}"
+            onclick="applyPagination()"
+            {% if page_obj.number == page %}
+                aria-current="page"
+            {% endif %}
+        >
+            {{ page }}
+        </button>
+    {% endfor %}
+
+    <button
+        type="button"
+        class="page-btn"
+        id="nextPage"
+        {% if page_obj.has_next %}
+            data-next-number="{{ page_obj.next_page_number }}"
+            onclick="applyPagination()"
+        {% else %}
+            disabled
+        {% endif %}
+        aria-label="Next page"
+    >
+        →
+    </button>
+</div>
+
+
+{% endif %}
