@@ -5,6 +5,7 @@ from decimal import Decimal
 from django import forms as dj_forms
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.db.models import Avg, Count, Max, Q, Sum
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -98,86 +99,123 @@ class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     filterable = True
     searchable = True
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(product__seller=self.request.user)
+            .select_related(
+                "product",
+                "product__category",
+                "product__category__product_class",
+            )
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["category_form"] = dj_forms.modelform_factory(
-            Product, fields=["category"]
+            Product,
+            fields=["category"],
         )
+
         return context
 
     def apply_filter(self, qs):
         status = self.request.GET.get("status")
 
-        query = Q()
-        if status != "all" and status:
-            query = Q(status=status)
+        if status and status != "all":
+            qs = qs.filter(status=status)
 
-        return qs.filter(query)
+        return qs
 
     def search(self, qs):
         search = self.request.GET.get("search")
-        query = Q()
+
         if search:
-            query = Q(product__title__icontains=search) | Q(
-                product__upc__icontains=search
+            qs = qs.filter(
+                Q(product__title__icontains=search)
+                | Q(product__upc__icontains=search)
+                | Q(sku__icontains=search)
             )
 
-        return qs.filter(query)
+        return qs
 
 
-class CreateUpdateProductView(IsSellerMixin, TemplateResponseMixin, View):
+class CreateUpdateProductView(
+    IsSellerMixin,
+    TemplateResponseMixin,
+    View,
+):
     template_name = "dashboard/catalog/product/create_update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        product_id = None
-
-        category_id = kwargs.get("category_id")
         product_id = kwargs.get("pk")
+        category_id = kwargs.get("category_id")
+
+        self.product = None
+        self.stock = None
+        self.category = None
+        self.product_class = None
 
         if product_id:
-            self.stock = get_object_or_404(StockRecord, id=product_id)
-            self.product = self.stock.product
+            self.product = get_object_or_404(
+                Product.objects.select_related(
+                    "category__product_class",
+                ),
+                pk=product_id,
+                seller=request.user,
+            )
+
             self.category = self.product.category
-            self.product_class = self.category.product_class
+
+            if self.category:
+                self.product_class = self.category.product_class
+
+            self.stock = getattr(
+                self.product,
+                "stock_record",
+                None,
+            )
 
         elif category_id:
-            self.category = get_object_or_404(Category, id=category_id)
-            product_class = self.category.product_class
-            print("category_id", category_id, "product_class", product_class)
-            self.product_class = product_class
-            self.product = None
-            self.stock = None
+            self.category = get_object_or_404(
+                Category.objects.select_related(
+                    "product_class",
+                ),
+                pk=category_id,
+            )
 
-        else:
-            self.product_class = None
-            self.product = None
-            self.stock = None
-            self.category = None
+            self.product_class = self.category.product_class
 
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        img_formset = forms.image_formset(instance=self.product, prefix="img")
         product_form = forms.ProductForm(
-            self.product_class, instance=self.product, prefix="product"
+            self.product_class,
+            instance=self.product,
+            prefix="product",
         )
 
-        offer_discount = False
-        if self.stock:
-            offer_discounts = self.stock.get_offer_discount
-            if offer_discounts:
-                offer_discount = True
+        image_formset = forms.image_formset(
+            instance=self.product,
+            prefix="img",
+        )
+
+        offer_discount = bool(self.stock and self.stock.get_offer_discount)
+
         stock_record_form = forms.StockRecordForm(
-            offer_discount=offer_discount, instance=self.stock
+            offer_discount=offer_discount,
+            instance=self.stock,
         )
 
         return self.render_to_response(
             {
-                "img_formset": img_formset,
                 "product_form": product_form,
+                "img_formset": image_formset,
                 "stock_record_form": stock_record_form,
                 "product_class": self.product_class,
-                "object": self.stock,
+                "object": self.product,
                 "category": self.category,
             }
         )
@@ -185,57 +223,85 @@ class CreateUpdateProductView(IsSellerMixin, TemplateResponseMixin, View):
     def post(self, request, *args, **kwargs):
         product_form = forms.ProductForm(
             self.product_class,
-            instance=self.product,
             data=request.POST,
+            instance=self.product,
             prefix="product",
         )
-        if product_form.is_valid():
-            product_form.instance.category = self.category
 
-            self.object = product_form.save()
-        else:
-            img_formset = forms.image_formset(
-                data=request.POST, files=request.FILES, prefix="img"
-            )
-
-            stock_record_form = forms.StockRecordForm(data=request.POST)
-            return render(
-                request,
-                "dashboard/product/create_update.html",
-                {
-                    "product_form": product_form,
-                    "img_formset": img_formset,
-                    "stock_record_form": stock_record_form,
-                },
-            )
-
-        img_formset = forms.image_formset(
-            data=request.POST, files=request.FILES, instance=self.object, prefix="img"
+        image_formset = forms.image_formset(
+            data=request.POST,
+            files=request.FILES,
+            instance=self.product,
+            prefix="img",
         )
+
         stock_record_form = forms.StockRecordForm(
-            data=request.POST, instance=self.stock
+            data=request.POST,
+            instance=self.stock,
         )
-        if img_formset.is_valid() and stock_record_form.is_valid():
-            img_formset.save()
+
+        if not product_form.is_valid():
+            return self._render_invalid(
+                product_form,
+                image_formset,
+                stock_record_form,
+            )
+
+        if not image_formset.is_valid():
+            return self._render_invalid(
+                product_form,
+                image_formset,
+                stock_record_form,
+            )
+
+        if not stock_record_form.is_valid():
+            return self._render_invalid(
+                product_form,
+                image_formset,
+                stock_record_form,
+            )
+
+        with transaction.atomic():
+            product = product_form.save(commit=False)
+
+            # Ownership must never come from submitted form data.
+            product.seller = request.user
+            product.category = self.category
+            product.save()
+
+            # Save dynamic ProductAttributeValue records now that
+            # the Product has a primary key.
+            product_form.save_attributes(product)
+
+            # Required for ModelForm fields involving many-to-many
+            # relationships, if any are added later.
+            product_form.save_m2m()
+
+            image_formset.instance = product
+            image_formset.save()
 
             stock = stock_record_form.save(commit=False)
-            stock.product = self.object
-            stock.seller = request.user
+            stock.product = product
             stock.save()
 
-        else:
-            self.object.delete()
-            return render(
-                request,
-                "dashboard/catalog/product/create_update.html",
-                {
-                    "product_form": product_form,
-                    "img_formset": img_formset,
-                    "stock_record_form": stock_record_form,
-                },
-            )
-
         return redirect("dashboard:products")
+
+    def _render_invalid(
+        self,
+        product_form,
+        image_formset,
+        stock_record_form,
+    ):
+        return self.render_to_response(
+            {
+                "product_form": product_form,
+                "img_formset": image_formset,
+                "stock_record_form": stock_record_form,
+                "product_class": self.product_class,
+                "object": self.product,
+                "category": self.category,
+            }
+        )
 
 
 class DeleteProductView(IsSellerMixin, DeleteMixin, DeleteView):

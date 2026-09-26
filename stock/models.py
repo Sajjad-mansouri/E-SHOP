@@ -23,12 +23,6 @@ class StockRecord(models.Model):
         verbose_name=_("Product"),
     )
 
-    seller = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name=_("seller"),
-        related_name="stockrecords",
-    )
     status = models.CharField(
         _("status"), choices=STATUS_CHOICES, default="public", max_length=10
     )
@@ -74,12 +68,11 @@ class StockRecord(models.Model):
     )
 
     class Meta:
-        unique_together = ("seller", "sku")
         verbose_name = _("Stock record")
         verbose_name_plural = _("Stock records")
 
     def __str__(self):
-        return f"record: seller {self.seller}, product {self.product}"
+        return f"record: seller {self.product.seller}, product {self.product}"
 
     @property
     def get_product_discounts(self):

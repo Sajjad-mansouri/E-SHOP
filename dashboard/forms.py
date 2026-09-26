@@ -108,9 +108,9 @@ def _image_form(attr):
 
 
 class ProductForm(forms.ModelForm):
-    ATRIBUTES_FORMS = {
+    ATTRIBUTES_FORMS = {
         "text": _text_form,
-        "Decimal": _decimal_form,
+        "decimal": _decimal_form,
         "integer": _integer_form,
         "boolean": _boolean_form,
         "float": _float_form,
@@ -133,73 +133,129 @@ class ProductForm(forms.ModelForm):
             "slug",
         ]
         widgets = {
-            "product_class": forms.Select(attrs={"class": "form-control"}),
             "title": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "e.g. Sony WH‑1000XM5"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "e.g. Sony WH-1000XM5",
+                }
             ),
-            "upc": forms.TextInput(attrs={"class": "form-control"}),
+            "upc": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
             "short_description": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "e.g. Sony WH‑1000XM5"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "e.g. Premium wireless headphones",
+                }
             ),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                }
+            ),
             "slug": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "sony-wh-1000xm5"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "sony-wh-1000xm5",
+                }
             ),
-            "meta_title": forms.TextInput(attrs={"class": "form-control"}),
+            "meta_title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
             "meta_description": forms.Textarea(
-                attrs={"class": "form-control", "rows": 3}
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                }
             ),
         }
 
     def __init__(self, product_class, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.instance = kwargs.get("instance")
 
-        if product_class:
-            self.product_class = product_class
-            attrs = product_class.attributes.all()
-            for attr in attrs:
-                initial = None
-                if self.instance.id:
-                    try:
-                        attr_value = ProductAttributeValue.objects.get(
-                            product=self.instance, attribute=attr
-                        )
-                        initial = attr_value.get_value
-                    except ProductAttributeValue.DoesNotExist:
-                        pass
+        self.product_class = product_class
 
-                self.fields[f"attr_{attr.name}"] = self.ATRIBUTES_FORMS[attr.type](attr)
-                self.fields[f"attr_{attr.name}"].initial = initial
+        if not product_class:
+            return
+
+        for attribute in product_class.attributes.all():
+            initial = None
+
+            if self.instance.pk:
+                try:
+                    attribute_value = ProductAttributeValue.objects.get(
+                        product=self.instance,
+                        attribute=attribute,
+                    )
+                    initial = attribute_value.get_value
+                except ProductAttributeValue.DoesNotExist:
+                    pass
+
+            field_name = f"attr_{attribute.pk}"
+
+            field_factory = self.ATTRIBUTES_FORMS.get(attribute.type)
+
+            if field_factory is None:
+                continue
+
+            field = field_factory(attribute)
+            field.initial = initial
+
+            self.fields[field_name] = field
 
     def save(self, commit=True):
-        product = super().save(commit=True)
+        product = super().save(commit=commit)
 
-        if commit:
-            attrs = []
-            for field_name, field_value in self.cleaned_data.items():
-                if field_name.startswith("attr"):
-                    attr_name = field_name.split("attr_")[1]
-                    attr = self.product_class.attributes.get(name=attr_name)
+        if not commit:
+            return product
 
-                    attr_dict = {
-                        "product": product,
-                        "attribute": attr,
-                        f"value_{attr.type}": field_value,
-                    }
-                    if self.instance:
-                        ProductAttributeValue.objects.update_or_create(
-                            product=product,
-                            attribute=attr,
-                            defaults={f"value_{attr.type}": field_value},
-                        )
-                    attrs.append(attr_dict)
-
-            if not self.instance:
-                product_attrs = [ProductAttributeValue(**attr) for attr in attrs]
-                ProductAttributeValue.objects.bulk_update(product_attrs)
+        self._save_attribute_values(product)
 
         return product
+
+    def save_attributes(self, product):
+        """
+        Save dynamic ProductAttributeValue records after the Product
+        has been persisted.
+        """
+        self._save_attribute_values(product)
+
+    def _save_attribute_values(self, product):
+        if not self.product_class:
+            return
+
+        attributes = {
+            attribute.pk: attribute for attribute in self.product_class.attributes.all()
+        }
+
+        for field_name, field_value in self.cleaned_data.items():
+            if not field_name.startswith("attr_"):
+                continue
+
+            attribute_id = field_name.removeprefix("attr_")
+
+            try:
+                attribute_id = int(attribute_id)
+            except ValueError:
+                continue
+
+            attribute = attributes.get(attribute_id)
+
+            if attribute is None:
+                continue
+
+            ProductAttributeValue.objects.update_or_create(
+                product=product,
+                attribute=attribute,
+                defaults={
+                    f"value_{attribute.type}": field_value,
+                },
+            )
 
 
 class ProductImageForm(forms.ModelForm):

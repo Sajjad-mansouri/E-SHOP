@@ -32,20 +32,43 @@
         <td>{{stock_record.product.upc}}</td>
 
         <td>
-          $1200
-          <div class="old">${{stock_record.price}}</div>
-          <div class="discount">-12%</div>
+            {% if stock_record.price %}
+
+            {% if stock_record.discount %}
+              ${{ stock_record.get_final_price|floatformat:2 }}
+              <div class="old">${{stock_record.price}}</div>
+
+              <div class="discount">-12%</div>
+            {%else%}
+            <div class="old">${{stock_record.price}}</div>
+            {%endif%}
+            {% else %}
+                —
+            {% endif %}
         </td>
-        <td>{{stock_record.product.product_class.name}}</td>
-        <td>{{stock_record.num_in_stock}}</td>
-        <td>{{stock_record.status}}</td>
-        <td>{{stock_record.date_updated|date}}</td>
+        <td>
+          {% if stock_record.product.category.product_class %}
+            {{ stock_record.product.category.product_class.name }}
+          {%else%}
+            _
+          {%endif%}
+
+      </td>
+        <td>{{ stock_record.num_in_stock|default:"0" }}</td>
+        <td>{{ stock_record.get_status_display }}</td>
+        <td>{{ stock_record.date_updated|date:"Y-m-d H:i" }}</td>
 
         <td>
           <button class="action-btn edit-btn"  onclick="update('{{stock_record.id}}')">✏️ Edit</button>
           <button class="action-btn delete-btn" data-id="{{stock_record.id}}" onclick="openDeleteModal('{{stock_record.product.id}}', '{{stock_record.product.title}}')">🗑️ Remove</button>
         </td>
       </tr>
+      {% empty %}
+        <tr>
+          <td colspan="8">
+            No products found.
+          </td>
+        </tr>
       {%endfor%}
     </tbody>
   </table>

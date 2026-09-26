@@ -12,7 +12,7 @@ urlpatterns = [
         name="create_product",
     ),
     path(
-        "catalog/product/update/<int:pk>/",
+        "catalog/product/<int:pk>/update/",
         views.CreateUpdateProductView.as_view(),
         name="update_product",
     ),
