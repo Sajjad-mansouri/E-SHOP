@@ -16,10 +16,10 @@ User = get_user_model()
 
 class StockRecord(models.Model):
     STATUS_CHOICES = [("public", "Public"), ("private", "Private")]
-    product = models.ForeignKey(
+    product = models.OneToOneField(
         "catalog.Product",
         on_delete=models.CASCADE,
-        related_name="stockrecords",
+        related_name="stock_record",
         verbose_name=_("Product"),
     )
 

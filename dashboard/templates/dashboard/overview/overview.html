@@ -64,15 +64,26 @@
         </thead>
 
         <tbody>
-        {%for order in orders|slice:":5"%}
+
+        {% for order in orders|slice:":5" %}
         <tr>
-            <td>#{{order.order_number}}</td>
-            <td>{{order.shipping_address.full_name}}</td>
-            <td>${{order.calc_total_cost|floatformat:2}}</td>
-            <td><span class="status delivered">{{order.status}}</span></td>
-            <td>{{order.created_at}}</td>
+            <td>#{{ order.order_number }}</td>
+            <td>{{ order.shipping_full_name }}</td>
+            <td>${{ order.total_amount|floatformat:2 }}</td>
+            <td>
+                <span class="status {{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+            </td>
+            <td>{{ order.created_at }}</td>
         </tr>
-        {%endfor%}
+        {% empty %}
+        <tr>
+            <td colspan="5">No orders found.</td>
+        </tr>
+        {% endfor %}
+
+
         </tbody>
 
         </table>

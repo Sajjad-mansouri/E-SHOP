@@ -1,5 +1,6 @@
 import zoneinfo
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django import forms as dj_forms
 from django.contrib.auth import get_user_model
@@ -42,45 +43,51 @@ class DashboardOverView(IsSellerMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        customers = self.get_customers()
-        stock_records = self.get_stock_products()
-        orders = self.get_orders()
-        today_orders = self.get_today_order()
-        earns = self.get_revenue()
 
-        context["customers"] = customers
-        context["stock_records"] = stock_records
+        orders = self.get_orders()
+
+        context["customers"] = self.get_customers()
+        context["stock_records"] = self.get_stock_products()
         context["orders"] = orders
-        context["today_orders"] = today_orders
-        context["earns"] = earns
+        context["today_orders"] = self.get_today_orders(orders)
+        context["earns"] = self.get_revenue(orders)
 
         return context
 
     def get_customers(self):
-        customers = UserModel.objects.filter(user_type="customer")
-        return customers
+        return UserModel.objects.filter(
+            user_type="customer",
+        )
 
     def get_stock_products(self):
-        stock_records = StockRecord.objects.filter(status="public", num_in_stock__gt=0)
-        return stock_records
+        return StockRecord.objects.filter(
+            status="public",
+            num_in_stock__gt=0,
+        )
 
     def get_orders(self):
-        orders = Order.objects.all()
-        return orders
+        return Order.objects.all()
 
-    def get_today_order(self):
-        today = timezone.now()
-        orders = self.get_orders()
-        today_orders = orders.filter(created_at__date=today)
-        return today_orders
+    def get_today_orders(self, orders):
+        today = timezone.localdate()
+        return orders.filter(
+            created_at__date=today,
+        )
 
-    def get_revenue(self):
-        earns = 0
-        orders = self.get_orders().filter(status__in=["paid", "shipped", "delivered"])
-        for order in orders:
-            earns += order.pure_price
+    def get_revenue(self, orders):
+        revenue_statuses = [
+            "paid",
+            "shipped",
+            "delivered",
+        ]
 
-        return earns
+        revenue = orders.filter(
+            status__in=revenue_statuses,
+        ).aggregate(
+            total=Sum("total_amount"),
+        )["total"]
+
+        return revenue or Decimal("0.00")
 
 
 class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):

@@ -88,6 +88,11 @@ class Category(MP_Node):
 
 
 class Product(models.Model):
+    seller = models.ForeignKey(
+        UserModel,
+        on_delete=models.CASCADE,
+        related_name="products",
+    )
     title = models.CharField(max_length=200, verbose_name=_("title"))
     slug = models.SlugField(max_length=200, blank=True, verbose_name=_("slug"))
     short_description = models.CharField(
