@@ -6,7 +6,7 @@ from django import forms as dj_forms
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Avg, Count, Max, Prefetch, Q, Sum
+from django.db.models import Count, Max, Prefetch, Q, Sum
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -1117,88 +1117,312 @@ class SalesReport(IsSellerMixin, ListView):
     template_name = "dashboard/report/sales_report.html"
     model = Order
 
+    COMPLETED_STATUSES = [
+        Order.STATUS_PENDING,
+        Order.STATUS_PROCESSING,
+        Order.STATUS_SHIPPED,
+        Order.STATUS_DELIVERED,
+    ]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         recent_orders = self.object_list[:10]
+
         product_selling_q, total_q = self.get_filtered_objects()
-        top_selling, product_sold = self.get_top_selling_products(product_selling_q)
+
+        top_selling, product_sold = self.get_top_selling_products(
+            product_selling_q,
+        )
+
         total_revenue, total_orders, average_order = self.get_total_order_stat(total_q)
-        context["recent_orders"] = recent_orders
-        context["top_selling"] = top_selling
-        context["total_revenue"] = total_revenue
-        context["total_orders"] = total_orders
-        context["average_order"] = average_order
-        context["product_sold"] = product_sold
+
+        context.update(
+            {
+                "recent_orders": recent_orders,
+                "top_selling": top_selling,
+                "total_revenue": total_revenue,
+                "total_orders": total_orders,
+                "average_order": average_order,
+                "product_sold": product_sold,
+            }
+        )
 
         return context
 
-    def get_top_selling_products(self, product_selling_q):
-        q = (
-            Q(
-                stock_carts__cart__order__status__in=[
-                    "pending",
-                    "processing",
-                    "shipped",
-                    "delivered",
-                ]
+    def get_queryset(self):
+        """
+        Return only orders that contain products belonging to
+        the authenticated seller.
+        """
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                items__stock__product__seller=self.request.user,
             )
-            & product_selling_q
+            .select_related(
+                "user",
+                "shipping_address",
+                "shipping_method",
+            )
+            .distinct()
         )
-        top_selling = StockRecord.objects.annotate(
-            sell_count=Sum("stock_carts__quantity", filter=q),
-            revenue=Sum("stock_carts__final_item_price", filter=q),
+
+    def get_top_selling_products(self, product_selling_q):
+        """
+        Calculate seller-specific product sales.
+
+        Revenue is based on OrderItem.total_price, which represents
+        the actual item total after product discounts.
+        """
+        items = OrderItem.objects.filter(
+            order__status__in=self.COMPLETED_STATUSES,
+            stock__product__seller=self.request.user,
         )
-        top_selling = top_selling.order_by("-sell_count")
-        top_selling_agg = top_selling.aggregate(product_sold=Sum("sell_count"))
-        return top_selling, top_selling_agg["product_sold"]
+
+        if product_selling_q:
+            items = items.filter(product_selling_q)
+
+        top_selling = (
+            items.values(
+                "stock__product_id",
+                "stock__product__title",
+            )
+            .annotate(
+                sell_count=Sum("quantity"),
+                revenue=Sum("total_price"),
+            )
+            .order_by("-sell_count", "-revenue")
+        )
+
+        product_sold = (
+            items.aggregate(
+                product_sold=Sum("quantity"),
+            )["product_sold"]
+            or 0
+        )
+
+        return top_selling, product_sold
 
     def get_total_order_stat(self, total_q):
-        q = Q(status__in=["pending", "processing", "shipped", "delivered"]) & total_q
-        total_agg = Order.objects.aggregate(total_revenue=Sum("total_cost", filter=q))
-        avg_agg = Order.objects.aggregate(average_order=Avg("total_cost", filter=q))
+        """
+        Calculate seller-specific revenue and order statistics.
 
-        total_orders = Order.objects.filter(q).count()
-        return total_agg["total_revenue"], total_orders, avg_agg["average_order"]
+        Revenue is based on OrderItem.total_price, not Order.total_amount,
+        so discounts are already reflected in the reported revenue.
+        """
+        orders = (
+            Order.objects.filter(
+                items__stock__product__seller=self.request.user,
+                status__in=self.COMPLETED_STATUSES,
+            )
+            .filter(total_q)
+            .distinct()
+        )
+
+        seller_items = OrderItem.objects.filter(
+            order__in=orders,
+            stock__product__seller=self.request.user,
+        )
+
+        total_revenue = (
+            seller_items.aggregate(
+                total_revenue=Sum("total_price"),
+            )["total_revenue"]
+            or 0
+        )
+
+        total_orders = orders.count()
+
+        average_order = total_revenue / total_orders if total_orders else 0
+
+        return total_revenue, total_orders, average_order
 
     def get_filtered_objects(self):
         period = self.request.GET.get("period")
         is_filter = self.request.GET.get("filter")
         is_range = self.request.GET.get("is_range")
+
         range_start = self.request.GET.get("range_start")
         range_end = self.request.GET.get("range_end")
-        product_selling_q, total_q = Q(), Q()
+
+        product_selling_q = Q()
+        total_q = Q()
+
         if is_filter == "true" and period != "total":
             product_selling_q, total_q = self.get_filter_by_period(
-                period, is_range, range_start, range_end
+                period,
+                is_range,
+                range_start,
+                range_end,
             )
 
         return product_selling_q, total_q
 
     def get_filter_by_period(
-        self, period=None, is_range=None, range_start=None, range_end=None
+        self,
+        period,
+        is_range,
+        range_start,
+        range_end,
     ):
-        if is_range:
-            timezone_str = self.request.GET.get("timezone")
-            tz = zoneinfo.ZoneInfo(timezone_str)
-            start_naive = datetime.strptime(range_start, "%Y-%m-%d")
-            end_naive = datetime.strptime(range_end, "%Y-%m-%d")
+        if is_range == "true":
+            filter_query = self.get_filter_by_range(
+                range_start,
+                range_end,
+            )
 
-            start = timezone.make_aware(start_naive, tz)
-            end = timezone.make_aware(end_naive, tz)
+            return filter_query, filter_query
 
-        product_selling_q = Q(stock_carts__cart__order__created_at__gte=start) & Q(
-            stock_carts__cart__order__created_at__lte=end
+        filter_query = self.get_filter_by_named_period(period)
+
+        if filter_query is None:
+            return Q(), Q()
+
+        return filter_query, filter_query
+
+    def get_filter_by_named_period(self, period):
+        now = timezone.localtime()
+
+        if period == "today":
+            start = now.replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+            end = start + timedelta(days=1)
+
+        elif period == "week":
+            start = (now - timedelta(days=now.weekday())).replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+            end = start + timedelta(days=7)
+
+        elif period == "month":
+            start = now.replace(
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+
+            if start.month == 12:
+                end = start.replace(
+                    year=start.year + 1,
+                    month=1,
+                )
+            else:
+                end = start.replace(
+                    month=start.month + 1,
+                )
+
+        elif period == "year":
+            start = now.replace(
+                month=1,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+            end = start.replace(
+                year=start.year + 1,
+            )
+
+        else:
+            return None
+
+        return Q(
+            created_at__gte=start,
+            created_at__lt=end,
         )
 
-        total_q = Q(created_at__gte=start) & Q(created_at__lte=end)
+    def get_filter_by_range(self, range_start, range_end):
+        if not range_start or not range_end:
+            return Q(pk__in=[])
 
-        return product_selling_q, total_q
+        try:
+            start_date = datetime.strptime(
+                range_start,
+                "%Y-%m-%d",
+            ).date()
 
-    def render_to_response(self, context, **response_kwargs):
-        is_ajax = self.request.headers.get("AJAX")
-        if is_ajax == "true":
-            self.template_name = "dashboard/report/_report.html"
-        return super().render_to_response(context, **response_kwargs)
+            end_date = datetime.strptime(
+                range_end,
+                "%Y-%m-%d",
+            ).date()
+        except ValueError:
+            return Q(pk__in=[])
+
+        if start_date > end_date:
+            return Q(pk__in=[])
+
+        timezone_name = self.request.GET.get("timezone")
+
+        try:
+            tz = (
+                zoneinfo.ZoneInfo(timezone_name)
+                if timezone_name
+                else timezone.get_current_timezone()
+            )
+        except zoneinfo.ZoneInfoNotFoundError:
+            tz = timezone.get_current_timezone()
+
+        start_naive = datetime.combine(
+            start_date,
+            datetime.min.time(),
+        )
+
+        end_naive = datetime.combine(
+            end_date + timedelta(days=1),
+            datetime.min.time(),
+        )
+
+        start = timezone.make_aware(
+            start_naive,
+            tz,
+        )
+
+        end = timezone.make_aware(
+            end_naive,
+            tz,
+        )
+
+        return Q(
+            created_at__gte=start,
+            created_at__lt=end,
+        )
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get("filter") == "true":
+            return self.get_statistics_response()
+
+        return super().get(request, *args, **kwargs)
+
+    def get_statistics_response(self):
+        product_selling_q, total_q = self.get_filtered_objects()
+
+        top_selling, product_sold = self.get_top_selling_products(
+            product_selling_q,
+        )
+
+        total_revenue, total_orders, average_order = self.get_total_order_stat(total_q)
+
+        context = {
+            "top_selling": top_selling,
+            "product_sold": product_sold,
+            "total_revenue": total_revenue,
+            "total_orders": total_orders,
+            "average_order": average_order,
+        }
+
+        return self.render_to_response(context)
 
 
 class ReviewListView(IsSellerMixin, ListView):
