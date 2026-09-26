@@ -1431,81 +1431,198 @@ class ReviewListView(IsSellerMixin, ListView):
     context_object_name = "reviews"
 
     def dispatch(self, request, *args, **kwargs):
-        self.is_ajax = self.request.headers.get("AJAX")
+        self.is_ajax = request.headers.get("AJAX") == "true"
         return super().dispatch(request, *args, **kwargs)
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.is_ajax == "true":
-            self.template_name = "dashboard/review/_reviews.html"
-        return super().render_to_response(context, **response_kwargs)
+    def get_queryset(self):
+        stock_content_type = ContentType.objects.get_for_model(
+            StockRecord,
+        )
+
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                content_type=stock_content_type,
+                object_id__in=StockRecord.objects.filter(
+                    product__seller=self.request.user,
+                ).values("pk"),
+            )
+            .select_related("user", "content_type")
+            .order_by("-created")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.is_ajax:
-            reviews = self.search_reviews()
-            context["reviews"] = reviews
+
+        reviews = self.get_filtered_reviews()
+
+        context["reviews"] = reviews
 
         return context
 
-    def search_reviews(self):
-        search = self.request.GET.get("search")
-        status = self.request.GET.get("status")
-        rating = self.request.GET.get("rating")
-        start_date = self.request.GET.get("start_date")
-        end_date = self.request.GET.get("end_date")
+    def get_filtered_reviews(self):
+        reviews = self.object_list
 
-        comments = self.object_list
-        if not (search or status or rating or start_date or end_date):
-            return comments
+        search = self.request.GET.get("search", "").strip()
+        status = self.request.GET.get("status", "").strip()
+        rating = self.request.GET.get("rating", "").strip()
+        start_date = self.request.GET.get("start_date", "").strip()
+        end_date = self.request.GET.get("end_date", "").strip()
+
         if search:
-            stock_ct = ContentType.objects.get_for_model(StockRecord)
-            q1 = Q(content_type=stock_ct)
-            q2 = Q(
-                object_id__in=StockRecord.objects.filter(
-                    product__title__icontains=search
-                ).values_list("id", flat=True)
+            reviews = reviews.filter(
+                Q(
+                    object_id__in=StockRecord.objects.filter(
+                        product__seller=self.request.user,
+                        product__title__icontains=search,
+                    ).values("pk")
+                )
+                | Q(user__username__icontains=search)
             )
-            q3 = Q(user__username__icontains=search)
-            comments = comments.filter((q1 & q2) | q3)
 
         if status and status != "all":
-            comments = comments.filter(status=status)
+            reviews = reviews.filter(status=status)
 
         if rating and rating != "all":
-            comments = comments.filter(rating=rating)
+            reviews = reviews.filter(rating=rating)
 
         if start_date:
             start = self.make_date_aware(start_date)
-            comments = comments.filter(created__gte=start)
+
+            if start is not None:
+                reviews = reviews.filter(
+                    created__gte=start,
+                )
+
         if end_date:
             end = self.make_date_aware(end_date)
-            comments = comments.filter(created__lte=end)
 
-        return comments
+            if end is not None:
+                end += timedelta(days=1)
 
-    def make_date_aware(self, date):
-        timezone_str = self.request.GET.get("timezone")
-        tz = zoneinfo.ZoneInfo(timezone_str)
-        naive_date = datetime.strptime(date, "%Y-%m-%d")
-        date = timezone.make_aware(naive_date, tz)
-        return date
+                reviews = reviews.filter(
+                    created__lt=end,
+                )
+
+        return reviews
+
+    def make_date_aware(self, date_string):
+        try:
+            date = datetime.strptime(
+                date_string,
+                "%Y-%m-%d",
+            ).date()
+        except (TypeError, ValueError):
+            return None
+
+        timezone_name = self.request.GET.get("timezone")
+
+        if timezone_name:
+            try:
+                tz = zoneinfo.ZoneInfo(timezone_name)
+            except zoneinfo.ZoneInfoNotFoundError:
+                tz = timezone.get_current_timezone()
+        else:
+            tz = timezone.get_current_timezone()
+
+        naive_datetime = datetime.combine(
+            date,
+            datetime.min.time(),
+        )
+
+        return timezone.make_aware(
+            naive_datetime,
+            tz,
+        )
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.is_ajax:
+            self.template_name = "dashboard/review/_reviews.html"
+
+        return super().render_to_response(
+            context,
+            **response_kwargs,
+        )
 
 
 class ReviewStatusUpdateView(IsSellerMixin, UpdateView):
     model = Comment
     form_class = forms.CommentStatusForm
 
+    def get_queryset(self):
+        stock_content_type = ContentType.objects.get_for_model(
+            StockRecord,
+        )
+
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                content_type=stock_content_type,
+                object_id__in=StockRecord.objects.filter(
+                    product__seller=self.request.user,
+                ).values("pk"),
+            )
+        )
+
     def form_valid(self, form):
-        form.save()
-        status = form.cleaned_data["status"]
-        return JsonResponse({"status": True, "action": status})
+        review = form.save()
+
+        return JsonResponse(
+            {
+                "status": True,
+                "action": review.status,
+            }
+        )
 
     def form_invalid(self, form):
-        return JsonResponse({"status": False})
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": form.errors.get_json_data(),
+            },
+            status=400,
+        )
 
 
-class ReviewDeletView(IsSellerMixin, DeleteMixin, DeleteView):
+class ReviewDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
     model = Comment
+
+    def get_queryset(self):
+        stock_content_type = ContentType.objects.get_for_model(
+            StockRecord,
+        )
+
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                content_type=stock_content_type,
+                object_id__in=StockRecord.objects.filter(
+                    product__seller=self.request.user,
+                ).values("pk"),
+            )
+        )
+
+    def form_valid(self, form):
+        self.object.delete()
+
+        return JsonResponse(
+            {
+                "status": True,
+                "message": "Review deleted successfully.",
+            }
+        )
+
+    def form_invalid(self, form):
+        return JsonResponse(
+            {
+                "status": False,
+                "message": "Unable to delete review.",
+            },
+            status=400,
+        )
 
 
 class AppliedOfferListView(IsSellerMixin, ListView):

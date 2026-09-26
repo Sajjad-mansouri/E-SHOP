@@ -161,7 +161,7 @@ urlpatterns = [
     ),
     path(
         "content/review/delete/<int:pk>/",
-        views.ReviewDeletView.as_view(),
+        views.ReviewDeleteView.as_view(),
         name="review_delete",
     ),
     path(
