@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "collection",
     # third party
     "treebeard",
+    "rest_framework",
 ]
 SITE_ID = 1
 
@@ -153,3 +154,9 @@ EMAIL_BACKEND = config("EMAIL_BACKEND")
 
 LOGIN_REDIRECT_URL = "catalog:home"
 LOGOUT_REDIRECT_URL = "catalog:home"
+
+
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
+FRONTEND_URL = config("FRONTEND_URL")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")

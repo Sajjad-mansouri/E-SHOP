@@ -1,311 +1,772 @@
-{%extends 'base.html'%}
-{%load static%}
+{% extends 'base.html' %}
+{% load static %}
 
-{%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/create_order.css'%}">
-{%endblock%}
-{%block content%}
+{% block style %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'css/create_order.css' %}"
+>
+{% endblock %}
+
+{% block content %}
 <!-- CHECKOUT PAGE CONTENT -->
 <div class="checkout-header">
-  <h1><i class="fa-solid fa-cart-arrow-down"></i> Checkout</h1>
-  <p>Complete your order with secure checkout</p>
+    <h1>
+        <i class="fa-solid fa-cart-arrow-down"></i>
+        Checkout
+    </h1>
 
-  <!-- Checkout Steps -->
-  <div class="checkout-steps">
-    <div class="step completed">
-      <div class="step-circle">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      <span class="step-label">Cart</span>
-      <div class="step-line"></div>
-    </div>
-
-    <div class="step active">
-      <div class="step-circle">2</div>
-      <span class="step-label">Details</span>
-      <div class="step-line"></div>
-    </div>
-
-    <div class="step">
-      <div class="step-circle">3</div>
-      <span class="step-label">Payment</span>
-      <div class="step-line"></div>
-    </div>
-
-    <div class="step">
-      <div class="step-circle">4</div>
-      <span class="step-label">Confirmation</span>
-    </div>
-  </div>
+    <p>Complete your order with secure checkout</p>
 </div>
 
 <div class="checkout-container">
-  <!-- Main Checkout Form -->
-  <div class="checkout-main">
-    <!-- Shipping Address Section -->
-    <section class="checkout-section">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-truck-fast"></i> Shipping Address</h2>
-        <a class="edit-btn" id="editAddress" href="{%url 'address:new_address'%}">
-          <i class="fa-solid fa-pen"></i> Add New Address
-        </a>
-      </div>
 
-      <div class="address-list">
-        {%for address in addresses%}
-        <div class="address-card {%if address.is_default_address%}selected{%endif%}" data-address="{{address.id}}">
-          <div class="address-header">
-            <div>
-              <span class="address-name">{{address.full_name}}</span>
+    <!-- Main Checkout Form -->
+    <div class="checkout-main">
 
+        <!-- Shipping Address Section -->
+        <section class="checkout-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fa-solid fa-truck-fast"></i>
+                    Shipping Address
+                </h2>
+
+                <a
+                    class="edit-btn"
+                    id="editAddress"
+                    href="{% url 'address:new_address' %}"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    Add New Address
+                </a>
             </div>
-            <div>
-              <i class="fa-solid fa-check-circle" style="color: var(--success);"></i>
+
+            <div class="address-list">
+                {% for address in addresses %}
+                    <div
+                        class="address-card {% if address.is_default_address %}selected{% endif %}"
+                        data-address="{{ address.id }}"
+                    >
+                        <div class="address-header">
+                            <div>
+                                <span class="address-name">
+                                    {{ address.full_name }}
+                                </span>
+                            </div>
+
+                            <div>
+                                <i
+                                    class="fa-solid fa-check-circle"
+                                    style="color: var(--success);"
+                                ></i>
+                            </div>
+                        </div>
+
+                        <div class="address-details">
+                            <p>{{ address.line1 }}</p>
+                            <p>
+                                {{ address.city }},
+                                {{ address.postcode }}
+                            </p>
+                            <p>{{ address.country }}</p>
+                            <p>
+                                <strong>Phone:</strong>
+                                {{ address.phone_number }}
+                            </p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-message">
+                        You don't have any shipping addresses.
+                        Please add an address before placing your order.
+                    </p>
+                {% endfor %}
             </div>
-          </div>
-          <div class="address-details">
-            <p>{{address.line1}}</p>
-            <p>{{address.city}}, {{address.postcode}}</p>
-            <p>{{address.country}}</p>
-            <p><strong>Phone:</strong> {{address.phone_number}}</p>
-          </div>
+        </section>
+
+
+        <!-- Shipping Method Section -->
+        <section class="checkout-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fa-solid fa-shipping-fast"></i>
+                    Shipping Method
+                </h2>
+            </div>
+
+            <div class="shipping-methods">
+                {% for shipping_method in shipping_methods %}
+                    <div
+                        class="payment-method {% if forloop.first %}selected{% endif %}"
+                        data-shipping="{{ shipping_method.id }}"
+                    >
+                        <div class="payment-icon-large">
+                            <i class="fa-solid fa-truck"></i>
+                        </div>
+
+                        <div class="payment-details">
+                            <div class="payment-name">
+                                {{ shipping_method.shipping_type }}
+                                Shipping
+                            </div>
+
+                            <div class="payment-desc">
+                                Delivery in
+                                {{ shipping_method.delivery_time }}
+                                business days
+                            </div>
+
+                            {% if shipping_method.free_shipping %}
+                                <div class="payment-desc">
+                                    <strong>Free</strong>
+                                    (Orders over
+                                    ${{ shipping_method.free_shipping_threshold }})
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if shipping_method.free_shipping %}
+                            {% if cart.get_items_price >= shipping_method.free_shipping_threshold %}
+                                <div
+                                    style="
+                                        font-weight: 700;
+                                        font-size: 1.2rem;
+                                    "
+                                >
+                                    <span class="shipping-cost">Free</span>
+                                </div>
+                            {% else %}
+                                <div
+                                    style="
+                                        font-weight: 700;
+                                        font-size: 1.2rem;
+                                    "
+                                >
+                                    $
+                                    <span class="shipping-cost">
+                                        {{ shipping_method.price }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div
+                                style="
+                                    font-weight: 700;
+                                    font-size: 1.2rem;
+                                "
+                            >
+                                $
+                                <span class="shipping-cost">
+                                    {{ shipping_method.price }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="empty-message">
+                        No shipping methods are currently available.
+                    </p>
+                {% endfor %}
+            </div>
+        </section>
+
+
+        <!-- Order Items Preview -->
+        <section class="checkout-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fa-solid fa-box"></i>
+                    Order Items
+                </h2>
+
+                <a
+                    href="{% url 'cart:cart_items' %}"
+                    class="edit-btn"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    Edit Cart
+                </a>
+            </div>
+
+            <div class="order-items">
+                {% for item in items %}
+                    <div class="order-item">
+
+                        {% with image=item.stock.product.images.all.0 %}
+                            {% if image %}
+                                <img
+                                    src="{{ image.image.url }}"
+                                    alt="{{ item.stock.product.title }}"
+                                    class="order-item-img"
+                                >
+                            {% endif %}
+                        {% endwith %}
+
+                        <div class="order-item-details">
+                            <div class="order-item-name">
+                                {{ item.stock.product.title }}
+                            </div>
+
+                            <div class="order-item-quantity">
+                                Quantity: {{ item.quantity }}
+                            </div>
+                        </div>
+
+                        <div class="order-item-price">
+                            ${{ item.get_item_price }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-message">
+                        Your cart is empty.
+                    </p>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+
+
+    <!-- Order Summary Sidebar -->
+    <div class="order-summary-sidebar">
+
+        <h2>Order Summary</h2>
+
+        <div class="summary-row">
+            <span>
+                Subtotal ({{ items|length }} items)
+            </span>
+
+            <span>
+                ${{ cart.get_items_price }}
+            </span>
         </div>
-        {%endfor%}
 
 
-      </div>
-    </section>
-
-    <!-- Shipping Method Section -->
-    <section class="checkout-section">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-shipping-fast"></i> Shipping Method</h2>
-      </div>
-
-      <div class="shipping-methods">
-        {%for shipping_method in shipping_methods%}
-
-        <div class="payment-method {%if forloop.first%}selected{%endif%}" data-shipping="{{shipping_method.id}}">
-          <div class="payment-icon-large">
-            <i class="fa-solid fa-truck"></i>
-          </div>
-          <div class="payment-details">
-            <div class="payment-name">{{shipping_method.shipping_type}} Shipping</div>
-            <div class="payment-desc">Delivery in {{shipping_method.delivery_time}} business days </div>
-            {%if shipping_method.free_shipping%}
-            <div class="payment-desc"><strong>Free</strong> (Orders over ${{shipping_method.free_shipping_threshold}})</div>
-            {%endif%}
-          </div>
-          {%if shipping_method.free_shipping%}
-          {%if cart.get_items_price > shipping_method.free_shipping_threshold%}
-          <div style="font-weight: 700; font-size: 1.2rem;"><span class="shipping-cost">Free</span></div>
-          {%else%}
-          <div style="font-weight: 700; font-size: 1.2rem;">$<span class="shipping-cost">{{shipping_method.price}}</span></div>
-
-          {%endif%}
-
-          {%else%}
-          <div style="font-weight: 700; font-size: 1.2rem;">$<span class="shipping-cost">{{shipping_method.price}}</span></div>
-          {%endif%}
+        <div class="summary-row">
+            <span>Shipping</span>
+            <span id="shippingCost">-</span>
         </div>
-        {%endfor%}
 
 
-      </div>
-    </section>
+        {% if coupon_application %}
+            <div class="summary-row discount">
+                <span>
+                    Discount
+                    ({{ coupon_application.coupon.code }})
+                </span>
 
-    <!-- Payment Method Section -->
-    <section class="checkout-section">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-credit-card"></i> Payment Method</h2>
-      </div>
+                <span>
+                    -{{ coupon_application.coupon.discount }}%
+                </span>
+            </div>
+        {% endif %}
 
-      <div class="payment-methods-list">
-        <h2>No Payment Method Now(Added in Real World Ecomm)</h2>
-      </div>
-    </section>
 
-    <!-- Order Items Preview -->
-    <section class="checkout-section">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-box"></i> Order Items</h2>
-        <a href="{%url 'cart:cart_items'%}" class="edit-btn">
-          <i class="fa-solid fa-pen"></i> Edit Cart
+        <div class="summary-row total">
+            <span>Total</span>
+
+            <span id="orderTotal">
+                ${{ final_price }}
+            </span>
+        </div>
+
+
+        <div class="secure-checkout">
+            <i class="fa-solid fa-shield-check"></i>
+
+            <div class="secure-text">
+                <h4>Secure Checkout</h4>
+
+                <p>
+                    Your payment information is encrypted and secure
+                </p>
+            </div>
+        </div>
+
+
+        {% csrf_token %}
+
+        <button
+            type="button"
+            class="place-order-btn"
+            id="placeOrderBtn"
+        >
+            <i class="fa-solid fa-lock"></i>
+            Place Order
+        </button>
+
+
+        <a
+            href="{% url 'cart:cart_items' %}"
+            class="back-to-cart"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Cart
         </a>
-      </div>
 
-      <div class="order-items">
-        {%for item in items%}
-        <div class="order-item">
-          <img src="{{item.stock.product.images.all.0.image.url}}" alt="Noise cancelling headphones" class="order-item-img">
-          <div class="order-item-details">
-            <div class="order-item-name">{{item.stock.product.title}}</div>
-            <div class="order-item-quantity">Quantity: {{item.quantity}}</div>
-          </div>
-          <div class="order-item-price">${{item.get_item_price}}</div>
+
+        <div
+            style="
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            "
+        >
+            <p
+                style="
+                    color: #666;
+                    font-size: 0.9rem;
+                    text-align: center;
+                "
+            >
+                By placing your order, you agree to our
+                <a
+                    href="#"
+                    style="color: var(--primary);"
+                >
+                    Terms of Service
+                </a>
+                and
+                <a
+                    href="#"
+                    style="color: var(--primary);"
+                >
+                    Privacy Policy
+                </a>.
+            </p>
         </div>
-        {%endfor%}
 
-      </div>
-    </section>
-  </div>
-
-  <!-- Order Summary Sidebar -->
-  <div class="order-summary-sidebar">
-    <h2>Order Summary</h2>
-
-    <div class="summary-row">
-      <span>Subtotal ({{items|length}} items)</span>
-      <span>${{cart.get_items_price}}</span>
     </div>
 
-    <div class="summary-row">
-      <span>Shipping</span>
-      <span id="shippingCost">-</span>
-    </div>
-
-    {%if coupon_application%}
-    <div class="summary-row discount">
-      <span>Discount ({{coupon_application.coupon.code}})</span>
-      <span>-%{{coupon_application.coupon.discount}}</span>
-    </div>
-    {%endif%}
-
-    <div class="summary-row total">
-      <span>Total</span>
-      <span id="orderTotal">${{final_price}} {{final_price}}</span>
-    </div>
-
-    <div class="secure-checkout">
-      <i class="fa-solid fa-shield-check"></i>
-      <div class="secure-text">
-        <h4>Secure Checkout</h4>
-        <p>Your payment information is encrypted and secure</p>
-      </div>
-    </div>
-    {%csrf_token%}
-    <button class="place-order-btn" id="placeOrderBtn">
-      <i class="fa-solid fa-lock"></i> Place Order
-    </button>
-
-    <a href="cart.html" class="back-to-cart">
-      <i class="fa-solid fa-arrow-left"></i> Back to Cart
-    </a>
-
-    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
-      <p style="color: #666; font-size: 0.9rem; text-align: center;">
-        By placing your order, you agree to our <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.
-      </p>
-    </div>
-  </div>
 </div>
+{% endblock %}
 
 
-{%endblock%}
-{%block script%}
+{% block script %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
-    const addressCards = document.querySelectorAll('.address-card');
-    const shippingMethods = document.querySelectorAll('.payment-method[data-shipping]');
-    const paymentMethods = document.querySelectorAll('.payment-method[data-payment]');
-    const placeOrderBtn = document.getElementById('placeOrderBtn');
-    const shippingCostEl = document.getElementById('shippingCost');
-    const orderTotalEl = document.getElementById('orderTotal');
-    const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+    class OrderApiService {
+        static getCsrfToken() {
+            const csrfInput = document.querySelector(
+                '[name="csrfmiddlewaretoken"]'
+            );
 
-    // Order data
-    let subtotal = Number("{{cart.get_items_price}}");
-    let discount = Number("{{discount}}");
-    let shippingCost = 0.00;
+            if (!csrfInput) {
+                throw new Error("CSRF token was not found.");
+            }
 
-    // Update order total display
-    function updateOrderTotal() {
-      const total = subtotal + shippingCost - discount;
-      orderTotalEl.textContent = '$' + total.toFixed(2);
+            return csrfInput.value;
+        }
+
+        static async createOrder(addressId, shippingId) {
+            const formData = new FormData();
+
+            formData.append(
+                "shipping_address",
+                addressId
+            );
+
+            formData.append(
+                "shipping_method",
+                shippingId
+            );
+
+            const response = await fetch(
+                "{% url 'order:order' %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": this.getCsrfToken(),
+                        "Accept": "application/json",
+                    },
+                    body: formData,
+                }
+            );
+
+            const data = await this.parseResponse(response);
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    data.detail ||
+                    "Failed to create order."
+                );
+            }
+
+            return data;
+        }
+
+        static async createOrderCheckout(orderId) {
+            const response = await fetch(
+                `/api/v1/payment/orders/${encodeURIComponent(orderId)}/checkout/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": this.getCsrfToken(),
+                        "Accept": "application/json",
+                    },
+                }
+            );
+
+            const data = await this.parseResponse(response);
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail ||
+                    data.error ||
+                    "Failed to create checkout session."
+                );
+            }
+
+            return data;
+        }
+
+        static async parseResponse(response) {
+            const contentType = response.headers.get(
+                "content-type"
+            );
+
+            if (
+                contentType &&
+                contentType.includes("application/json")
+            ) {
+                return await response.json();
+            }
+
+            return {};
+        }
     }
 
-    // Initialize
-    updateOrderTotal();
 
-    // Address selection
-    addressCards.forEach(card => {
-      card.addEventListener('click', function() {
-        addressCards.forEach(c => c.classList.remove('selected'));
-        this.classList.add('selected');
-      });
-    });
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+            const addressCards =
+                document.querySelectorAll(
+                    ".address-card"
+                );
 
-    // Shipping method selection
-    shippingMethods.forEach(method => {
-      method.addEventListener('click', function() {
-        shippingMethods.forEach(m => m.classList.remove('selected'));
-        this.classList.add('selected');
+            const shippingMethods =
+                document.querySelectorAll(
+                    ".payment-method[data-shipping]"
+                );
 
-        // Update shipping cost
+            const placeOrderBtn =
+                document.getElementById(
+                    "placeOrderBtn"
+                );
 
-        const shippingCostRaw = this.querySelector(".shipping-cost").innerText
-        shippingCostEl.textContent = shippingCostRaw;
+            const shippingCostEl =
+                document.getElementById(
+                    "shippingCost"
+                );
 
-        if(shippingCostRaw=="Free"){
-          shippingCost = 0.00;
+            const orderTotalEl =
+                document.getElementById(
+                    "orderTotal"
+                );
 
-        }else{
-          shippingCost = Number(shippingCostRaw)
+
+            /*
+             * These values are only used for displaying
+             * the checkout preview.
+             *
+             * The backend remains authoritative for the
+             * actual Order.total_amount and Payment.amount.
+             */
+            const subtotal =
+                Number("{{ cart.get_items_price|default:'0' }}") || 0;
+
+            const discount =
+                Number("{{ discount|default:'0' }}") || 0;
+
+            let shippingCost = 0;
+
+
+            function updateOrderTotal() {
+                const total =
+                    subtotal +
+                    shippingCost -
+                    discount;
+
+                orderTotalEl.textContent =
+                    "$" + total.toFixed(2);
+            }
+
+
+            /*
+             * Address selection
+             */
+            addressCards.forEach(function (card) {
+                card.addEventListener(
+                    "click",
+                    function () {
+                        addressCards.forEach(
+                            function (item) {
+                                item.classList.remove(
+                                    "selected"
+                                );
+                            }
+                        );
+
+                        this.classList.add(
+                            "selected"
+                        );
+                    }
+                );
+            });
+
+
+            /*
+             * Shipping method selection
+             */
+            shippingMethods.forEach(function (method) {
+                method.addEventListener(
+                    "click",
+                    function () {
+                        shippingMethods.forEach(
+                            function (item) {
+                                item.classList.remove(
+                                    "selected"
+                                );
+                            }
+                        );
+
+                        this.classList.add(
+                            "selected"
+                        );
+
+                        const shippingCostElement =
+                            this.querySelector(
+                                ".shipping-cost"
+                            );
+
+                        if (!shippingCostElement) {
+                            shippingCost = 0;
+                            shippingCostEl.textContent =
+                                "$0.00";
+
+                            updateOrderTotal();
+                            return;
+                        }
+
+                        const shippingCostRaw =
+                            shippingCostElement.textContent.trim();
+
+                        if (
+                            shippingCostRaw.toLowerCase() ===
+                            "free"
+                        ) {
+                            shippingCost = 0;
+                            shippingCostEl.textContent =
+                                "Free";
+                        } else {
+                            shippingCost =
+                                Number(
+                                    shippingCostRaw
+                                ) || 0;
+
+                            shippingCostEl.textContent =
+                                "$" +
+                                shippingCost.toFixed(2);
+                        }
+
+                        updateOrderTotal();
+                    }
+                );
+            });
+
+
+            /*
+             * Initialize the first/pre-selected
+             * shipping method.
+             */
+            const preselectedShipping =
+                document.querySelector(
+                    ".payment-method[data-shipping].selected"
+                );
+
+            if (preselectedShipping) {
+                const shippingCostElement =
+                    preselectedShipping.querySelector(
+                        ".shipping-cost"
+                    );
+
+                if (shippingCostElement) {
+                    const shippingCostRaw =
+                        shippingCostElement.textContent.trim();
+
+                    if (
+                        shippingCostRaw.toLowerCase() ===
+                        "free"
+                    ) {
+                        shippingCost = 0;
+
+                        shippingCostEl.textContent =
+                            "Free";
+                    } else {
+                        shippingCost =
+                            Number(
+                                shippingCostRaw
+                            ) || 0;
+
+                        shippingCostEl.textContent =
+                            "$" +
+                            shippingCost.toFixed(2);
+                    }
+                }
+            }
+
+            updateOrderTotal();
+
+
+            /*
+             * Place Order
+             *
+             * 1. Create Order.
+             * 2. Create Stripe Checkout Session.
+             * 3. Redirect to Stripe.
+             */
+            placeOrderBtn.addEventListener(
+                "click",
+                async function () {
+                    const selectedAddress =
+                        document.querySelector(
+                            ".address-card.selected"
+                        );
+
+                    const selectedShipping =
+                        document.querySelector(
+                            ".payment-method[data-shipping].selected"
+                        );
+
+
+                    /*
+                     * Validate checkout selections.
+                     */
+                    if (!selectedAddress) {
+                        alert(
+                            "Please select a shipping address."
+                        );
+                        return;
+                    }
+
+                    if (!selectedShipping) {
+                        alert(
+                            "Please select a shipping method."
+                        );
+                        return;
+                    }
+
+
+                    const addressId =
+                        selectedAddress.dataset.address;
+
+                    const shippingId =
+                        selectedShipping.dataset.shipping;
+
+
+                    /*
+                     * Prevent duplicate clicks.
+                     */
+                    placeOrderBtn.disabled = true;
+
+                    const originalBtnHTML =
+                        placeOrderBtn.innerHTML;
+
+                    placeOrderBtn.innerHTML =
+                        '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+
+                    try {
+                        /*
+                         * -------------------------------------------------
+                         * Step 1
+                         * Create the Order.
+                         *
+                         * The backend should return:
+                         *
+                         * {
+                         *     "status": true,
+                         *     "order_id": "...",
+                         *     "order_number": "..."
+                         * }
+                         * -------------------------------------------------
+                         */
+                        const orderData =
+                            await OrderApiService.createOrder(
+                                addressId,
+                                shippingId
+                            );
+
+
+                        if (
+                            !orderData ||
+                            !orderData.order_id
+                        ) {
+                            throw new Error(
+                                "The order was created but no order ID was returned."
+                            );
+                        }
+
+
+                        /*
+                         * -------------------------------------------------
+                         * Step 2
+                         * Create Stripe Checkout Session.
+                         *
+                         * IMPORTANT:
+                         * Use order_id here, not order_number,
+                         * because the API URL expects <order_id>.
+                         * -------------------------------------------------
+                         */
+                        const checkoutData =
+                            await OrderApiService.createOrderCheckout(
+                                orderData.order_id
+                            );
+
+
+                        if (
+                            !checkoutData ||
+                            !checkoutData.checkout_url
+                        ) {
+                            throw new Error(
+                                "The checkout session was not created."
+                            );
+                        }
+
+
+                        /*
+                         * -------------------------------------------------
+                         * Step 3
+                         * Redirect the customer to Stripe Checkout.
+                         * -------------------------------------------------
+                         */
+                        window.location.href =
+                            checkoutData.checkout_url;
+
+                    } catch (error) {
+                        console.error(
+                            "Order placement failed:",
+                            error
+                        );
+
+                        alert(
+                            error.message ||
+                            "Something went wrong. Please try again."
+                        );
+
+                        placeOrderBtn.disabled =
+                            false;
+
+                        placeOrderBtn.innerHTML =
+                            originalBtnHTML;
+                    }
+                }
+            );
         }
-
-        updateOrderTotal();
-      });
-    });
-
-    // Payment method selection
-    paymentMethods.forEach(method => {
-      method.addEventListener('click', function() {
-        paymentMethods.forEach(m => m.classList.remove('selected'));
-        this.classList.add('selected');
-      });
-    });
-
-
-    // Place order button
-    placeOrderBtn.addEventListener('click', function() {
-      // Validate selections
-      const selectedAddress = document.querySelector('.address-card.selected');
-      const selectedShipping = document.querySelector('.payment-method[data-shipping].selected');
-
-
-      if (!selectedAddress || !selectedShipping ) {
-        alert('Please complete all checkout steps before placing your order.');
-        return;
-      }
-      const address = selectedAddress.getAttribute('data-address');
-      const shipping = selectedShipping.getAttribute('data-shipping');
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-      let formData = new FormData()
-      formData.append("shipping_address", address)
-      formData.append("shipping_method", shipping)
-
-      fetch("{% url 'order:order'%}", {
-        method:"POST",
-        headers:{
-          "X-CSRFToken":csrfToken
-        },
-        body:formData
-      })
-      .then(response=>response.json())
-      .then(data=>{
-        if (data.status){
-          window.location.href="{%url 'payment:checkout'%}"
-        }
-      })
-
-
-    });
-
-
-  });
+    );
 </script>
-
-<!-- Font Awesome for icons (using CDN) -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script> -->
-{%endblock%}
+{% endblock %}

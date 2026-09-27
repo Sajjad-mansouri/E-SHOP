@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views.generic.edit import CreateView
 
@@ -7,10 +10,10 @@ from shipping.models import Shipping
 
 from .forms import OrderForm
 from .models import Order
-from .services import OrderCheckoutService
+from .services import OrderService
 
 
-class OrderCreateView(CreateView):
+class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order
     form_class = OrderForm
     template_name = "order/create_order.html"
@@ -24,27 +27,40 @@ class OrderCreateView(CreateView):
         try:
             cart = self.get_user_cart()
         except Cart.DoesNotExist:
-            context["cart"] = None
-            context["items"] = []
-            context["coupon_application"] = None
-            context["final_price"] = 0
-            context["discount"] = 0
+            context.update(
+                {
+                    "cart": None,
+                    "items": [],
+                    "coupon_application": None,
+                    "final_price": Decimal("0.00"),
+                    "discount": Decimal("0.00"),
+                }
+            )
             return context
 
+        items = cart.items.select_related(
+            "stock",
+            "stock__product",
+        )
+
         context["cart"] = cart
-        context["items"] = cart.items.select_related("stock")
+        context["items"] = items
 
         coupon_application = self.get_user_application_coupon(cart)
-
         context["coupon_application"] = coupon_application
 
-        subtotal = cart.get_items_price
+        subtotal = Decimal("0.00")
+
+        for item in items:
+            subtotal += item.stock.get_final_price * item.quantity
 
         if coupon_application:
             discount_percent = coupon_application.coupon.discount
-            discount = subtotal * discount_percent / 100
+            discount = (subtotal * discount_percent / Decimal("100")).quantize(
+                Decimal("0.01")
+            )
         else:
-            discount = 0
+            discount = Decimal("0.00")
 
         context["discount"] = discount
         context["final_price"] = subtotal - discount
@@ -52,22 +68,41 @@ class OrderCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        cart = self.get_user_cart()
+        try:
+            cart = self.get_user_cart()
+        except Cart.DoesNotExist:
+            return JsonResponse(
+                {
+                    "status": False,
+                    "error": "Your cart is empty.",
+                },
+                status=400,
+            )
 
         coupon_application = self.get_user_application_coupon(cart)
 
-        order = OrderCheckoutService.create_order(
-            user=self.request.user,
-            cart=cart,
-            shipping_address=form.cleaned_data["shipping_address"],
-            shipping_method=form.cleaned_data["shipping_method"],
-            coupon_application=coupon_application,
-        )
+        try:
+            order = OrderService.create_order(
+                user=self.request.user,
+                cart=cart,
+                shipping_address=form.cleaned_data["shipping_address"],
+                shipping_method=form.cleaned_data["shipping_method"],
+                coupon_application=coupon_application,
+            )
+        except ValueError as exc:
+            return JsonResponse(
+                {
+                    "status": False,
+                    "error": str(exc),
+                },
+                status=400,
+            )
 
         return JsonResponse(
             {
                 "status": True,
                 "order_number": str(order.order_number),
+                "order_id": str(order.id),
             }
         )
 
@@ -78,13 +113,14 @@ class OrderCreateView(CreateView):
         )
 
     def get_user_application_coupon(self, cart):
-        try:
-            return CouponApplication.objects.get(
+        return (
+            CouponApplication.objects.filter(
                 user=self.request.user,
                 cart=cart,
             )
-        except CouponApplication.DoesNotExist:
-            return None
+            .select_related("coupon")
+            .first()
+        )
 
     def form_invalid(self, form):
         return JsonResponse(
