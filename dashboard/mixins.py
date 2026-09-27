@@ -49,21 +49,32 @@ class FormHandlerMixin:
 
 
 class FilterQuerySetMixin:
+    filterable = False
+    searchable = False
+
     def get_queryset(self):
         qs = super().get_queryset()
+
         if self.filterable:
             qs = self.apply_filter(qs)
+
         if self.searchable:
             qs = self.search(qs)
+
         return qs
 
 
 class AjaxMixin:
     def render_to_response(self, context, **response_kwargs):
-        is_ajax = self.request.headers.get("AJAX")
+        is_ajax = self.request.headers.get("AJAX", "").lower()
+
         if is_ajax == "true":
             self.template_name = self.Ajax_template
-        return super().render_to_response(context, **response_kwargs)
+
+        return super().render_to_response(
+            context,
+            **response_kwargs,
+        )
 
 
 class AjaxQuerysetMixin(FilterQuerySetMixin, AjaxMixin):

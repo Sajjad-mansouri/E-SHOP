@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, Q, Sum
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -38,9 +38,14 @@ from .wizard_views import OfferWizardStepView
 UserModel = get_user_model()
 
 
-# Create your views here.
 class DashboardOverView(IsSellerMixin, TemplateView):
     template_name = "dashboard/overview/overview.html"
+
+    REVENUE_STATUSES = (
+        Order.STATUS_PROCESSING,
+        Order.STATUS_SHIPPED,
+        Order.STATUS_DELIVERED,
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,40 +63,64 @@ class DashboardOverView(IsSellerMixin, TemplateView):
     def get_customers(self):
         return UserModel.objects.filter(
             user_type="customer",
-        )
+            orders__items__stock__product__seller=self.request.user,
+        ).distinct()
 
     def get_stock_products(self):
         return StockRecord.objects.filter(
+            product__seller=self.request.user,
             status="public",
             num_in_stock__gt=0,
         )
 
     def get_orders(self):
-        return Order.objects.all()
+        return (
+            Order.objects.filter(
+                items__stock__product__seller=self.request.user,
+            )
+            .select_related(
+                "user",
+                "shipping_address",
+                "shipping_method",
+            )
+            .prefetch_related("items")
+            .distinct()
+        )
 
     def get_today_orders(self, orders):
-        today = timezone.localdate()
+        now = timezone.localtime()
+
+        start = now.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+        end = start + timedelta(days=1)
+
         return orders.filter(
-            created_at__date=today,
+            created_at__gte=start,
+            created_at__lt=end,
         )
 
     def get_revenue(self, orders):
-        revenue_statuses = [
-            "paid",
-            "shipped",
-            "delivered",
-        ]
-
-        revenue = orders.filter(
-            status__in=revenue_statuses,
+        revenue = OrderItem.objects.filter(
+            order__in=orders,
+            order__status__in=self.REVENUE_STATUSES,
+            stock__product__seller=self.request.user,
         ).aggregate(
-            total=Sum("total_amount"),
+            total=Sum("total_price"),
         )["total"]
 
         return revenue or Decimal("0.00")
 
 
-class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
+class ProductListView(
+    IsSellerMixin,
+    AjaxQuerysetMixin,
+    ListView,
+):
     template_name = "dashboard/catalog/product/list.html"
     model = StockRecord
     Ajax_template = "dashboard/catalog/product/_list.html"
@@ -99,11 +128,18 @@ class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     filterable = True
     searchable = True
 
+    VALID_STATUSES = {
+        "public",
+        "private",
+    }
+
     def get_queryset(self):
         return (
             super()
             .get_queryset()
-            .filter(product__seller=self.request.user)
+            .filter(
+                product__seller=self.request.user,
+            )
             .select_related(
                 "product",
                 "product__category",
@@ -117,29 +153,40 @@ class ProductListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
         context["category_form"] = dj_forms.modelform_factory(
             Product,
             fields=["category"],
-        )
+        )()
 
         return context
 
     def apply_filter(self, qs):
-        status = self.request.GET.get("status")
+        status = self.request.GET.get(
+            "status",
+            "",
+        ).strip()
 
-        if status and status != "all":
-            qs = qs.filter(status=status)
+        if not status or status == "all":
+            return qs
 
-        return qs
+        if status not in self.VALID_STATUSES:
+            return qs
+
+        return qs.filter(
+            status=status,
+        )
 
     def search(self, qs):
-        search = self.request.GET.get("search")
+        search = self.request.GET.get(
+            "search",
+            "",
+        ).strip()
 
-        if search:
-            qs = qs.filter(
-                Q(product__title__icontains=search)
-                | Q(product__upc__icontains=search)
-                | Q(sku__icontains=search)
-            )
+        if not search:
+            return qs
 
-        return qs
+        return qs.filter(
+            Q(product__title__icontains=search)
+            | Q(product__upc__icontains=search)
+            | Q(sku__icontains=search)
+        )
 
 
 class CreateUpdateProductView(
@@ -240,21 +287,17 @@ class CreateUpdateProductView(
             instance=self.stock,
         )
 
-        if not product_form.is_valid():
-            return self._render_invalid(
-                product_form,
-                image_formset,
-                stock_record_form,
-            )
+        product_valid = product_form.is_valid()
+        image_valid = image_formset.is_valid()
+        stock_valid = stock_record_form.is_valid()
 
-        if not image_formset.is_valid():
-            return self._render_invalid(
-                product_form,
-                image_formset,
-                stock_record_form,
+        if not all(
+            (
+                product_valid,
+                image_valid,
+                stock_valid,
             )
-
-        if not stock_record_form.is_valid():
+        ):
             return self._render_invalid(
                 product_form,
                 image_formset,
@@ -262,29 +305,34 @@ class CreateUpdateProductView(
             )
 
         with transaction.atomic():
-            product = product_form.save(commit=False)
+            product = product_form.save(
+                commit=False,
+            )
 
-            # Ownership must never come from submitted form data.
+            # Never trust ownership from submitted data.
             product.seller = request.user
             product.category = self.category
             product.save()
 
-            # Save dynamic ProductAttributeValue records now that
-            # the Product has a primary key.
+            # Save dynamic ProductAttributeValue records
+            # after Product has a primary key.
             product_form.save_attributes(product)
 
-            # Required for ModelForm fields involving many-to-many
-            # relationships, if any are added later.
+            # Required for ModelForm many-to-many fields.
             product_form.save_m2m()
 
             image_formset.instance = product
             image_formset.save()
 
-            stock = stock_record_form.save(commit=False)
+            stock = stock_record_form.save(
+                commit=False,
+            )
             stock.product = product
             stock.save()
 
-        return redirect("dashboard:products")
+        return redirect(
+            "dashboard:products",
+        )
 
     def _render_invalid(
         self,
@@ -308,6 +356,15 @@ class DeleteProductView(IsSellerMixin, DeleteMixin, DeleteView):
     template_name = "dashboard/delete_product.html"
     model = Product
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                seller=self.request.user,
+            )
+        )
+
 
 class ProductTypeView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     model = ProductClass
@@ -318,12 +375,12 @@ class ProductTypeView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     searchable = True
 
     def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(name__icontains=search)
+        search = self.request.GET.get("search", "").strip()
 
-        return qs.filter(query)
+        if not search:
+            return qs
+
+        return qs.filter(name__icontains=search)
 
 
 class ProductTypeCreateUpdateView(IsSellerMixin, UpdateView):
@@ -334,46 +391,52 @@ class ProductTypeCreateUpdateView(IsSellerMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["attrs_formset"] = self.get_formset()
+        context["attrs_formset"] = kwargs.get(
+            "formset",
+            self.get_formset(),
+        )
         return context
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
         self.object = self.get_object()
+
         form = self.get_form()
-        if form.is_valid():
-            self.object = form.save(commit=False)
         formset = self.get_formset()
 
         if form.is_valid() and formset.is_valid():
             return self.form_valid(form, formset)
-        else:
-            return self.form_invalid(form, formset)
+
+        return self.form_invalid(form, formset)
 
     def get_object(self):
         product_type_pk = self.kwargs.get("pk")
+
         if product_type_pk:
-            return get_object_or_404(ProductClass, pk=product_type_pk)
-        else:
-            return None
+            return get_object_or_404(
+                ProductClass,
+                pk=product_type_pk,
+            )
+
+        return None
 
     def get_formset(self):
-        formset = forms.product_type_attr_formset(**self.get_form_kwargs())
-
-        return formset
+        return forms.product_type_attr_formset(
+            **self.get_form_kwargs(),
+        )
 
     def form_valid(self, form, formset):
-        success_url = self.get_success_url()
-        self.object = form.save()
-        formset.save()
-        return HttpResponseRedirect(success_url)
+        with transaction.atomic():
+            self.object = form.save()
+            formset.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form, formset):
         return self.render_to_response(
-            self.get_context_data(form=form, formset=formset)
+            self.get_context_data(
+                form=form,
+                formset=formset,
+            )
         )
 
 
@@ -383,19 +446,19 @@ class ProductTypeDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
 
 class CategoryListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     template_name = "dashboard/catalog/category/categories.html"
-    Ajax_template = "dashboard/catalog/product_type/_list.html"
+    Ajax_template = "dashboard/catalog/category/_category.html"
     model = Category
     paginate_by = 10
     filterable = False
     searchable = True
 
     def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(name__icontains=search)
+        search = self.request.GET.get("search", "").strip()
 
-        return qs.filter(query)
+        if not search:
+            return qs
+
+        return qs.filter(name__icontains=search)
 
 
 class SubCategoryView(IsSellerMixin, DetailView):
@@ -433,12 +496,12 @@ class OfferRangeListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     searchable = True
 
     def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(name__icontains=search)
+        search = self.request.GET.get("search", "").strip()
 
-        return qs.filter(query)
+        if not search:
+            return qs
+
+        return qs.filter(name__icontains=search)
 
 
 class OfferRangeCreateView(IsSellerMixin, CreateView):
@@ -453,7 +516,6 @@ class OfferRangeUpdateView(IsSellerMixin, UpdateView):
     template_name = "dashboard/offer/range/create_update.html"
     form_class = forms.OfferRangeForm
     success_url = reverse_lazy("dashboard:offer_range")
-    search_template_name = "dashboard/offer/range/test.html"
 
 
 class OfferRangeDeleteView(IsSellerMixin, DeleteMixin, DeleteView):
@@ -470,19 +532,20 @@ class OfferListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     searchable = True
 
     def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(name__icontains=search)
+        search = self.request.GET.get("search", "").strip()
 
-        return qs.filter(query)
+        if not search:
+            return qs
+
+        return qs.filter(name__icontains=search)
 
     def apply_filter(self, qs):
-        status = self.request.GET.get("status")
-        query = Q()
-        if status != "all" and status:
-            query = Q(status=status)
-        return qs.filter(query)
+        status = self.request.GET.get("status", "").strip()
+
+        if not status or status == "all":
+            return qs
+
+        return qs.filter(status=status)
 
 
 class CreateOfferView(IsSellerMixin, OfferWizardStepView):
@@ -493,8 +556,13 @@ class OfferStepView(IsSellerMixin, View):
     def get(self, request, *args, **kwargs):
         offer_step = kwargs.get("offer_step")
         offer_pk = kwargs.get("offer_pk")
+
         if offer_pk:
-            offer = get_object_or_404(Offer, pk=offer_pk)
+            offer = get_object_or_404(
+                Offer,
+                pk=offer_pk,
+                seller=request.user,
+            )
             offer_type = offer.offer_type
         else:
             offer = None
@@ -506,8 +574,13 @@ class OfferStepView(IsSellerMixin, View):
             form = forms.OfferTypeForm(instance=offer_type)
         elif offer_step == 3:
             form = forms.OfferRestrictionForm(instance=offer)
+        else:
+            raise Http404
+
         return render(
-            request, f"dashboard/offer/offer/_step_{offer_step}.html", {"form": form}
+            request,
+            f"dashboard/offer/offer/_step_{offer_step}.html",
+            {"form": form},
         )
 
 
@@ -520,6 +593,15 @@ class DeleteOfferView(IsSellerMixin, DeleteMixin, DeleteView):
     model = Offer
     success_url = reverse_lazy("dashboard:offer_list")
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                seller=self.request.user,
+            )
+        )
+
 
 class CouponListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     model = Coupon
@@ -531,19 +613,20 @@ class CouponListView(IsSellerMixin, AjaxQuerysetMixin, ListView):
     searchable = True
 
     def search(self, qs):
-        search = self.request.GET.get("search")
-        query = Q()
-        if search:
-            query = Q(code__icontains=search)
+        search = self.request.GET.get("search", "").strip()
 
-        return qs.filter(query)
+        if not search:
+            return qs
+
+        return qs.filter(code__icontains=search)
 
     def apply_filter(self, qs):
-        status = self.request.GET.get("status")
-        query = Q()
-        if status != "all" and status:
-            query = Q(status=status)
-        return qs.filter(query)
+        status = self.request.GET.get("status", "").strip()
+
+        if not status or status == "all":
+            return qs
+
+        return qs.filter(status=status)
 
 
 class CouponCreateView(IsSellerMixin, CreateView):
@@ -551,10 +634,6 @@ class CouponCreateView(IsSellerMixin, CreateView):
     form_class = forms.CouponForm
     success_url = reverse_lazy("dashboard:coupon_list")
     template_name = "dashboard/offer/coupon/create_update.html"
-
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
 
 
 class CouponUpdateView(IsSellerMixin, UpdateView):
