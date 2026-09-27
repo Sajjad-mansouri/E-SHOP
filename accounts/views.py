@@ -273,7 +273,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class AddressBookView(ListView):
+class AddressBookView(LoginRequiredMixin, ListView):
     model = Address
     template_name = "account/address/address_book.html"
 
@@ -283,33 +283,46 @@ class AddressBookView(ListView):
         return qs.filter(user=self.request.user)
 
 
-class WishlistView(ListView):
+class WishlistView(LoginRequiredMixin, ListView):
     model = WishList
     template_name = "account/wishlist/wishlist.html"
+    context_object_name = "wishlist_items"
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        return (
+            WishList.objects.filter(user=self.request.user)
+            .select_related(
+                "stock_record",
+                "stock_record__product",
+            )
+            .order_by("-created")
+        )
 
-        return qs.filter(user=self.request.user)
 
-
-class WishlistDeleteView(DeleteView):
+class WishlistDeleteView(LoginRequiredMixin, DeleteView):
     model = WishList
 
     def get_object(self, queryset=None):
         wishlist_id = self.request.POST.get("id")
-        try:
-            wishlist_id = int(wishlist_id)
-            wishlist_object = WishList.objects.get(id=wishlist_id)
-        except (WishList.DoesNotExist, ValueError):
-            return None
-        return wishlist_object
+
+        return WishList.objects.filter(
+            pk=wishlist_id,
+            user=self.request.user,
+        ).first()
 
     def form_valid(self, form):
-        if self.object:
-            self.object.delete()
-            return JsonResponse({"status": True})
-        return JsonResponse({"status": False})
+        if self.object is None:
+            return JsonResponse(
+                {
+                    "status": False,
+                    "error": "Wishlist item not found.",
+                },
+                status=404,
+            )
+
+        self.object.delete()
+
+        return JsonResponse({"status": True})
 
 
 class LoginView(auth_views.LoginView):
