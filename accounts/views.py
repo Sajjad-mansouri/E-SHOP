@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -16,7 +18,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from address.models import Address
-from order.models import Order
+from order.models import Order, OrderItem
+from payment.models import Payment
 from wishlist.models import WishList
 
 from .forms import CustomAuthenticationForm, UserProfileForm, UserRegistrationForm
@@ -151,55 +154,123 @@ class RegistrationConfirmView(PasswordContextMixin, TemplateView):
         return context
 
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "account/profile.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["profile_user"] = self.request.user
+        return context
 
-class UpdateProfileView(UpdateView):
+
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
     model = UserModel
     form_class = UserProfileForm
     template_name = "account/edit_profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
 
     def form_valid(self, form):
         form.save()
         return JsonResponse({"status": True})
 
     def form_invalid(self, form):
-        errors = form.errors
-        return JsonResponse({"status": False, "errors": errors})
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": form.errors.get_json_data(),
+            },
+            status=400,
+        )
 
 
-class DeleteProfileView(DeleteView):
+class DeleteProfileView(LoginRequiredMixin, DeleteView):
     model = UserModel
     template_name = "account/delete_profile.html"
-    success_url = "login"
+    success_url = reverse_lazy("account:login")
+
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
-class PasswordChangeView(auth_views.PasswordChangeView):
+class PasswordChangeView(LoginRequiredMixin, auth_views.PasswordChangeView):
     template_name = "registration/password_change.html"
 
     def form_valid(self, form):
         form.save()
         update_session_auth_hash(self.request, form.user)
+
         return JsonResponse({"status": True})
 
     def form_invalid(self, form):
-        return JsonResponse({"status": False, "errors": form.errors})
+        return JsonResponse(
+            {
+                "status": False,
+                "errors": form.errors.get_json_data(),
+            },
+            status=400,
+        )
 
 
-class OrderHistoryView(ListView):
+class OrderHistoryView(LoginRequiredMixin, ListView):
     model = Order
     template_name = "account/order/order_history.html"
+    context_object_name = "orders"
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related("shipping_address", "shipping_method")
+            .prefetch_related("items")
+            .order_by("-created_at")
+        )
 
-        return qs.filter(user=self.request.user)
 
-
-class OrderDetailView(DetailView):
+class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
     template_name = "account/order/order_detail.html"
+    context_object_name = "order"
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related(
+                "shipping_address",
+                "shipping_method",
+            )
+            .prefetch_related(
+                Prefetch(
+                    "items",
+                    queryset=OrderItem.objects.select_related(
+                        "stock__product",
+                    ),
+                ),
+                Prefetch(
+                    "payments",
+                    queryset=Payment.objects.order_by("-created_at"),
+                ),
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        payments = list(self.object.payments.all())
+        latest_payment = payments[0] if payments else None
+
+        context["latest_payment"] = latest_payment
+        context["can_retry_payment"] = (
+            self.object.status == Order.STATUS_PENDING
+            and latest_payment is not None
+            and latest_payment.status
+            in {
+                Payment.Status.FAILED,
+                Payment.Status.CANCELLED,
+            }
+        )
+
+        return context
 
 
 class AddressBookView(ListView):

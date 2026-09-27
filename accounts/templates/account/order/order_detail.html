@@ -1,131 +1,237 @@
-{%extends 'account/account_base.html'%}
-{%load static%}
+{% extends "account/account_base.html" %}
+{% load static %}
 
+{% block title %}Order Detail{% endblock %}
 
-{%block title%}Order Detail{%endblock%}
-{%block style%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/order_detail.css'%}">
+{% block style %}
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="{% static 'css/order_detail.css' %}"
+>
+{% endblock %}
 
-{%endblock%}
-  {%block content%}
-
-  <!-- content -->
+{% block content %}
 <div class="account-content">
+	{%csrf_token%}
+    <div class="order-header">
+        <div>
+            <h2>Order #{{ order.order_number }}</h2>
+            <p class="sub-text">
+                Placed on {{ order.created_at|date:"F j, Y, g:i A" }}
+            </p>
+        </div>
 
-<h2>Order #{{order.order_number}}</h2>
-<p class="sub-text">Placed on {{order.created_at}}</p>
+        {% if can_retry_payment %}
+        <button
+            type="button"
+            class="btn-retry-payment"
+            id="retry-payment-btn"
+            data-order-id="{{ order.pk }}"
+        >
+            Retry Payment
+        </button>
+        {% endif %}
+    </div>
 
-<div class="order-info">
+    <div class="order-info">
 
-<div class="info-box">
-<strong>Status</strong>
-<span class="badge">{{order.status}}</span>
+        <div class="info-box">
+            <strong>Status</strong>
+            <span class="badge">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+
+        <div class="info-box">
+            <strong>Payment Status</strong>
+
+            {% if latest_payment %}
+                <span>
+                    {{ latest_payment.get_status_display }}
+                </span>
+            {% else %}
+                <span>Not started</span>
+            {% endif %}
+        </div>
+
+        <div class="info-box">
+            <strong>Shipping Address</strong>
+
+            {% if order.shipping_address %}
+                {{ order.user.get_full_name }}<br>
+                {{ order.shipping_address.line1 }}<br>
+                {{ order.shipping_address.province }},
+                {{ order.shipping_address.postcode }}
+            {% else %}
+                <span>No shipping address</span>
+            {% endif %}
+        </div>
+
+        <div class="info-box">
+            <strong>Email</strong>
+            {{ order.user.email }}
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>
+                        <div class="product">
+                            {% if item.stock and item.stock.product.images.all.0 %}
+                                <img
+                                    src="{{ item.stock.product.images.all.0.image.url }}"
+                                    alt="{{ item.product_name }}"
+                                >
+                            {% endif %}
+
+                            <span>{{ item.product_name }}</span>
+                        </div>
+                    </td>
+
+                    <td>
+                        ${{ item.unit_price }}
+                    </td>
+
+                    <td>
+                        {{ item.quantity }}
+                    </td>
+
+                    <td>
+                        ${{ item.total_price }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">
+                        No items found for this order.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="totals">
+
+        <div class="total-row">
+            <span>Subtotal</span>
+            <span>${{ order.subtotal }}</span>
+        </div>
+
+        <div class="total-row">
+            <span>Coupon Discount</span>
+            <span>- ${{ order.discount_amount }}</span>
+        </div>
+
+        <div class="total-row">
+            <span>Shipping</span>
+            <span>${{ order.shipping_amount }}</span>
+        </div>
+
+        <div class="total-row">
+            <span>Tax</span>
+            <span>${{ order.tax_amount }}</span>
+        </div>
+
+        <div class="total-row final">
+            <span>Total</span>
+            <span>${{ order.total_amount }}</span>
+        </div>
+
+        {% if order.coupon_code %}
+        <span class="coupon-badge">
+            Coupon {{ order.coupon_code }} applied
+        </span>
+        {% endif %}
+
+    </div>
+
+    <a
+        href="{% url 'account:order_history' %}"
+        class="btn-back"
+    >
+        Back to Orders
+    </a>
+
 </div>
+{% endblock %}
 
-<div class="info-box">
-<strong>Payment Method</strong>
-{{order.payment.payment_method}}
-</div>
+{% block script %}
+<script>
+const retryPaymentButton = document.querySelector("#retry-payment-btn");
+function getCookie(name) {
+    const cookies = document.cookie.split(";");
 
-<div class="info-box">
-<strong>Shipping Address</strong>
-{{request.user.get_full_name}}<br>
-{{order.shipping_address.line1}}<br>
-{{order.shipping_address.province}}, {{order.shipping_address.postcode}}
-</div>
+    for (const cookie of cookies) {
+        const [key, ...valueParts] = cookie.trim().split("=");
 
-<div class="info-box">
-<strong>Email</strong>
-{{request.user.email}}
+        if (key === name) {
+            return decodeURIComponent(valueParts.join("="));
+        }
+    }
 
-</div>
+    return null;
+}
+if (retryPaymentButton) {
+    retryPaymentButton.addEventListener("click", async () => {
+        const orderId = retryPaymentButton.dataset.orderId;
 
-</div>
+        retryPaymentButton.disabled = true;
+        retryPaymentButton.textContent = "Processing...";
 
-<!-- product table -->
+        try {
+            const response = await fetch(
+                `/api/v1/payment/orders/${encodeURIComponent(orderId)}/checkout/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "same-origin",
+                },
+            );
 
-<div class="table-container">
+            const data = await response.json();
 
-<table>
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || "Unable to start payment.",
+                );
+            }
 
-<thead>
-<tr>
-<th>Product</th>
-<th>Price</th>
-<th>Qty</th>
-<th>Total</th>
-</tr>
-</thead>
+            if (!data.checkout_url) {
+                throw new Error(
+                    "Payment checkout URL was not returned.",
+                );
+            }
 
-<tbody>
-{%for item in order.cart.items.all%}
-<tr>
+            window.location.href = data.checkout_url;
+        } catch (error) {
+            console.error(error);
 
-	<td>
-		<div class="product">
-		<img src="{{item.stock.product.images.all.0.image.url}}">
-		<span>{{item.stock.product.title}}</span>
-		</div>
-	</td>
+            retryPaymentButton.disabled = false;
+            retryPaymentButton.textContent = "Retry Payment";
 
-	<td>
-		<span class="old-price">${{item.stock.price}}</span>
-		<span class="new-price">${{item.stock.get_final_price}}</span>
-	</td>
-
-	<td>{{item.quantity}}</td>
-
-	<td>${{item.get_item_price}}</td>
-
-</tr>
-{%endfor%}
-
-
-</tbody>
-
-</table>
-
-</div>
-
-<!-- totals -->
-
-<div class="totals">
-
-<div class="total-row">
-<span>Subtotal</span>
-<span>${{order.calc_items_price}}</span>
-</div>
-
-
-<div class="total-row">
-<span>Coupon Discount</span>
-<span>- ${{order.calc_discount}}</span>
-</div>
-
-<div class="total-row">
-<span>Shipping</span>
-<span>${{order.calc_shipping_cost}}</span>
-</div>
-<div class="total-row">
-<span>Tax</span>
-<span>${{order.calc_tax}}</span>
-</div>
-
-<div class="total-row final">
-<span>Total</span>
-<span>${{order.calc_total_cost}}</span>
-</div>
-
-<span class="coupon-badge">Coupon {{order.get_coupon}} applied</span>
-
-</div>
-
-<a href="{%url 'account:order_history'%}" class="btn-back">Back to Orders</a>
-
-</div>
-
-{%endblock%}
-
-{%block script%}
-
-{%endblock%}
+            alert(error.message);
+        }
+    });
+}
+</script>
+{% endblock %}
