@@ -311,18 +311,29 @@ class UserRating(models.Model):
         verbose_name=_("user"),
     )
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, verbose_name=_("product")
+        Product,
+        on_delete=models.CASCADE,
+        verbose_name=_("product"),
     )
     rating = models.IntegerField(
-        _("rating"), validators=[MinValueValidator(0), MaxValueValidator(5)]
+        _("rating"),
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5),
+        ],
     )
-
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("User Rating")
         verbose_name_plural = _("User Ratings")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "product"],
+                name="unique_user_product_rating",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.user} rate {self.product} {self.rating}"
