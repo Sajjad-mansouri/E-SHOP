@@ -1,0 +1,142 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% translate "Message Received" %} - E‑SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style type="text/css">
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+    .logo-icon {
+      display: inline-block;
+      color: #ffffff;
+    }
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+    .logo-text span {
+      color: #1a1a1a;
+    }
+    @media only screen and (max-width: 600px) {
+      .logo-text {
+        font-size: 18px !important;
+      }
+      .logo-icon {
+        font-size: 28px !important;
+      }
+      .responsive-padding {
+        padding: 20px 20px !important;
+      }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:20px; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background-color:#f4f7fc;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7fc; padding:20px 0;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border-radius:24px; border:1px solid #e9edf2; box-shadow:0 12px 40px rgba(0,0,0,0.06);">
+
+        <!-- HEADER with Brand Logo -->
+        <tr>
+          <td style="background:linear-gradient(135deg, #ff3366 0%, #ff9966 100%); padding:24px 30px 20px; text-align:center; border-radius:24px 24px 0 0;">
+            <a href="{{ site_address|default:'#' }}" class="brand-logo" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: #ffffff; margin-bottom: 12px;">
+              <span class="logo-icon" style="display: inline-block; color: #ffffff; font-size: 32px;">
+                <i class="fas fa-bag-shopping"></i>
+              </span>
+              <span class="logo-text" style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">E‑<span style="color:#1a1a1a;">SHOP</span></span>
+            </a>
+            <h1 style="color:#ffffff; font-size:24px; font-weight:700; margin:8px 0 0 0;">✅ {% translate "Message Received" %}</h1>
+            <p style="color:rgba(255,255,255,0.9); font-size:14px; margin:6px 0 0 0;">{% translate "Thanks for reaching out to E‑SHOP" %}</p>
+          </td>
+        </tr>
+
+        <!-- BODY -->
+        <tr>
+          <td style="padding:30px 35px;" class="responsive-padding">
+
+            <p style="font-size:18px; font-weight:600; color:#1a1a1a; margin:0 0 16px 0;">
+              {% translate "Hello" %} {{ name }},
+            </p>
+
+            <p style="font-size:15px; color:#444; line-height:1.7; margin:0 0 10px 0;">
+              {% translate "Thank you for taking the time to send me a message through the E‑SHOP portfolio." %}
+            </p>
+            <p style="font-size:15px; color:#444; line-height:1.7; margin:0 0 20px 0;">
+              {% translate "I will review it and get back to you shortly." %}
+            </p>
+
+            <!-- Message Summary -->
+            <table width="100%" cellpadding="12" cellspacing="0" style="background:#fff5f6; border-radius:16px; border-left:4px solid #ef4056; margin:0 0 24px 0;">
+              <tr>
+                <td>
+                  <p style="font-size:12px; font-weight:700; color:#6b7f92; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px 0;">📋 {% translate "Your Message Summary" %}</p>
+                  <p style="margin:2px 0; font-size:15px; color:#1a1a1a;"><strong>{% translate "Name" %}:</strong> {{ name }}</p>
+                  <p style="margin:2px 0; font-size:15px; color:#1a1a1a;"><strong>{% translate "Email" %}:</strong> {{ email }}</p>
+                  {% if subject %}
+                  <p style="margin:2px 0; font-size:15px; color:#1a1a1a;"><strong>{% translate "Subject" %}:</strong> {{ subject }}</p>
+                  {% endif %}
+                  <p style="margin:10px 0 0 0; font-size:15px; color:#1a1a1a;"><strong>{% translate "Message" %}:</strong></p>
+                  <p style="margin:4px 0 0 0; font-size:15px; line-height:1.7; color:#1a1a1a;">{{ message }}</p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA: Browse our shop -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px 0;">
+              <tr>
+                <td align="center">
+                  <a href="{{ site_address }}{% url 'catalog:home' %}"
+                     style="display:inline-block; background:linear-gradient(135deg, #ef4056 0%, #d32f2f 100%); color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; padding:14px 32px; border-radius:10px; box-shadow:0 4px 12px rgba(239,64,86,0.3);">
+                    <i class="fas fa-bag-shopping" style="margin-right:8px;"></i>
+                    {% translate "Continue Shopping" %}
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <hr style="border:0; height:1px; background:#e9edf2; margin:0 0 24px 0;">
+
+            <p style="color:#5b6f82; font-size:14px; line-height:1.8; margin:0 0 20px 0;">
+              {% translate "If you did not submit this request, please ignore this email — no action is needed." %}
+            </p>
+
+            <!-- SIGNATURE -->
+            <p style="margin:0 0 4px 0; font-weight:600; color:#1a1a1a; font-size:15px;">{% translate "Best regards," %}</p>
+            <p style="margin:0; font-weight:600; color:#1a1a1a; font-size:16px;">{{ developer_name|default:'Sajjad Mansouri' }}</p>
+            <p style="margin:0; color:#5b6f82; font-size:14px;">{% translate "Backend Developer & Creator of E‑SHOP" %}</p>
+            <p style="margin:4px 0 0 0;">
+              <a href="{{ site_address }}" style="color:#ef4056; text-decoration:none; font-size:14px; font-weight:600;">
+                <i class="fas fa-bag-shopping" style="margin-right:4px;"></i>
+                {{ site_name|default:'E‑SHOP' }}
+              </a>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="background:#f8f9fa; padding:20px; text-align:center; font-size:12px; color:#8a9caa; border-top:1px solid #e9edf2; border-radius:0 0 24px 24px;">
+            {% translate "This is an automated confirmation. We usually reply personally within 24 hours." %}<br>
+            &copy; {{ current_year|default:'2026' }} {{ site_name|default:'E‑SHOP' }}. {% translate "All rights reserved." %}
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

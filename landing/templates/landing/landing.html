@@ -1,0 +1,1396 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% translate "E‑SHOP — Modern Django E-Commerce Portfolio" %}</title>
+    <meta name="description" content="{% translate 'A portfolio e-commerce platform built with Django — catalog, cart, wishlist, orders, coupons, and Stripe payments across a modular, domain-oriented architecture.' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ef4056;
+            --primary-dark: #d32f2f;
+            --dark: #1a1a1a;
+            --gray: #444;
+            --gray-light: #6b7280;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.05);
+            --hover-shadow: 0 12px 24px -8px rgba(239,64,86,0.15);
+            --offer-gradient: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            --flash-gradient: linear-gradient(135deg, #ff3366 0%, #ff9966 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark);
+            background: #ffffff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* Global guard: ensure [hidden] always wins over display:flex/grid */
+        [hidden] { display: none !important; }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ---------- Navbar ---------- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .logo span { color: var(--dark); }
+
+        .portfolio-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gray-light);
+            background: var(--light);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .portfolio-tag i {
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .nav-links a { color: var(--gray); transition: color .2s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 26px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all .2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(239,64,86,0.3);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #b71c1c 100%);
+            color: #fff !important;
+            box-shadow: 0 6px 18px rgba(239,64,86,0.5);
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--dark);
+            border: 1.5px solid var(--border);
+        }
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative;
+            padding: 100px 0 80px;
+            background:
+                radial-gradient(60% 80% at 90% 0%, rgba(239,64,86,0.08) 0%, transparent 60%),
+                radial-gradient(50% 60% at 0% 100%, rgba(255,153,102,0.08) 0%, transparent 60%),
+                #ffffff;
+            overflow: hidden;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff5f6;
+            color: var(--primary);
+            border: 1px solid rgba(239,64,86,0.2);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .badge .dot {
+            width: 8px; height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 22px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff9966 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p.lead {
+            font-size: 1.1rem;
+            color: var(--gray-light);
+            line-height: 1.75;
+            margin-bottom: 36px;
+            max-width: 560px;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .hero-visual { position: relative; }
+        .hero-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 20px 60px -20px rgba(0,0,0,0.15);
+        }
+        .hero-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .window-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .window-dot.red { background: #ff5f56; }
+        .window-dot.yellow { background: #ffbd2e; }
+        .window-dot.green { background: #27c93f; }
+
+        .hero-card code {
+            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-size: 0.86rem;
+            color: var(--gray);
+            line-height: 2;
+            display: block;
+        }
+        .hero-card code .key { color: #7c3aed; }
+        .hero-card code .string { color: #059669; }
+        .hero-card code .comment { color: #9ca3af; }
+
+        /* ---------- Stats ---------- */
+        .stats {
+            padding: 48px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--light);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff9966 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------- Section common ---------- */
+        section { padding: 96px 0; }
+        .section-head {
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto 64px;
+        }
+        .section-label {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .section-desc {
+            color: var(--gray-light);
+            font-size: 1.05rem;
+            line-height: 1.75;
+        }
+
+        /* ---------- Features ---------- */
+        .feature-group { margin-bottom: 64px; }
+        .feature-group:last-child { margin-bottom: 0; }
+
+        .feature-group-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-group-title::before {
+            content: '';
+            width: 4px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            border-color: rgba(239,64,86,0.3);
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+        }
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+            color: #fff;
+        }
+        .feature-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
+        }
+        .feature-card p {
+            color: var(--gray-light);
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+        .feature-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            object-fit: cover;
+        }
+
+        /* ---------- Highlights ---------- */
+        .highlights-section { background: var(--light); }
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 26px;
+        }
+        .highlight-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 34px;
+            transition: all .3s ease;
+        }
+        .highlight-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+            border-color: rgba(239,64,86,0.3);
+        }
+        .highlight-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .highlight-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .highlight-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .highlight-card > p {
+            color: var(--gray-light);
+            font-size: 0.94rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        .endpoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-family: Consolas, Monaco, 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--gray);
+            transition: all .2s;
+        }
+        .endpoint:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .endpoint i {
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+
+        /* ---------- Contact ---------- */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 56px;
+            align-items: start;
+        }
+        .contact-info h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+        .contact-info > p {
+            color: var(--gray-light);
+            line-height: 1.75;
+            margin-bottom: 32px;
+        }
+        .contact-card {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+        .contact-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .contact-card p {
+            color: var(--gray-light);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.94rem;
+        }
+        .social-list {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--gray);
+            transition: all .2s;
+        }
+        .social-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .social-link i { font-size: 1rem; }
+
+        /* ---------- Form ---------- */
+        .form-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+        }
+        .form-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+        }
+        .form-card > p {
+            color: var(--gray-light);
+            font-size: 0.92rem;
+            margin-bottom: 28px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        .form-group label .required { color: var(--primary); }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--dark);
+            background: #fff;
+            transition: all .2s;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(239,64,86,0.1);
+        }
+        .form-group input.is-invalid,
+        .form-group textarea.is-invalid {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 4px rgba(211,47,47,0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 130px;
+        }
+
+        .form-group .errorlist {
+            list-style: none;
+            color: var(--primary-dark);
+            font-size: 0.82rem;
+            margin-top: 6px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ✅ FIX: make [hidden] win over display:flex */
+        .form-group .errorlist[hidden] { display: none; }
+
+        .form-group .errorlist::before {
+            content: '\f06a';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.8rem;
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 15px 24px;
+            font-size: 1rem;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---------- Toast ---------- */
+        .toast-container {
+            position: fixed;
+            top: 88px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            max-width: calc(100vw - 48px);
+        }
+        .toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 300px;
+            max-width: 420px;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--primary);
+            animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .toast.toast-success { border-left-color: #10b981; }
+        .toast.toast-error   { border-left-color: var(--primary-dark); }
+        .toast.toast-info    { border-left-color: #0ea5e9; }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .toast-success .toast-icon { background: #10b981; }
+        .toast-error   .toast-icon { background: var(--primary-dark); }
+        .toast-info    .toast-icon { background: #0ea5e9; }
+
+        .toast-body { flex: 1; }
+        .toast-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--gray-light);
+            line-height: 1.5;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 2px;
+            transition: color .2s;
+            align-self: flex-start;
+        }
+        .toast-close:hover { color: var(--dark); }
+
+        .toast.toast-hide {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ---------- Footer ---------- */
+        .footer {
+            background: var(--dark);
+            color: #9ca3af;
+            padding: 56px 0 32px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 40px;
+        }
+        .footer-brand-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .footer-brand-name span.brand-shop { color: var(--primary); }
+        .footer-portfolio-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #d1d5db;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 3px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.2px;
+        }
+        .footer-portfolio-tag i {
+            color: var(--primary);
+            font-size: 0.65rem;
+        }
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.75;
+            max-width: 340px;
+        }
+        .footer-col h5 {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+        }
+        .footer-col a {
+            display: block;
+            font-size: 0.88rem;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            transition: color .2s;
+        }
+        .footer-col a:hover { color: var(--primary); }
+
+        .footer-bottom {
+            border-top: 1px solid #2a2a2a;
+            padding-top: 26px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* ---------- Mobile menu button ---------- */
+        .nav-toggle {
+            display: none;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--dark);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all .2s;
+        }
+        .nav-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 960px) {
+            .hero-grid,
+            .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+
+            .nav-toggle { display: inline-flex; }
+
+            .nav-links {
+                position: absolute;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: #fff;
+                border-bottom: 1px solid var(--border);
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+                padding: 12px 24px 20px;
+                box-shadow: 0 12px 30px -12px rgba(0,0,0,0.12);
+                transform: translateY(-12px);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform .25s ease, opacity .25s ease;
+            }
+            .nav-links.is-open {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .nav-links a {
+                padding: 12px 4px;
+                border-bottom: 1px solid var(--border);
+                color: var(--dark);
+                font-size: 1rem;
+                font-weight: 600;
+            }
+            .nav-links a:last-of-type { border-bottom: none; }
+            .nav-links a:hover { color: var(--primary); }
+
+            .nav-links .btn {
+                width: 100%;
+                justify-content: center;
+                margin-top: 12px;
+                border-bottom: none !important;
+            }
+        }
+        @media (max-width: 640px) {
+            section { padding: 64px 0; }
+            .hero { padding: 60px 0 48px; }
+            .form-card { padding: 28px 22px; }
+            .form-row { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .stat-number { font-size: 2.1rem; }
+            .toast-container { top: 80px; right: 12px; left: 12px; }
+            .toast { min-width: auto; width: 100%; }
+            .portfolio-tag { font-size: 0.62rem; padding: 2px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <div class="brand-wrap">
+                <a href="{% url 'landing:home' %}" class="logo">E‑<span>SHOP</span></a>
+                <span class="portfolio-tag">
+                    <i class="fas fa-briefcase"></i>
+                    {% translate "Portfolio" %}
+                </span>
+            </div>
+
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="{% translate 'Toggle menu' %}" aria-expanded="false" aria-controls="navLinks">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="#features">{% translate "Features" %}</a>
+                <a href="#architecture">{% translate "Architecture" %}</a>
+                <a href="#contact">{% translate "Contact" %}</a>
+                <a href="/catalog/" class="btn btn-primary">
+                    <i class="fas fa-bag-shopping"></i>
+                    {% translate "Visit Shop" %}
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ TOAST CONTAINER ============ -->
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <span class="badge">
+                    <span class="dot"></span>
+                    {% translate "Portfolio Project · Django 5.2 · Stripe · DRF" %}
+                </span>
+                <h1>
+                    {% translate "A modern" %}
+                    <span class="highlight">{% translate "e-commerce portfolio" %}</span>
+                    {% translate "built with Django." %}
+                </h1>
+                <p class="lead">
+                    {% blocktranslate %}
+                    A portfolio-focused Django e-commerce application that demonstrates the full shopping journey — from product catalog and reusable collections to cart, wishlist, orders, coupons, and Stripe-powered payments — all built on a modular, domain-oriented architecture.
+                    {% endblocktranslate %}
+                </p>
+                <div class="hero-actions">
+                    <a href="#features" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        {% translate "Explore the Build" %}
+                    </a>
+                    <a href="#contact" class="btn btn-ghost">
+                        <i class="fas fa-paper-plane"></i>
+                        {% translate "Get in Touch" %}
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <span class="window-dot red"></span>
+                        <span class="window-dot yellow"></span>
+                        <span class="window-dot green"></span>
+                    </div>
+                    <code>
+                        <span class="comment"># Domain-oriented architecture</span><br>
+                        <span class="key">catalog</span>/ &nbsp;&nbsp;<span class="comment"># products & lists</span><br>
+                        <span class="key">cart</span>/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># shopping cart</span><br>
+                        <span class="key">order</span>/ &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># checkout & orders</span><br>
+                        <span class="key">payment</span>/ &nbsp;&nbsp;<span class="comment"># Stripe integration</span><br>
+                        <span class="key">dashboard</span>/ <span class="comment"># seller tools</span><br>
+
+                    </code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    {% if statistics %}
+    <section class="stats">
+        <div class="container stats-grid">
+            <div>
+                <div class="stat-number">{{ statistics.api_endpoints }}</div>
+                <div class="stat-label">{% translate "API Endpoints" %}</div>
+            </div>
+
+            <div>
+                <div class="stat-number">13</div>
+                <div class="stat-label">{% translate "Django Apps" %}</div>
+            </div>
+            <div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">{% translate "Portfolio Project" %}</div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ============ FEATURES ============ -->
+    <section id="features">
+        <div class="container">
+            <div class="section-head">
+                <span class="section-label">{% translate "Features" %}</span>
+                <h2 class="section-title">{% translate "Everything you need to run an online store" %}</h2>
+                <p class="section-desc">
+                    {% translate "From browsing and cart to checkout and fulfillment — every domain is implemented as its own Django app to showcase real e-commerce workflows." %}
+                </p>
+            </div>
+
+            {% for feature in features %}
+            <div class="feature-group">
+                <h3 class="feature-group-title">{{ feature.title }}</h3>
+                <div class="feature-grid">
+                    {% for item in feature.items.all %}
+                    <div class="feature-card">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}" class="feature-image">
+                        {% endif %}
+                        <div class="feature-icon" style="background: {{ item.color|default:'var(--primary)' }};">
+                            <i class="{{ item.icon }}"></i>
+                        </div>
+                        <h4>{{ item.title }}</h4>
+                        <p>{{ item.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align:center; color: var(--gray-light);">
+                {% translate "No features configured yet." %}
+            </p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- ============ HIGHLIGHTS / ARCHITECTURE ============ -->
+    <section id="architecture" class="highlights-section">
+        <div class="container">
+            <div class="section-head">
+                <span class="section-label">{% translate "Architecture" %}</span>
+                <h2 class="section-title">{% translate "Modular by design" %}</h2>
+                <p class="section-desc">
+                    {% translate "Business domains are separated into their own Django applications — keeping models, views, forms, services, and tests tightly scoped and easy to maintain." %}
+                </p>
+            </div>
+
+            <div class="highlight-grid">
+                {% for highlight in highlights %}
+                <div class="highlight-card">
+                    <div class="highlight-header">
+                        <div class="highlight-icon" style="background: {{ highlight.color|default:'var(--primary)' }};">
+                            <i class="{{ highlight.icon }}"></i>
+                        </div>
+                        <h3>{{ highlight.title }}</h3>
+                    </div>
+                    <p>{{ highlight.description }}</p>
+                    <div class="endpoint-list">
+                        {% for endpoint in highlight.endpoints.all %}
+                        <div class="endpoint">
+                            <i class="fas fa-angle-right"></i>
+                            {{ endpoint.end_point }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align:center; color: var(--gray-light);">
+                    {% translate "No highlights configured yet." %}
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact">
+        <div class="container contact-grid">
+            <!-- Info side -->
+            <div class="contact-info">
+                <span class="section-label">{% translate "Contact" %}</span>
+                <h2>
+                    {% if contact %}{{ contact.title }}{% else %}{% translate "Let's talk" %}{% endif %}
+                </h2>
+                <p>
+                    {% if contact %}{{ contact.description }}{% else %}
+                    {% translate "Have a question about the project, the architecture, or the deployment? Drop a message and I'll get back to you." %}
+                    {% endif %}
+                </p>
+
+                {% if contact %}
+                <div class="contact-card">
+                    <h4>{{ contact.name }}</h4>
+                    <p>{% translate "Available for questions about the project, architecture, or deployment." %}</p>
+                    <a href="mailto:{{ contact.email }}" class="contact-email">
+                        <i class="fas fa-envelope"></i>
+                        {{ contact.email }}
+                    </a>
+                </div>
+
+                {% if contact.social_links.all %}
+                <h5 style="font-size:0.9rem; font-weight:700; margin-bottom:14px; color: var(--dark);">
+                    {% translate "Find me online" %}
+                </h5>
+                <div class="social-list">
+                    {% for link in contact.social_links.all %}
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <i class="{{ link.icon }}"></i>
+                        {{ link.platform }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Form side -->
+            <div class="form-card">
+                <h3>{% translate "Send me a message" %}</h3>
+                <p>{% translate "I typically reply within 1–2 business days." %}</p>
+
+                <form id="contactForm" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_name">
+                                {% translate "Name" %} <span class="required">*</span>
+                            </label>
+                            <input type="text" id="id_name" name="name"
+                                   placeholder="{% translate 'Your name' %}"
+                                   autocomplete="name" required>
+                            <ul class="errorlist" data-error-for="name" hidden></ul>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_email">
+                                {% translate "Email" %} <span class="required">*</span>
+                            </label>
+                            <input type="email" id="id_email" name="email"
+                                   placeholder="{% translate 'you@example.com' %}"
+                                   autocomplete="email" required>
+                            <ul class="errorlist" data-error-for="email" hidden></ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_subject">
+                            {% translate "Subject" %}
+                        </label>
+                        <input type="text" id="id_subject" name="subject"
+                               placeholder="{% translate 'Subject (optional)' %}">
+                        <ul class="errorlist" data-error-for="subject" hidden></ul>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_message">
+                            {% translate "Message" %} <span class="required">*</span>
+                        </label>
+                        <textarea id="id_message" name="message" rows="6"
+                                  placeholder="{% translate 'Tell me about your project, question, or feedback...' %}"
+                                  required></textarea>
+                        <ul class="errorlist" data-error-for="message" hidden></ul>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn btn-primary form-submit">
+                        <span class="btn-label">
+                            <i class="fas fa-paper-plane"></i>
+                            {% translate "Send Message" %}
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-name">
+                        E‑<span class="brand-shop">SHOP</span>
+                        <span class="footer-portfolio-tag">
+                            <i class="fas fa-briefcase"></i>
+                            {% translate "Portfolio" %}
+                        </span>
+                    </div>
+                    <p>
+                        {% translate "A portfolio Django e-commerce platform built to demonstrate real-world e-commerce workflows and clean domain-oriented architecture." %}
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h5>{% translate "Shop" %}</h5>
+                    <a href="/catalog/">{% translate "Catalog" %}</a>
+
+                </div>
+                <div class="footer-col">
+                    <h5>{% translate "Account" %}</h5>
+                    <a href="{%url 'account:profile'%}">{% translate "My Account" %}</a>
+
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; {% now "Y" %} {{ site_name|default:"E‑SHOP" }}. {% translate "Portfolio Project — All rights reserved." %}
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============ SCRIPTS ============ -->
+    <script>
+    (function () {
+        "use strict";
+
+        // --- Configuration ---
+        const MESSAGE_ENDPOINT = "/landing/message/";
+        const TOAST_TIMEOUT = 5000;         // 5 seconds — auto fadeout
+        const TOAST_FADE_DURATION = 500;    // ms — must match CSS transition
+
+        // --- Element refs ---
+        const form = document.getElementById("contactForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const toastContainer = document.getElementById("toastContainer");
+
+        // --- Mobile nav toggle ---
+        const navToggle = document.getElementById("navToggle");
+        const navLinks = document.getElementById("navLinks");
+
+        if (navToggle && navLinks) {
+            navToggle.addEventListener("click", function () {
+                const isOpen = navLinks.classList.toggle("is-open");
+                navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+                navToggle.innerHTML = isOpen
+                    ? '<i class="fas fa-xmark"></i>'
+                    : '<i class="fas fa-bars"></i>';
+            });
+
+            // Close menu when a link inside is clicked (mobile UX)
+            navLinks.querySelectorAll("a").forEach(function (link) {
+                link.addEventListener("click", function () {
+                    if (navLinks.classList.contains("is-open")) {
+                        navLinks.classList.remove("is-open");
+                        navToggle.setAttribute("aria-expanded", "false");
+                        navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                });
+            });
+        }
+
+        if (!form || !submitBtn) return;
+
+        // --- CSRF helper ---
+        function getCsrfToken() {
+            const input = form.querySelector("input[name='csrfmiddlewaretoken']");
+            if (input && input.value) return input.value;
+
+            const name = "csrftoken";
+            const cookies = document.cookie ? document.cookie.split(";") : [];
+            for (let i = 0; i < cookies.length; i++) {
+                const c = cookies[i].trim();
+                if (c.substring(0, name.length + 1) === name + "=") {
+                    return decodeURIComponent(c.substring(name.length + 1));
+                }
+            }
+            return "";
+        }
+
+        // --- Toast system ---
+        function showToast(type, title, message, timeout) {
+            timeout = (typeof timeout === "number") ? timeout : TOAST_TIMEOUT;
+
+            const toast = document.createElement("div");
+            toast.className = "toast toast-" + type;
+            toast.setAttribute("role", "alert");
+
+            const iconClass = type === "success" ? "fa-circle-check"
+                            : type === "error"   ? "fa-circle-exclamation"
+                                                 : "fa-circle-info";
+
+            toast.innerHTML =
+                '<div class="toast-icon"><i class="fas ' + iconClass + '"></i></div>' +
+                '<div class="toast-body">' +
+                    '<div class="toast-title"></div>' +
+                    '<div class="toast-message"></div>' +
+                '</div>' +
+                '<button type="button" class="toast-close" aria-label="Close">' +
+                    '<i class="fas fa-xmark"></i>' +
+                '</button>';
+
+            toast.querySelector(".toast-title").textContent = title || "";
+            toast.querySelector(".toast-message").textContent = message || "";
+
+            toastContainer.appendChild(toast);
+
+            let hideTimer = null;
+            let removeTimer = null;
+
+            function dismiss() {
+                if (hideTimer) clearTimeout(hideTimer);
+                toast.classList.add("toast-hide");
+                removeTimer = setTimeout(function () {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, TOAST_FADE_DURATION);
+            }
+
+            toast.querySelector(".toast-close").addEventListener("click", dismiss);
+
+            if (timeout > 0) {
+                hideTimer = setTimeout(dismiss, timeout);
+            }
+
+            return toast;
+        }
+
+        // --- Inline error rendering ---
+        function clearErrors() {
+            form.querySelectorAll(".errorlist").forEach(function (ul) {
+                ul.innerHTML = "";
+                ul.hidden = true;
+            });
+            form.querySelectorAll(".is-invalid").forEach(function (el) {
+                el.classList.remove("is-invalid");
+            });
+        }
+
+        function renderErrors(errors) {
+            let hasFieldError = false;
+
+            Object.keys(errors).forEach(function (field) {
+                const listEl = form.querySelector('[data-error-for="' + field + '"]');
+                const inputEl = form.querySelector('[name="' + field + '"]');
+
+                let messages = errors[field];
+                if (!Array.isArray(messages)) messages = [String(messages)];
+
+                if (listEl) {
+                    listEl.innerHTML = "";
+                    messages.forEach(function (msg) {
+                        const li = document.createElement("li");
+                        li.textContent = msg;
+                        listEl.appendChild(li);
+                    });
+                    listEl.hidden = false;
+                    hasFieldError = true;
+                }
+                if (inputEl) inputEl.classList.add("is-invalid");
+            });
+
+            return hasFieldError;
+        }
+
+        // --- Loading state ---
+        function setLoading(isLoading) {
+            if (isLoading) {
+                submitBtn.disabled = true;
+                submitBtn.querySelector(".btn-label").innerHTML =
+                    '<span class="spinner"></span> Sending...';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.querySelector(".btn-label").innerHTML =
+                    '<i class="fas fa-paper-plane"></i> Send Message';
+            }
+        }
+
+        // --- Submit handler ---
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            clearErrors();
+
+            const formData = new FormData(form);
+            const payload = {
+                name: (formData.get("name") || "").trim(),
+                email: (formData.get("email") || "").trim(),
+                subject: (formData.get("subject") || "").trim(),
+                message: (formData.get("message") || "").trim()
+            };
+
+            setLoading(true);
+
+            fetch(MESSAGE_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRFToken": getCsrfToken(),
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify(payload),
+                credentials: "same-origin"
+            })
+            .then(function (response) {
+                return response.json()
+                    .catch(function () { return {}; })
+                    .then(function (data) {
+                        return { ok: response.ok, status: response.status, data: data };
+                    });
+            })
+            .then(function (result) {
+                if (result.ok) {
+                    form.reset();
+
+                    showToast(
+                        "success",
+                        "Email sent",
+                        "Thanks! Your message has been sent — I'll get back to you soon."
+                    );
+                } else {
+                    let handled = false;
+
+                    if (result.data && typeof result.data === "object") {
+                        handled = renderErrors(result.data);
+                    }
+
+                    let detail = "Something went wrong. Please try again.";
+                    if (result.data && result.data.detail) detail = result.data.detail;
+                    if (result.status === 429) detail = "Too many requests — please wait a moment and try again.";
+
+                    if (!handled) {
+                        showToast("error", "Could not send message", detail);
+                    } else {
+                        showToast("error", "Please check the form", "Fix the highlighted fields and try again.");
+                    }
+                }
+            })
+            .catch(function (err) {
+                console.error("[contact] network error:", err);
+                showToast(
+                    "error",
+                    "Network error",
+                    "Could not reach the server. Please check your connection and try again."
+                );
+            })
+            .finally(function () {
+                setLoading(false);
+            });
+        });
+    })();
+    </script>
+
+</body>
+</html>

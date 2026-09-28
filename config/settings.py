@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "shipping",
     "payment",
     "collection",
+    "landing",
     # third party
     "treebeard",
     "rest_framework",
@@ -161,9 +162,13 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 LOGIN_REDIRECT_URL = "catalog:home"
 LOGOUT_REDIRECT_URL = "catalog:home"
-
+LOGIN_URL = "account:login"
 
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
 FRONTEND_URL = config("FRONTEND_URL")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+
+
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+HOST_ASYNC_ABILITY = config("HOST_ASYNC_ABILITY", cast=bool)
