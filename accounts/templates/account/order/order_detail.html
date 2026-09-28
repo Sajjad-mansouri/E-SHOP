@@ -22,14 +22,20 @@
             </p>
         </div>
 
-        {% if can_retry_payment %}
+        {% if payment_action %}
         <button
             type="button"
             class="btn-retry-payment"
             id="retry-payment-btn"
             data-order-id="{{ order.pk }}"
         >
-            Retry Payment
+            {% if payment_action == "continue" %}
+                Continue Payment
+            {% elif payment_action == "retry" %}
+                Retry Payment
+            {% else %}
+                Pay Now
+            {% endif %}
         </button>
         {% endif %}
     </div>

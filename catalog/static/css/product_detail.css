@@ -609,3 +609,30 @@ color:#c93737;
 .unlike.selected{
   color: red;
 }
+
+
+
+.price-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stock-status {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.stock-available {
+  color: #218739;
+}
+
+.stock-low {
+  color: #d97706;
+}
+
+.stock-out {
+  color: #d32f2f;
+}

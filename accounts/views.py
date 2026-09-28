@@ -260,15 +260,19 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         latest_payment = payments[0] if payments else None
 
         context["latest_payment"] = latest_payment
-        context["can_retry_payment"] = (
-            self.object.status == Order.STATUS_PENDING
-            and latest_payment is not None
-            and latest_payment.status
-            in {
+
+        context["payment_action"] = None
+
+        if self.object.status == Order.STATUS_PENDING:
+            if latest_payment is None:
+                context["payment_action"] = "pay"
+            elif latest_payment.status == Payment.Status.PENDING:
+                context["payment_action"] = "continue"
+            elif latest_payment.status in {
                 Payment.Status.FAILED,
                 Payment.Status.CANCELLED,
-            }
-        )
+            }:
+                context["payment_action"] = "retry"
 
         return context
 

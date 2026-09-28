@@ -54,8 +54,40 @@
 
     <div class="price-block">
       <span class="current-price">{{stock_record.output_display_final_price}}</span>
-      {%if record.has_dicounted%}<span class="old-price">${{stock_record.price}}</span>
-      <span class="discount-badge">-{{stock_record.get_discount}}%</span>{%endif%}
+
+      {%if stock_record.has_dicounted%}
+        <span class="old-price">${{stock_record.price}}</span>
+        <span class="discount-badge">-{{stock_record.get_discount}}%</span>
+      {%endif%}
+
+      <!-- STOCK AVAILABILITY -->
+      <div class="stock-status">
+        {%if stock_record.num_in_stock is None%}
+
+          <span class="stock-available">
+            In stock
+          </span>
+
+        {%elif stock_record.num_in_stock > 0%}
+
+          {%if stock_record.num_in_stock <= 5%}
+            <span class="stock-low">
+              Only {{stock_record.num_in_stock}} left in stock
+            </span>
+          {%else%}
+            <span class="stock-available">
+              {{stock_record.num_in_stock}} available
+            </span>
+          {%endif%}
+
+        {%else%}
+
+          <span class="stock-out">
+            Out of stock
+          </span>
+
+        {%endif%}
+      </div>
     </div>
 
 
@@ -81,7 +113,7 @@
         {% is_bookmarked stock_record as is_bookmarked%}
         <button class="btn-secondary" id="cart" data-cart="{{is_bookmarked}}" >
           <svg class="icon" viewBox="0 0 24 24">
-            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
+            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
           </svg>
           <span>
             {%if is_bookmarked%}
@@ -95,7 +127,7 @@
       {%else%}
         <button class="btn-secondary" onclick="openAuthModal()" >
           <svg class="icon" viewBox="0 0 24 24">
-            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
+            <path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 1.99-.9 1.99-2-.89-2-1.99-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/>
           </svg>
           <span>Add to Cart</span>
         </button>
@@ -266,74 +298,80 @@
 
   // wishlist button toggle
   const wishlistBtn = document.getElementById('wishlistBtn');
-  wishlistBtn.addEventListener('click', async function(e) {
-    e.preventDefault();
-    const wishType = wishlistBtn.dataset.wish;
-    const stock = "{{stock_record.id}}"
-    let url = "{%url 'wishlist:wishlist'%}"
-    const formData = new FormData()
-    formData.append('stock',stock)
-    formData.append('funcType', wishType)
 
-    const icon = this.querySelector('svg');
-    const path = icon.querySelector('path');
-    const span = this.querySelector("span")
-    const data = await postFetch(url, formData, "json")
-    console.log(data)
-    if(data.status==true){
-      // Toggle between outlined and filled heart
-      if (wishType=="add") {
-            // Change to filled heart
-            path.setAttribute('d', 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
-            this.classList.remove("remove");
-            this.classList.add("add")
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const wishType = wishlistBtn.dataset.wish;
+      const stock = "{{stock_record.id}}"
+      let url = "{%url 'wishlist:wishlist'%}"
+      const formData = new FormData()
+      formData.append('stock',stock)
+      formData.append('funcType', wishType)
 
-            span.innerText = "Remove from Wishlist"
-            wishlistBtn.setAttribute("data-wish", "remove")
-      } else if(wishType == "remove") {
-            // Change back to outlined heart
-            path.setAttribute('d', 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z');
-            this.classList.remove("add");
-            this.classList.add("remove")
-            span.innerText = "Add to Wishlist"
-            wishlistBtn.setAttribute("data-wish", "add")
+      const icon = this.querySelector('svg');
+      const path = icon.querySelector('path');
+      const span = this.querySelector("span")
+      const data = await postFetch(url, formData, "json")
+      console.log(data)
+      if(data.status==true){
+        // Toggle between outlined and filled heart
+        if (wishType=="add") {
+              // Change to filled heart
+              path.setAttribute('d', 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+              this.classList.remove("remove");
+              this.classList.add("add")
+
+              span.innerText = "Remove from Wishlist"
+              wishlistBtn.setAttribute("data-wish", "remove")
+        } else if(wishType == "remove") {
+              // Change back to outlined heart
+              path.setAttribute('d', 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 5 16.5 5zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z');
+              this.classList.remove("add");
+              this.classList.add("remove")
+              span.innerText = "Add to Wishlist"
+              wishlistBtn.setAttribute("data-wish", "add")
+        }
+
       }
-
-    }
-  });
+    });
+  }
 
   const cart = document.getElementById('cart');
-  cart.addEventListener("click", async function(){
-    const isInCart = this.dataset.cart;
-    const span = this.querySelector("span");
-    const formData = new FormData()
-    const cartCountSpan = document.querySelector('.cart-count');
-    console.log(isInCart)
-    if (isInCart=="True"){
-      url = "{%url 'cart:remove_cart_item'%}"
-      nextBtnText = "Add to Cart";
-    }else{
-       url = "{%url 'cart:add_cart_item'%}"
-       nextBtnText = "Remove from Cart";
-    }
 
-    formData.append('stock',"{{stock_record.id}}")
-    const data = await postFetch(url, formData, "json")
-
-    if(data.status==true){
-      if(data.type=="add"){
-        span.innerText = nextBtnText
-        this.setAttribute("data-cart", "True")
-        cartCountSpan.innerText = Number(cartCountSpan.innerText) + 1
-
-      }else if(data.type =="remove"){
-        span.innerText = nextBtnText
-        this.setAttribute("data-cart", "False")
-        cartCountSpan.innerText = Number(cartCountSpan.innerText) - 1
+  if (cart) {
+    cart.addEventListener("click", async function(){
+      const isInCart = this.dataset.cart;
+      const span = this.querySelector("span");
+      const formData = new FormData()
+      const cartCountSpan = document.querySelector('.cart-count');
+      console.log(isInCart)
+      if (isInCart=="True"){
+        url = "{%url 'cart:remove_cart_item'%}"
+        nextBtnText = "Add to Cart";
+      }else{
+         url = "{%url 'cart:add_cart_item'%}"
+         nextBtnText = "Remove from Cart";
       }
-    }
 
-  })
+      formData.append('stock',"{{stock_record.id}}")
+      const data = await postFetch(url, formData, "json")
+
+      if(data.status==true){
+        if(data.type=="add"){
+          span.innerText = nextBtnText
+          this.setAttribute("data-cart", "True")
+          cartCountSpan.innerText = Number(cartCountSpan.innerText) + 1
+
+        }else if(data.type =="remove"){
+          span.innerText = nextBtnText
+          this.setAttribute("data-cart", "False")
+          cartCountSpan.innerText = Number(cartCountSpan.innerText) - 1
+        }
+      }
+
+    })
+  }
 
   async function postFetch(url, formData, responseType){
     let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -438,7 +476,11 @@
   });
 
   // Write review button
-  document.getElementById('writeReviewBtn').addEventListener('click', openModal);
+  const writeReviewBtn = document.getElementById('writeReviewBtn');
+
+  if (writeReviewBtn) {
+    writeReviewBtn.addEventListener('click', openModal);
+  }
 
   // Edit review
   function editReview(reviewId) {
@@ -541,8 +583,7 @@
         const starsContainer = reviewItem.querySelector('.comment-stars');
         starsContainer.innerHTML = '';
         for (let i = 0; i < currentRating; i++) {
-          const star = document
-                    const starSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const starSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           starSvg.setAttribute('class', 'icon');
           starSvg.setAttribute('viewBox', '0 0 24 24');
           const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -652,13 +693,14 @@
       }
     }
   });
-function openAuthModal() {
-  document.getElementById("authRequiredModal").style.display = "flex";
-}
 
-function closeAuthModal() {
-  document.getElementById("authRequiredModal").style.display = "none";
-}
+  function openAuthModal() {
+    document.getElementById("authRequiredModal").style.display = "flex";
+  }
+
+  function closeAuthModal() {
+    document.getElementById("authRequiredModal").style.display = "none";
+  }
 
   function Login(){
     window.location.href = "{%url 'account:login'%}" + `?next=` + "{{request.path}}"
