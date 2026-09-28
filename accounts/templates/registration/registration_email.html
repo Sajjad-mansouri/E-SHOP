@@ -1,20 +1,343 @@
-{% load i18n %}{% autoescape off %}
-{% translate "Hi" %}
-{% blocktranslate %}Thank you for signing up at {{ site_name }}!{% endblocktranslate %}
+{% load i18n %}
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 
-{% blocktranslate %}To complete your registration and activate your account, please verify your email address by clicking the link below:{% endblocktranslate %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>{% translate "Verify your email" %} | E‑SHOP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+    /* Base resets */
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
 
-{{ protocol }}://{{ domain }}{% url 'account:register-confirm' uidb64=uid token=token %}
+    table {
+        border-collapse: collapse;
+    }
 
-{% blocktranslate %}
-If you didn’t create an account with us, you can safely ignore this message.
-If you have any questions, our support team is here to help.
-Thank you,
+    img {
+        border: 0;
+        display: block;
+        max-width: 100%;
+    }
 
-{{ site_name }} Support Team
-{% endblocktranslate %}
+    a {
+        text-decoration: none;
+    }
 
+    .wrapper {
+        width: 100%;
+        background: #f4f4f4;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
 
+    .card {
+        width: 600px;
+        max-width: 600px;
+        background: #ffffff;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+    }
 
+    .hero {
+        background: linear-gradient(135deg, #ff3366 0%, #ff9966 100%);
+        padding: 50px 40px;
+        text-align: center;
+    }
 
+    .brand-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 20px;
+    }
+
+    .brand-logo i {
+        font-size: 40px;
+        color: #ffffff;
+        margin-right: 8px;
+    }
+
+    .brand-name {
+        font-size: 32px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-name span {
+        color: #1a1a1a;
+    }
+
+    .hero-title {
+        color: #ffffff;
+        font-size: 30px;
+        font-weight: 700;
+        margin: 18px 0 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .content {
+        padding: 42px 46px;
+    }
+
+    .button {
+        display: inline-block;
+        background: linear-gradient(135deg, #ef4056 0%, #d32f2f 100%);
+        color: #ffffff !important;
+        padding: 16px 38px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(239, 64, 86, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    .button:hover {
+        box-shadow: 0 6px 18px rgba(239, 64, 86, 0.45);
+        transform: translateY(-1px);
+    }
+
+    .info-box {
+        background: #fff5f6;
+        border-left: 4px solid #ef4056;
+        padding: 18px 20px;
+        border-radius: 8px;
+    }
+
+    .security-notice {
+        background: #fef2f2;
+        border-left: 4px solid #d32f2f;
+        padding: 18px 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .perks {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin: 24px 0;
+        border: 1px solid #e0e0e0;
+    }
+
+    .perks ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #444;
+        font-size: 14px;
+        line-height: 2;
+    }
+
+    .perks ul li::marker {
+        color: #ef4056;
+    }
+
+    .footer {
+        background: #fafafa;
+        border-top: 1px solid #ececec;
+        text-align: center;
+        padding: 28px 24px;
+        color: #7a7a7a;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .footer-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #ef4056;
+        font-weight: 700;
+    }
+
+    .footer-brand i {
+        font-size: 16px;
+    }
+
+    @media only screen and (max-width: 640px) {
+        .card {
+            width: 100% !important;
+            border-radius: 0;
+        }
+
+        .hero {
+            padding: 40px 24px;
+        }
+
+        .content {
+            padding: 32px 22px;
+        }
+
+        .hero-title {
+            font-size: 26px;
+        }
+
+        .brand-logo i {
+            font-size: 32px;
+        }
+
+        .brand-name {
+            font-size: 24px;
+        }
+
+        .button {
+            display: block;
+            text-align: center;
+            padding: 16px 20px;
+        }
+    }
+    </style>
+</head>
+
+<body>
+    <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Main Card -->
+                <table class="card" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+                    <!-- Hero -->
+                    <tr>
+                        <td class="hero">
+                            <div class="brand-logo">
+                                <i class="fas fa-bag-shopping"></i>
+                                <span class="brand-name">E‑<span>SHOP</span></span>
+                            </div>
+                            <h1 class="hero-title" style="margin-top:28px;">
+                                {% translate "Verify Your Email Address" %}
+                            </h1>
+                            <p class="hero-subtitle">
+                                {% translate "You're one click away from unlocking your shopping experience." %}
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Body Content -->
+                    <tr>
+                        <td class="content">
+                            <p style="margin:0 0 18px; font-size:16px; color:#1a1a1a; line-height:1.8;">
+                                {% blocktranslate %}
+                                Hello and welcome to <strong>E‑SHOP</strong>!
+                                {% endblocktranslate %}
+                            </p>
+                            <p style="margin:0 0 22px; font-size:15px; color:#444; line-height:1.8;">
+                                {% blocktranslate %}
+                                Thank you for creating an account with us. Before you can start shopping, track your orders, and enjoy exclusive member-only deals, please verify your email address by clicking the button below.
+                                {% endblocktranslate %}
+                            </p>
+                            <div class="perks">
+                                <p style="margin:0 0 10px; font-weight:600; font-size:14px; color:#ef4056;">
+                                    <i class="fas fa-gift" style="margin-right: 6px;"></i>
+                                    {% translate "What you'll unlock once verified:" %}
+                                </p>
+                                <ul>
+                                    <li>{% translate "Fast and secure checkout" %}</li>
+                                    <li>{% translate "Saved wishlists and addresses" %}</li>
+                                </ul>
+                            </div>
+                            <div style="text-align:center; margin:36px 0 32px;">
+                                <a href="{{ protocol }}://{{ domain }}{% url 'account:register-confirm' uidb64=uid token=token %}" class="button" title="{% translate 'Verify Email Address' %}">
+                                    <i class="fas fa-envelope-circle-check" style="margin-right: 8px;"></i>
+                                    {% translate "Confirm My Email" %}
+                                </a>
+                            </div>
+                            <div class="info-box">
+                                <p style="margin:0 0 8px; font-weight:600; font-size:14px; color:#1a1a1a;">
+                                    <i class="fas fa-link" style="margin-right: 6px; color:#ef4056;"></i>
+                                    {% translate "Can't click the button?" %}
+                                </p>
+                                <p style="margin:0 0 12px; font-size:14px; color:#6b7280;">
+                                    {% translate "Copy and paste this link into your browser:" %}
+                                </p>
+                                <p style="margin:0; font-size:13px; font-family: Consolas, Monaco, 'Courier New', monospace; word-break:break-all; color:#ef4056;">
+                                    {{ protocol }}://{{ domain }}{% url 'account:register-confirm' uidb64=uid token=token %}
+                                </p>
+                            </div>
+                            <div class="security-notice">
+                                <p style="margin:0 0 8px; font-weight:600; font-size:14px; color:#991b1b;">
+                                    <i class="fas fa-shield-halved" style="margin-right: 6px;"></i>
+                                    {% translate "Security Notice" %}
+                                </p>
+                                <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.8;">
+                                    {% blocktranslate %}
+                                    If you didn't create an account on {{ site_name }}, please ignore this email. No account will be activated without email verification.
+                                    {% endblocktranslate %}
+                                </p>
+                            </div>
+                            <hr style="margin:36px 0; border:none; border-top:1px solid #ececec;">
+                            <!-- Signature -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+                                <tr>
+                                    <td>
+                                        <p style="margin:0; font-size:15px; color:#444; font-weight:600;">
+                                            {% translate "Happy shopping," %}
+                                        </p>
+                                        <p style="margin:10px 0 2px; font-size:18px; font-weight:700; color:#1a1a1a;">
+                                            {{ developer_name|default:'Sajjad Mansouri' }}
+                                        </p>
+                                        <p style="margin:0 0 16px; font-size:14px; color:#6b7280;">
+                                            {% translate "Backend Developer & Creator of E‑SHOP" %}
+                                        </p>
+                                        <p style="margin:0;">
+                                            <a href="{{ protocol }}://{{ domain }}" style="color:#ef4056; font-weight:600;">
+                                                <i class="fas fa-bag-shopping" style="margin-right: 6px;"></i>
+                                                {{ site_name }}
+                                            </a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer">
+                            <p style="margin:0 0 8px;">
+                                {% translate "This is an automated message – please do not reply to this email." %}
+                            </p>
+                            <p style="margin:0 0 12px;">
+                                <span class="footer-brand">
+                                    <i class="fas fa-bag-shopping"></i>
+                                    E‑SHOP
+                                </span>
+                            </p>
+                            <p style="margin:0;">
+                                &copy; {% now "Y" %} {{ site_name }}. {% translate "All rights reserved." %}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding:22px 20px; text-align:center;">
+                            <p style="margin:0; font-size:12px; color:#9ca3af;">
+                                {% translate "Thank you for joining E‑SHOP – happy shopping!" %}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
 {% endautoescape %}

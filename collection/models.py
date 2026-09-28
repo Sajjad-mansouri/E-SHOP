@@ -51,7 +51,6 @@ class ProductList(AbstractList):
         ProductClass, verbose_name=_("product classes"), blank=True
     )
 
-    @property
     def get_stocks(self):
         # included_products
         # excluded_products

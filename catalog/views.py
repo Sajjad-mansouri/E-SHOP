@@ -137,7 +137,7 @@ class CategoryProducts(
     model = StockRecord
     template_name = "catalog/category/products.html"
     AJAX_template_name = "catalog/category/_products.html"
-    paginate_by = 1
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -365,7 +365,7 @@ class OfferProductListView(
     model = Offer
     template_name = "catalog/offer/products.html"
     AJAX_template_name = "catalog/offer/_products.html"
-    paginate_by = 4
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -459,7 +459,7 @@ class ProductGroupListView(
     model = ProductList
     template_name = "catalog/collection/product_group/products.html"
     AJAX_template_name = "catalog/collection/product_group/_products.html"
-    paginate_by = 4
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -513,7 +513,7 @@ class SearchView(
     model = StockRecord
     template_name = "catalog/search/products.html"
     AJAX_template_name = "catalog/search/_products.html"
-    paginate_by = 4
+    paginate_by = 20
 
     def get_queryset(self):
         stocks = super().get_queryset().filter(status="public")

@@ -75,12 +75,12 @@ class UserRegistrationForm(UserCreationForm):
         self,
         domain_override=None,
         subject_template_name="registration/registration_subject.txt",
-        email_template_name="registration/registration_email.html",
+        email_template_name="registration/registration_email.txt",
         use_https=False,
         token_generator=default_token_generator,
         from_email=None,
         request=None,
-        html_email_template_name=None,
+        html_email_template_name="registration/registration_email.html",
         extra_email_context=None,
     ):
         """
@@ -123,12 +123,14 @@ class UserRegistrationForm(UserCreationForm):
 
     def save(self, commit=True, **opts):
         user = super().save(commit=False)
+
         user.is_active = False
         user.username = user.email
         user.user_type = "customer"
         user.save()
 
         self._save(**opts)
+
         return user
 
 

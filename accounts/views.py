@@ -41,11 +41,11 @@ class PasswordContextMixin:
 
 
 class RegistrationView(CreateView):
-    email_template_name = "registration/registration_email.html"
+    email_template_name = "registration/registration_email.txt"
     extra_email_context = None
     form_class = UserRegistrationForm
     from_email = None
-    html_email_template_name = None
+    html_email_template_name = "registration/registration_email.html"
     subject_template_name = "registration/registration_subject.txt"
     success_url = reverse_lazy("account:registration_done")
     template_name = "registration/register.html"
@@ -63,9 +63,10 @@ class RegistrationView(CreateView):
             "html_email_template_name": self.html_email_template_name,
             "extra_email_context": self.extra_email_context,
         }
-        form.save(**opts)
+        self.object = form.save(**opts)
         self.request.session["email"] = form.cleaned_data["email"]
-        return super().form_valid(form)
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class RegistrationDoneView(PasswordContextMixin, TemplateView):
@@ -335,14 +336,15 @@ class LoginView(auth_views.LoginView):
 
 class PasswordResetView(auth_views.PasswordResetView):
     template_name = "registration/pass_reset_form.html"
-    email_template_name = "registration/pass_reset_email.html"
+    email_template_name = "registration/pass_reset_email.txt"
+    html_email_template_name = "registration/pass_reset_email.html"
     subject_template_name = "registration/pass_reset_subject.txt"
     success_url = reverse_lazy("account:password_reset_done")
 
     def form_valid(self, form):
         email = form.cleaned_data["email"]
         self.request.session["email"] = email
-        print(self.request.session.get("email"))
+
         return super().form_valid(form)
 
 
