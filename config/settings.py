@@ -98,8 +98,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": config("ENGINE"),
-        "NAME": config("NAME"),
+        "ENGINE": config("DATABASAE_ENGINE"),
+        "NAME": config("DATABASAE_NAME"),
+        "USER": config("DATABASAE_USER"),
+        "PASSWORD": config("DATABASAE_PASSWORD"),
+        "HOST": config("DATABASAE_HOST"),
+        "PORT": config("DATABASAE_PORT"),
     }
 }
 
@@ -140,6 +144,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = "static"
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
