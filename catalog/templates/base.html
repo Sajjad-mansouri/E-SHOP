@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <title>E‑SHOP {%block title%} {%endblock%}</title>
-<link rel="icon" href="{% static 'favicon/favicon.ico' %}" sizes="any">
+  <link rel="icon" href="{% static 'favicon/favicon.ico' %}" sizes="any">
   <link rel="stylesheet" type="text/css" href="{%static 'css/base_style.css'%}">
   {%block style%}{%endblock%}
 
@@ -17,7 +17,7 @@
 <!-- HEADER with refined admin/logout block -->
 <header>
   <div class="header-container">
-    <a href="{%url 'catalog:home'%}" class="logo">E‑<span>SHOP</span></a>
+    <a href="{%url 'landing:home'%}" class="logo">E‑<span>SHOP</span></a>
 
     <div class="search-box">
       <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -89,16 +89,7 @@
 
 
     <footer class="footer">
-        <div class="footer-links">
-            <a href="#" class="footer-link">About</a>
-            <a href="#" class="footer-link">Contact</a>
-            <a href="#" class="footer-link">LinkedIn</a>
-            <a href="#" class="footer-link">GitHub</a>
-            <a href="#" class="footer-link">Portfolio</a>
 
-
-
-        </div>
         <p class="copyright">&copy; 2026 E-SHOP. All rights reserved.</p>
     </footer>
 
@@ -109,12 +100,23 @@
 const input = document.querySelector('.search-box input');
 const resultsBox = document.querySelector('.search-results');
 
+// Helper: hide/show the category navbar while search results are open
+function hideNavbar() {
+  const nav = document.querySelector('.nav-bar');
+  if (nav) nav.style.display = 'none';
+}
+function showNavbar() {
+  const nav = document.querySelector('.nav-bar');
+  if (nav) nav.style.display = '';
+}
+
 input.addEventListener('input', async function () {
   const query = this.value.trim().toLowerCase();
 
   if (!query) {
     resultsBox.style.display = 'none';
     resultsBox.innerHTML = "";
+    showNavbar();
     return;
   }
 
@@ -137,8 +139,9 @@ input.addEventListener('input', async function () {
     }
 
     resultsBox.style.display = 'block';
+    hideNavbar();
   }catch(error){
-
+    showNavbar();
   }
 });
 
@@ -173,8 +176,20 @@ async function getSearchResult(query){
 document.addEventListener('click', e => {
   if (!document.querySelector('.search-box').contains(e.target)) {
     resultsBox.style.display = 'none';
+    showNavbar();
   }
 });
+
+// Also restore navbar when input is cleared or loses focus via ESC
+input.addEventListener('blur', () => {
+  // Small delay so a click on a result can register first
+  setTimeout(() => {
+    if (resultsBox.style.display !== 'block') {
+      showNavbar();
+    }
+  }, 150);
+});
+
 function logOut(){
   const form = document.getElementById("logout-form");
   form.submit()

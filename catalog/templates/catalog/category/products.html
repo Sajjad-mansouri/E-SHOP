@@ -13,19 +13,19 @@
 {% get_product_breadcrumb '' category%}
 <!-- MAIN CONTENT -->
 <div class="category-container">
+
+  <!-- Mobile filter drawer toggle (hidden) -->
+  <input type="checkbox" id="filterDrawerToggle" class="filter-drawer-toggle" hidden>
+
+  <!-- Overlay — closes drawer when clicked -->
+  <label for="filterDrawerToggle" class="filter-overlay" aria-hidden="true"></label>
+
   <!-- FILTER SIDEBAR -->
   {%include 'catalog/category/_filter.html'%}
 
-
   <!-- PRODUCTS SECTION -->
   <main class="products-section">
-
-
-
-      {%include 'catalog/category/_products.html'%}
-
-
-
+    {%include 'catalog/category/_products.html'%}
   </main>
 </div>
 

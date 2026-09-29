@@ -1,6 +1,14 @@
 {%load catalog_tags%}
     <div class="products-header">
       <div class="products-count" id="productCount">{{paginator.count}} products exists</div>
+      <label for="filterDrawerToggle" class="filter-open-btn" aria-label="Open filters">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="7" y1="12" x2="17" y2="12"></line>
+          <line x1="10" y1="18" x2="14" y2="18"></line>
+        </svg>
+        <span>Filters</span>
+      </label>
       <div class="sort-container">
         <span class="sort-label">Sort by:</span>
         <select class="sort-select" id="sortSelect" onchange="sortProduct()">

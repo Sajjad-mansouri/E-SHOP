@@ -143,15 +143,43 @@ def is_selected_ordering(context, sort_by):
         return "selected"
 
 
-@register.inclusion_tag("catalog/partial/_navbar.html")
-def get_navbar():
-    categories = Category.objects.all()
-    root_categories = []
-    for category in categories:
-        if category.is_root():
-            root_categories.append(category)
+@register.inclusion_tag("catalog/partial/_navbar.html", takes_context=True)
+def get_navbar(context):
+    request = context.get("request")
+
+    current_slug = None
+    if (
+        request
+        and request.resolver_match
+        and request.resolver_match.url_name == "category_products"
+    ):
+        current_slug = request.resolver_match.kwargs.get("slug")
+
+    active_slugs = set()
+    active_root_slug = None
+
+    if current_slug:
+        try:
+            current = Category.objects.get(slug=current_slug)
+
+            for node in current.get_ancestors():
+                active_slugs.add(node.slug)
+            active_slugs.add(current.slug)
+
+            root = current.get_root()
+            active_root_slug = root.slug
+            active_slugs.add(root.slug)
+
+        except Category.DoesNotExist:
+            pass
+
+    categories = Category.get_root_nodes()
+
     return {
-        "categories": root_categories,
+        "categories": categories,
+        "active_slugs": active_slugs,
+        "active_root_slug": active_root_slug,
+        "request": request,
     }
 
 
