@@ -1,6 +1,8 @@
 {%extends 'base.html'%}
 {%load static catalog_tags%}
-
+ {%block title%}
+ - {{object.name}} OFFERS
+ {%endblock%}
 {%block style%}
 <link rel="stylesheet" type="text/css" href="{%static 'css/category_products.css'%}">
 {%endblock%}

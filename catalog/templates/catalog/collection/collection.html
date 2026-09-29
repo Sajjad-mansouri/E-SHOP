@@ -1,5 +1,8 @@
 
 {%extends "base.html"%}
+ {%block title%}
+ - {{object.name}} Collection
+ {%endblock%}
 {% load static catalog_tags%}
   {%block style%}
   <link rel="stylesheet" type="text/css" href="{% static 'css/collection/collection.css'%}">

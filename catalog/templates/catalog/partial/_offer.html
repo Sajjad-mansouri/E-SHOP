@@ -15,7 +15,7 @@
     </div>
 
     <div class="offers-scroll">
-      {%for offer_application in offer_apps|slice:":2"%}
+      {%for offer_application in offer_apps|slice:":5"%}
 
         {%include 'catalog/category/_stock_card.html' with stock=offer_application.stock %}
       {%endfor%}

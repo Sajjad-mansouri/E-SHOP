@@ -1947,7 +1947,7 @@ class CollectionListView(
 
             for product_group in product_groups:
                 product_ids.update(
-                    product_group.get_stocks.values_list(
+                    product_group.get_stocks().values_list(
                         "product_id",
                         flat=True,
                     )

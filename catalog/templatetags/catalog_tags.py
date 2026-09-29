@@ -159,7 +159,6 @@ def get_navbar():
 def get_offer_apps(offer_name):
     q = Q(offer__status="active") & Q(offer__name=offer_name) & Q(is_accepted=True)
     offer_apps = OfferApplication.objects.filter(q)
-
     return {"offer_apps": offer_apps, "offer_name": offer_name}
 
 

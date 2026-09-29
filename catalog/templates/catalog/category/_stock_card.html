@@ -12,8 +12,8 @@
         <span class="current-price">${{stock.get_final_price}}</span>
         {%if stock.get_discount > 0%}
         <span class="old-price">${{stock.price}}</span>
-        <span class="discount-percent">Save ${{stock.save_with_discount}}</span></div>
+        <span class="discount-percent">Save ${{stock.save_with_discount}}</span>
         {%endif%}
-      <div class="product-rating">★{{stock.rating}} ({{stock.comments.count}})
-  </div>
+      </div>
+      <div class="product-rating">★{{stock.rating}} ({{stock.comments.count}})</div>
 </a>
