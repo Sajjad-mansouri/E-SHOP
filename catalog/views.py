@@ -112,7 +112,7 @@ class ProductDetailView(DetailView):
 
         stock_record = self.get_stock_record()
         ratings = self.get_product_ratings(stock_record)
-
+        print(context)
         context.update(
             {
                 "stock_record": stock_record,
