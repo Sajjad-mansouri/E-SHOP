@@ -276,7 +276,7 @@ confirmDeleteBtn.addEventListener("click",()=>{
   .then(data=>{
     if (data.status){
       let previewCard = document.querySelector(`.preview-card[data-id="${dataId}"]`)
-      console.log(previewCard)
+
       previewCard.remove()
       deleteModal.style.display = "none";
 

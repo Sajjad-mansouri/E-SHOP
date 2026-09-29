@@ -101,7 +101,7 @@
       try{
         const formData = new FormData()
         const data = await fetchPost(url, formData)
-        console.log(data)
+
         if(data.status){
           showError("Successfully Removed!", "success")
           applyFilters(null)
@@ -110,7 +110,7 @@
 
         }
       }catch(error){
-        console.log(error)
+
           showError("An unexpected error occurred. Please try again later.", "error")
 
       }

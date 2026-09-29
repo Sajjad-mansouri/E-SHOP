@@ -79,12 +79,12 @@
 
 	status.addEventListener("change", async()=>{
 		const value = event.target.value;
-		console.log(value)
+
 		update_customers("status", value)
 	})
 	sort.addEventListener("change", async()=>{
 		const value = event.target.value;
-		console.log(value)
+
 		update_customers("ordering", value)
 	})
 	async function update_customers(type, value){

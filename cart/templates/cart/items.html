@@ -124,7 +124,7 @@
         subtotal += total;
         originalTotal += price * qty;
       });
-      console.log(originalTotal)
+
       // const subtotal = Number(document.getElementById('subtotal').getAttribute("data-subtotal"));
       if(couponDiscount){
 
@@ -145,7 +145,7 @@
       const cartTable = document.querySelector('.cart-table');
 
 
-      console.log('cart item length',cartItems.length)
+
       if (cartItems.length === 0) {
         emptyCart.style.display = 'block';
         cartSummary.style.display = 'none';
@@ -238,7 +238,7 @@
       })
       .then(response=>response.json())
       .then(data=>{
-        console.log(data)
+
         if(data.is_valid==true){
 
           showMessage(`Coupon ${code} applied!`, "success",);

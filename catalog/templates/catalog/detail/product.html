@@ -313,7 +313,7 @@
       const path = icon.querySelector('path');
       const span = this.querySelector("span")
       const data = await postFetch(url, formData, "json")
-      console.log(data)
+
       if(data.status==true){
         // Toggle between outlined and filled heart
         if (wishType=="add") {
@@ -345,7 +345,7 @@
       const span = this.querySelector("span");
       const formData = new FormData()
       const cartCountSpan = document.querySelector('.cart-count');
-      console.log(isInCart)
+
       if (isInCart=="True"){
         url = "{%url 'cart:remove_cart_item'%}"
         nextBtnText = "Add to Cart";
@@ -385,7 +385,7 @@
                               },
                               body:formData
                             })
-      console.log(response)
+
       if (! response.ok){
         throw new Error("Http Error")
       }
@@ -551,7 +551,7 @@
 
     let url;
     let output;
-    console.log("currentReviewId",currentReviewId)
+
     if(isEditing){
        url = "{%url 'comment:update_review' 0%}"
        url = url.replace("0", currentReviewId)

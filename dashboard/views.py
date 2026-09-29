@@ -953,10 +953,7 @@ class FulfilmentStatistic(IsSellerMixin, TemplateView):
         """
         Calculate all status counts with one database query.
         """
-        print(
-            orders,
-            Order.objects.filter(items__stock__product__seller=self.request.user),
-        )
+
         statistics = orders.aggregate(
             total=Count("pk", distinct=True),
             processing=Count(
@@ -1061,21 +1058,7 @@ class CustomerListView(IsSellerMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(
-            "users",
-            self.get_queryset(),
-            "qs",
-            UserModel.objects.filter(
-                orders__items__stock__product__seller=self.request.user,
-            ).filter(
-                orders__status__in=[
-                    "pending",
-                    "processing",
-                    "shipped",
-                    "delivered",
-                ],
-            ),
-        )
+
         context["object_list"] = self.get_queryset()
         return context
 

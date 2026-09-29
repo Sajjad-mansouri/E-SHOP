@@ -248,7 +248,7 @@
   }
   function serializeFiltersToURL(page) {
     const params = new URLSearchParams();
-    console.log(filters)
+
     for (const [key, value] of Object.entries(filters)) {
       if(Array.isArray(value)){
         value.forEach(v => params.append(key, v));
@@ -263,7 +263,7 @@
       }
 
     }
-    console.log(params)
+
     let newURL;
     if(page){
       const filterParam = params.toString()

@@ -216,10 +216,10 @@ function showErrors(errors) {
 		    let html = "<ul>";
 
 		    Object.entries(errors).forEach(([field, msgs]) => {
-		      console.log(field, msgs)
+
 		        msgs.forEach(msg => {
 		            if (field === "__all__") {
-		              console.log(msg)
+
 		                html += `<li>${msg.message}</li>`;
 		            } else {
 		                html += `<li><strong>${field}</strong>: ${msg.message}</li>`;

@@ -72,7 +72,6 @@ def product_rating_count(context, product_id):
 
 @register.inclusion_tag("catalog/partial/_breadcrumb.html", takes_context=True)
 def get_product_breadcrumb(context, product=None, category=None):
-    print("breadcrumb", category)
     if product:
         category = product.category
     if category:

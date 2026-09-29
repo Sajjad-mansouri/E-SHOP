@@ -282,9 +282,8 @@ image_formset = inlineformset_factory(
 
 class StockRecordForm(forms.ModelForm):
     def __init__(self, *args, offer_discount=None, **kwargs):
-        print(kwargs)
         super().__init__(*args, **kwargs)
-        print(offer_discount)
+
         if offer_discount:
             self.fields["offer_discount"] = forms.FloatField(
                 widget=forms.NumberInput(attrs={"class": "form-control"})
